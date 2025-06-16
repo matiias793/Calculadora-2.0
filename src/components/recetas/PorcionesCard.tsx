@@ -21,7 +21,7 @@ const PorcionesCard = () => {
   useEffect(() => {
     if (!recetaOriginal) return;
     const total = counterChica * 0.67 + counterMediana + counterGrande * 1.33;
-    dispatch(setPorciones(Math.round(total * 10)));
+    dispatch(setPorciones(Math.round(total)));
     dispatch(setPorcionesTipo({ chica: counterChica, mediana: counterMediana, grande: counterGrande }));
     recalculate(total);
   }, [counterChica, counterMediana, counterGrande, unidadVolumen, unidadMasa, recetaOriginal]);
