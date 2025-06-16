@@ -5,16 +5,18 @@ import { exportRecetaToPDF } from '@/utils/exportToPDF';
 import { useAppSelector } from '@/store';
 
 const IngredientesCard = () => {
-  const porciones = useAppSelector((state) => state.receta.porciones);
   const recetaPorciones = useAppSelector((state) => state.receta.recetaPorciones);
-  const porcionesTipo = useAppSelector((state) => state.receta.porcionesTipo); // ✅ Agregado
+  const porcionesTipo = useAppSelector((state) => state.receta.porcionesTipo);
+
+  const totalPersonas = porcionesTipo.chica + porcionesTipo.mediana + porcionesTipo.grande;
 
   return (
     <div className="w-full flex flex-col overflow-hidden rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
       <div className="p-6">
         <h4 className="text-lg text-logoGreen font-bold">
-          Ingredientes (para {porciones} {porciones === 1 ? 'persona' : 'personas'})
+          Ingredientes (para {totalPersonas} {totalPersonas === 1 ? 'persona' : 'personas'})
         </h4>
+
         <table className="w-full table-auto text-md mt-7">
           <thead>
             <tr className="text-md">
@@ -74,7 +76,8 @@ const IngredientesCard = () => {
                   mediana: porcionesTipo.mediana,
                   grande: porcionesTipo.grande
                 },
-                recetaPorciones?.ingredients || []
+                recetaPorciones?.ingredients || [],
+                recetaPorciones?.variants || []
               )
             }
             className="flex items-center gap-2 bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-2 px-4 rounded"
@@ -83,7 +86,6 @@ const IngredientesCard = () => {
             Exportar PDF
           </button>
         </div>
-
       </div>
     </div>
   );
