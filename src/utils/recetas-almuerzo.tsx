@@ -509,3 +509,16 @@ export const recetasAlmuerzo =  {
         ]
     }
 }
+export const nombresRecetasAlmuerzo = [
+  'Budín de pescado',
+  'Cazuela de lentejas',
+  'Pollo colorido',
+  'Hamburguesas de lentejas',
+  // ...agregá todos los títulos reales que tengas
+];
+export const nombresAcompanamientos = [
+  'Puré de papas',
+  'Puré triple',
+  
+  // agregá todos los que uses
+];
