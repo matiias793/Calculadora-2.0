@@ -41,3 +41,19 @@ body {
   width: 100%;
   height: 100%;
 }
+
+/* Estilos para los selectores del menú semanal */
+select option {
+  color: black !important;
+  background-color: white !important;
+}
+
+select:focus option:checked {
+  color: black !important;
+  background-color: #e5e7eb !important;
+}
+
+select:focus option:hover {
+  color: black !important;
+  background-color: #f3f4f6 !important;
+}

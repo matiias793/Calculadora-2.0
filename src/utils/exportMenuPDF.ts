@@ -2,6 +2,109 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { recetasAlmuerzo } from '@/utils/recetas-almuerzo';
 
+// Orden específico de ingredientes para el PDF
+const ORDEN_INGREDIENTES = [
+  'Leche fluida',
+  'Leche en polvo',
+  'Atún',
+  'Carne de cerdo magra',
+  'Carne vacuna picada',
+  'Carne vacuna entera',
+  'Huevos',
+  'Milanesa de carne',
+  'Milanesa de pescado',
+  'Milanesa de pollo',
+  'Pescado',
+  'Pollo suprema',
+  'Aceite',
+  'Almidón de Maíz',
+  'Arroz',
+  'Arvejas',
+  'Avena',
+  'Choclo',
+  'Fideos',
+  'Lentejas',
+  'Porotos',
+  'Polenta',
+  'Polvo Crema',
+  'Flan',
+  'Pulpa tomate',
+  'Puré papas',
+  'Queso rallado',
+  'Queso fresco',
+  'Pasta fresca',
+  'Sal',
+  'Vinagre',
+  'Limón',
+  'Orégano',
+  'Pimentón',
+  'Comino',
+  'Ajo',
+  'Nuez moscada',
+  'Tomillo',
+  'Albahaca',
+  'Perejil',
+  'Ciboulette',
+  'Acelga',
+  'Espinaca',
+  'Zapallito',
+  'Berenjena',
+  'Brócoli',
+  'Cebolla',
+  'Chaucha',
+  'Lechuga',
+  'Morrón',
+  'Papa',
+  'Boniato',
+  'Repollo',
+  'Remolacha',
+  'Tomate',
+  'Zanahoria',
+  'Zapallo',
+  'Calabaza',
+  'Banana',
+  'Ciruela',
+  'Durazno',
+  'Frutilla',
+  'Melón',
+  'Sandía',
+  'Mandarina',
+  'Naranja',
+  'Manzana',
+  'Uva',
+  'Kiwi',
+  'Azúcar',
+  'Pan blanco',
+  'Pan integral',
+  'Ricota',
+  'Puerro',
+  'Apio',
+  'Laurel'
+];
+
+// Función para obtener el orden de un ingrediente
+function obtenerOrdenIngrediente(nombre: string): number {
+  const nombreNormalizado = nombre.toLowerCase().trim();
+  
+  // Buscar coincidencias exactas o parciales
+  for (let i = 0; i < ORDEN_INGREDIENTES.length; i++) {
+    const ingredienteOrden = ORDEN_INGREDIENTES[i].toLowerCase();
+    
+    // Coincidencia exacta
+    if (nombreNormalizado === ingredienteOrden) {
+      return i;
+    }
+    
+    // Coincidencia parcial (para casos como "carne vacuna" vs "carne vacuna picada")
+    if (nombreNormalizado.includes(ingredienteOrden) || ingredienteOrden.includes(nombreNormalizado)) {
+      return i;
+    }
+  }
+  
+  // Si no se encuentra, poner al final
+  return ORDEN_INGREDIENTES.length + 1;
+}
+
 declare module 'jspdf' {
   interface jsPDF {
     lastAutoTable?: { finalY: number };
@@ -91,10 +194,17 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
         theme: 'plain'
       });
 
+      // Ordenar ingredientes por día también
+      const ingredientesOrdenados = ingredientes.sort((a, b) => {
+        const ordenA = obtenerOrdenIngrediente(a[0] as string);
+        const ordenB = obtenerOrdenIngrediente(b[0] as string);
+        return ordenA - ordenB;
+      });
+
       autoTable(doc, {
         startY: (doc as any).lastAutoTable?.finalY + 2,
         head: [['Ingrediente', 'Cantidad', 'Unidad']],
-        body: ingredientes,
+        body: ingredientesOrdenados,
       });
     };
 
@@ -112,10 +222,16 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
     theme: 'plain',
   });
 
-  const totalIngredientesArray = Object.entries(acumuladorIngredientes).map(([clave, { cantidad, unidad }]) => {
-    const [nombre] = clave.split('-');
-    return [nombre, cantidad.toFixed(2), unidad];
-  });
+  const totalIngredientesArray = Object.entries(acumuladorIngredientes)
+    .map(([clave, { cantidad, unidad }]) => {
+      const [nombre] = clave.split('-');
+      return [nombre, cantidad.toFixed(2), unidad];
+    })
+    .sort((a, b) => {
+      const ordenA = obtenerOrdenIngrediente(a[0] as string);
+      const ordenB = obtenerOrdenIngrediente(b[0] as string);
+      return ordenA - ordenB;
+    });
 
   autoTable(doc, {
     startY: (doc as any).lastAutoTable?.finalY + 2,

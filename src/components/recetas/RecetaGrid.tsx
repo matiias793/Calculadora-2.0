@@ -121,7 +121,7 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
                 <div id="tab-1" role="tabpanel" className={`py-4 transition duration-400 ease-in-out ${tab === 1 ? 'block' : 'hidden'}`}>
                     <div className="flex flex-col md:flex-row my-10 gap-5 items-start mt-10">
                         <div className="flex flex-col md:w-1/3 gap-5 w-full">
-                            <PorcionesCard />
+                            <PorcionesCard isAlmuerzo={isAlmuerzo} />
                             <UnidadesCard />
                         </div>
                         <div className="flex flex-col md:w-2/3 gap-5 w-full">

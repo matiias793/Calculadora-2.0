@@ -510,15 +510,45 @@ export const recetasAlmuerzo =  {
     }
 }
 export const nombresRecetasAlmuerzo = [
+  'Bocaditos de pollo',
   'Budín de pescado',
+  'Carbonada criolla',
+  'Carne a la portuguesa',
   'Cazuela de lentejas',
+  'Chop suey de cerdo',
+  'Chupín de pescado y verduras',
+  'Croquetas de atún y papas',
+  'Ensalada completa de pollo',
+  'Ensalada completa de atún',
+  'Hamburguesa de pescado',
+  'Lasaña',
+  'Pan de Carne / Hamburguesa',
+  'Pasta sorpresa',
+  'Pasta con verdusalsa',
+  'Pastel de carne y papa',
   'Pollo colorido',
-  'Hamburguesas de lentejas',
-  // ...agregá todos los títulos reales que tengas
+  'Pastel de carne y berenjenas',
+  'Pollo con salsa blanca y verduras',
+  'Torta de carne y vegetales',
+  'Tortilla de papa, vegetales y pollo',
+  'Torta de atún',
+  'Arroz plato principal',
+  'Fideos plato principal'
 ];
+
 export const nombresAcompanamientos = [
+  'Arroz',
+  'Fideos',
+  'Arroz con vegetales salteados',
+  'Arroz amarillo',
+  'Ensalada de vegetales',
+  'Ensalada jardinera',
+  'Ensalada primavera',
+  'Ensalada de leguminosas y vegetales',
+  'Papas al natural',
   'Puré de papas',
   'Puré triple',
-  
-  // agregá todos los que uses
+  'Puré de papas instantáneo',
+  'Hortalizas asadas',
+  'Salsa blanca liviana'
 ];

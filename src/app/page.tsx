@@ -55,6 +55,15 @@ const options = [
     ),
     title: 'Planificación semanal',
     url: '/menu-semanal',
+  },
+  {
+    image: (
+      <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+        <span className="text-white text-4xl font-bold">⚙️</span>
+      </div>
+    ),
+    title: 'Otras funciones',
+    url: '/otras-funciones',
   }
 ];
 

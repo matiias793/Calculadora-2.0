@@ -55,16 +55,16 @@ const MenuSemanal = () => {
 
       {menu.map((item, index) => (
         <div key={item.dia} className="mb-4 border-b pb-4">
-          <h3 className="text-lg font-semibold text-gray-700">{item.dia}</h3>
+          <h3 className="text-lg font-semibold text-black">{item.dia}</h3>
 
           <div className="mt-2 w-full max-w-md">
-            <label className="block mb-1 text-sm text-gray-600">Receta principal</label>
-            <select
-              disabled={item.sinMenu}
-              value={item.principal}
-              onChange={(e) => manejarCambio(index, 'principal', e.target.value)}
-              className="w-full p-2 border rounded"
-            >
+            <label className="block mb-1 text-sm text-black">Receta principal</label>
+                         <select
+               disabled={item.sinMenu}
+               value={item.principal}
+               onChange={(e) => manejarCambio(index, 'principal', e.target.value)}
+               className="w-full p-2 border rounded text-black"
+             >
               <option value="">Seleccionar...</option>
               {nombresRecetasAlmuerzo.map((nombre) => (
                 <option key={nombre} value={nombre}>{nombre}</option>
@@ -73,13 +73,13 @@ const MenuSemanal = () => {
           </div>
 
           <div className="mt-2 w-full max-w-md">
-            <label className="block mb-1 text-sm text-gray-600">Acompañamiento</label>
-            <select
-              disabled={item.sinMenu}
-              value={item.acompanamiento}
-              onChange={(e) => manejarCambio(index, 'acompanamiento', e.target.value)}
-              className="w-full p-2 border rounded"
-            >
+            <label className="block mb-1 text-sm text-black">Acompañamiento</label>
+                         <select
+               disabled={item.sinMenu}
+               value={item.acompanamiento}
+               onChange={(e) => manejarCambio(index, 'acompanamiento', e.target.value)}
+               className="w-full p-2 border rounded text-black"
+             >
               <option value="">Seleccionar...</option>
               {nombresAcompanamientos.map((nombre) => (
                 <option key={nombre} value={nombre}>{nombre}</option>
@@ -90,21 +90,21 @@ const MenuSemanal = () => {
           <div className="mt-2 grid grid-cols-3 gap-2 max-w-md">
             {(['chica', 'mediana', 'grande'] as TipoComensal[]).map((tipo) => (
               <div key={tipo}>
-                <label className="block text-sm text-gray-600">Porciones {tipo}</label>
-                <input
-                  type="number"
-                  disabled={item.sinMenu}
-                  value={item.porciones[tipo]}
-                  onChange={(e) => manejarCambioPorciones(index, tipo, e.target.value)}
-                  className="w-full p-2 border rounded"
-                  min={0}
-                />
+                <label className="block text-sm text-black">Porciones {tipo}</label>
+                                 <input
+                   type="number"
+                   disabled={item.sinMenu}
+                   value={item.porciones[tipo]}
+                   onChange={(e) => manejarCambioPorciones(index, tipo, e.target.value)}
+                   className="w-full p-2 border rounded text-black"
+                   min={0}
+                 />
               </div>
             ))}
           </div>
 
           <div className="mt-2">
-            <label className="inline-flex items-center">
+            <label className="inline-flex items-center text-black">
               <input
                 type="checkbox"
                 checked={item.sinMenu}
