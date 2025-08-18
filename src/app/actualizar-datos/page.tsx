@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import BackButton from '@/components/shared/BackButton';
 import { authService, uniformeService, User as SupabaseUser, Uniforme } from '@/lib/supabase';
+import { generarOpcionesEscuelas, validarEscuela, formatearNumeroEscuela } from '@/utils/escuelas-por-departamento';
 
 // Lista de los 19 departamentos de Uruguay
 const DEPARTAMENTOS_URUGUAY = [
@@ -89,6 +90,9 @@ export default function ActualizarDatos() {
   const [uniformeError, setUniformeError] = useState('');
   const [uniformeSuccess, setUniformeSuccess] = useState('');
 
+  // Estados para opciones de escuelas
+  const [opcionesEscuelas, setOpcionesEscuelas] = useState<string[]>([]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -160,6 +164,12 @@ export default function ActualizarDatos() {
     e.preventDefault();
     if (!currentUser) return;
 
+    // Validar que todos los campos estén completos
+    if (!uniformeData.talle_tunica || !uniformeData.talle_calzado || !uniformeData.tipo_uniforme) {
+      setUniformeError('Por favor, completa todos los campos del uniforme.');
+      return;
+    }
+
     setUniformeError('');
     setUniformeSuccess('');
     setSavingUniforme(true);
@@ -173,6 +183,7 @@ export default function ActualizarDatos() {
       });
 
       if (error) {
+        console.error('Error de Supabase:', error);
         setUniformeError('Error al guardar los datos. Intenta nuevamente.');
       } else {
         setUniformeSuccess('Datos de uniforme actualizados correctamente');
@@ -292,6 +303,18 @@ export default function ActualizarDatos() {
     setIsAuthenticated(false);
     setCurrentUser(null);
     setLoginData({ documento: '', password: '' });
+  };
+
+  // Función para actualizar opciones de escuelas cuando cambia el departamento
+  const handleDepartamentoChange = (departamento: string, isRegister: boolean = false) => {
+    const opciones = generarOpcionesEscuelas(departamento);
+    setOpcionesEscuelas(opciones);
+    
+    if (isRegister) {
+      setRegisterData({...registerData, departamento, escuela: ''});
+    } else {
+      setUpdateData({...updateData, departamento, escuela: ''});
+    }
   };
 
   return (
@@ -440,7 +463,7 @@ export default function ActualizarDatos() {
                       <select
                         required
                         value={registerData.departamento}
-                        onChange={(e) => setRegisterData({...registerData, departamento: e.target.value})}
+                        onChange={(e) => handleDepartamentoChange(e.target.value, true)}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                       >
                         <option value="">Selecciona un departamento</option>
@@ -457,14 +480,20 @@ export default function ActualizarDatos() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Escuela donde trabaja *
                       </label>
-                      <input
-                        type="text"
+                      <select
                         required
                         value={registerData.escuela}
                         onChange={(e) => setRegisterData({...registerData, escuela: e.target.value})}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                        placeholder="Ej: Escuela N° 123"
-                      />
+                        disabled={!registerData.departamento}
+                      >
+                        <option value="">{registerData.departamento ? 'Selecciona una escuela' : 'Primero selecciona un departamento'}</option>
+                        {opcionesEscuelas.map((escuela) => (
+                          <option key={escuela} value={escuela}>
+                            {escuela}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -624,7 +653,7 @@ export default function ActualizarDatos() {
                     <select
                       required
                       value={updateData.departamento}
-                      onChange={(e) => setUpdateData({...updateData, departamento: e.target.value})}
+                      onChange={(e) => handleDepartamentoChange(e.target.value, false)}
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                     >
                       <option value="">Selecciona un departamento</option>
@@ -639,14 +668,20 @@ export default function ActualizarDatos() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Escuela donde trabaja *
                     </label>
-                    <input
-                      type="text"
+                    <select
                       required
                       value={updateData.escuela}
                       onChange={(e) => setUpdateData({...updateData, escuela: e.target.value})}
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                      placeholder="Ej: Escuela N° 123"
-                    />
+                      disabled={!updateData.departamento}
+                    >
+                      <option value="">{updateData.departamento ? 'Selecciona una escuela' : 'Primero selecciona un departamento'}</option>
+                      {opcionesEscuelas.map((escuela) => (
+                        <option key={escuela} value={escuela}>
+                          {escuela}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

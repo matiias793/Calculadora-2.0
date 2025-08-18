@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Search, Edit, Trash2, Plus, LogOut, Eye, EyeOff, Users, Shirt, Download, Filter } from 'lucide-react';
 import { authService, uniformeService, User, UniformeConUsuario } from '@/lib/supabase';
 import AdminProtected from '@/components/shared/AdminProtected';
+import { generarOpcionesEscuelas } from '@/utils/escuelas-por-departamento';
 
 // Lista de los 19 departamentos de Uruguay
 const DEPARTAMENTOS_URUGUAY = [
@@ -39,12 +40,15 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [editingUserOpcionesEscuelas, setEditingUserOpcionesEscuelas] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState<'users' | 'uniformes'>('users');
   const [exportFilterDepartamento, setExportFilterDepartamento] = useState('');
   const [exportFilterEscuela, setExportFilterEscuela] = useState('');
   const [showExportModal, setShowExportModal] = useState(false);
+  const [opcionesEscuelas, setOpcionesEscuelas] = useState<string[]>([]);
+  const [escuelaFilter, setEscuelaFilter] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -53,16 +57,36 @@ const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
-    // Filtrar usuarios basado en el término de búsqueda
-    const filtered = users.filter(user =>
-      user.primer_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.primer_apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.documento.includes(searchTerm) ||
-      user.escuela.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.departamento.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Filtrar usuarios basado en el término de búsqueda y departamento
+    let filtered = users;
+    
+    // Filtrar por departamento si está seleccionado
+    if (departamentoFilter) {
+      filtered = filtered.filter(user =>
+        user.departamento.toLowerCase() === departamentoFilter.toLowerCase()
+      );
+    }
+    
+    // Filtrar por escuela si está seleccionada
+    if (escuelaFilter) {
+      filtered = filtered.filter(user =>
+        user.escuela.toLowerCase().includes(escuelaFilter.toLowerCase())
+      );
+    }
+    
+    // Filtrar por término de búsqueda
+    if (searchTerm) {
+      filtered = filtered.filter(user =>
+        user.primer_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.primer_apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.documento.includes(searchTerm) ||
+        user.escuela.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.departamento.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
     setFilteredUsers(filtered);
-  }, [searchTerm, users]);
+  }, [searchTerm, users, departamentoFilter, escuelaFilter]);
 
   useEffect(() => {
     // Filtrar uniformes basado en el departamento
@@ -105,9 +129,27 @@ const AdminDashboard = () => {
     router.push('/admin');
   };
 
+  // Función para actualizar opciones de escuelas cuando cambia el departamento
+  const handleDepartamentoFilterChange = (departamento: string) => {
+    setDepartamentoFilter(departamento);
+    setEscuelaFilter('');
+    if (departamento) {
+      const opciones = generarOpcionesEscuelas(departamento);
+      setOpcionesEscuelas(opciones);
+    } else {
+      setOpcionesEscuelas([]);
+    }
+  };
+
   const handleEditUser = (user: User) => {
     setEditingUser(user);
     setShowPassword(false);
+    
+    // Cargar opciones de escuelas para el departamento del usuario
+    if (user.departamento) {
+      const opciones = generarOpcionesEscuelas(user.departamento);
+      setEditingUserOpcionesEscuelas(opciones);
+    }
   };
 
   const handleSaveUser = async () => {
@@ -390,7 +432,7 @@ const AdminDashboard = () => {
             {/* Search and Actions for Users */}
             <div className="bg-white rounded-lg shadow mb-6">
               <div className="p-6 border-b border-gray-200">
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col lg:flex-row gap-4">
                   <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                     <input
@@ -400,6 +442,33 @@ const AdminDashboard = () => {
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <select
+                      value={departamentoFilter}
+                      onChange={(e) => handleDepartamentoFilterChange(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    >
+                      <option value="">Todos los departamentos</option>
+                      {DEPARTAMENTOS_URUGUAY.map((departamento) => (
+                        <option key={departamento} value={departamento}>
+                          {departamento}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={escuelaFilter}
+                      onChange={(e) => setEscuelaFilter(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      disabled={!departamentoFilter}
+                    >
+                      <option value="">Todas las escuelas</option>
+                      {opcionesEscuelas.map((escuela) => (
+                        <option key={escuela} value={escuela}>
+                          {escuela}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -693,7 +762,18 @@ const AdminDashboard = () => {
                 </label>
                 <select
                   value={editingUser.departamento}
-                  onChange={(e) => setEditingUser({...editingUser, departamento: e.target.value})}
+                  onChange={(e) => {
+                    const departamento = e.target.value;
+                    setEditingUser({...editingUser, departamento, escuela: ''});
+                    
+                    // Actualizar opciones de escuelas
+                    if (departamento) {
+                      const opciones = generarOpcionesEscuelas(departamento);
+                      setEditingUserOpcionesEscuelas(opciones);
+                    } else {
+                      setEditingUserOpcionesEscuelas([]);
+                    }
+                  }}
                   className="w-full p-2 border border-gray-300 rounded-md"
                 >
                   <option value="">Selecciona un departamento</option>
@@ -709,12 +789,19 @@ const AdminDashboard = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Escuela
                 </label>
-                <input
-                  type="text"
+                <select
                   value={editingUser.escuela}
                   onChange={(e) => setEditingUser({...editingUser, escuela: e.target.value})}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                />
+                  disabled={!editingUser.departamento}
+                >
+                  <option value="">{editingUser.departamento ? 'Selecciona una escuela' : 'Primero selecciona un departamento'}</option>
+                  {editingUserOpcionesEscuelas.map((escuela) => (
+                    <option key={escuela} value={escuela}>
+                      {escuela}
+                    </option>
+                  ))}
+                </select>
               </div>
               
               <div>
