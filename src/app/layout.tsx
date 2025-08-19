@@ -52,7 +52,7 @@ export default function RootLayout({
           <div className="w-1/6 bg-yellow-300"></div>
           <div className="w-1/6 bg-violet-400"></div>
         </div>
-        <div className="bg-green-50 min-h-screen py-2 md:py-8 md:px-0 px-4">
+        <div className="bg-green-50 min-h-screen py-2 sm:py-4 md:py-8 px-2 sm:px-4">
           <Providers>
             { children }
           </Providers>

@@ -2,24 +2,31 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
+import Image from 'next/image';
 import OptionCard from "@/components/main/OptionCard";
 import BackButton from "@/components/shared/BackButton";
 
 const otrasOpciones = [
   {
     image: (
-      <div className="w-full h-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center">
-        <span className="text-white text-4xl font-bold">👤</span>
-      </div>
+      <Image
+        src="/images/actualiza-datos.png"
+        fill
+        style={{ objectFit: "cover" }}
+        alt="Actualizar mis datos"
+      />
     ),
     title: 'Actualizar mis datos',
     url: '/actualizar-datos'
   },
   {
     image: (
-      <div className="w-full h-full bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center">
-        <span className="text-white text-4xl font-bold">⚙️</span>
-      </div>
+      <Image
+        src="/images/admin-panel.png"
+        fill
+        style={{ objectFit: "cover" }}
+        alt="Panel de Administrador"
+      />
     ),
     title: 'Panel de Administrador',
     url: '/admin'
@@ -28,16 +35,16 @@ const otrasOpciones = [
 
 const OtrasFunciones = () => {
   return (
-    <div className="mx-auto max-w-screen-xl w-full">
+    <div className="mx-auto max-w-screen-xl px-2 sm:px-4 w-full mt-6 sm:mt-10">
       <div className="flex flex-col items-start">
-        <span className="lg:pl-32 md:pl-20 flex flex-col items-start justify-start mb-4">
+        <span className="pl-2 sm:pl-4 md:pl-20 lg:pl-32 flex flex-col items-start justify-start mb-4">
           <BackButton/>
         </span>
       </div>
 
-      <h2 className="text-2xl font-bold text-logoGreen text-center mb-4">Otras Funciones</h2>
+      <h2 className="text-2xl sm:text-3xl font-bold text-logoGreen text-center mb-4 sm:mb-6">Otras Funciones</h2>
       
-      <div className="flex flex-row flex-wrap justify-center gap-5 mt-10 w-full px-4 md:px-0 mb-8">
+      <div className="flex flex-row flex-wrap justify-center gap-3 sm:gap-5 mt-8 sm:mt-10 w-full mb-6 sm:mb-8">
         {
           otrasOpciones.map(option => (
             <OptionCard key={option.title} {...option} />

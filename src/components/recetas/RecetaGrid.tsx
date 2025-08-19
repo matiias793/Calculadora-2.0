@@ -91,8 +91,8 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
     };
 
     return (
-        <div className="mx-auto max-w-screen-xl w-full">
-            <span className="font-bold text-3xl text-logoGreen text-center mt-5 w-full flex flex-col h-auto">
+        <div className="mx-auto max-w-screen-xl w-full px-2 sm:px-4">
+            <span className="font-bold text-2xl sm:text-3xl text-logoGreen text-center mt-4 sm:mt-5 w-full flex flex-col h-auto">
                 <span className="flex flex-col items-start justify-start mb-4">
                     <BackButton />
                 </span>
@@ -102,17 +102,17 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
             </span>
             <div className="tabs flex flex-col w-full mt-7">
                 <div className="relative flex flex-row items-center">
-                    <button className={`w-full md:w-[300px] h-16 px-4 flex flex-row justify-center items-center gap-1 relative py-2 ${tab === 1 ? 'active' : ''}`} onClick={() => handleTabClick(1)}>
-                        <FaShoppingBasket className='text-3xl md:mr-2 text-logoGreen font-bold' />
-                        <p className="hidden md:flex text-logoGreen text-lg font-bold">Ingredientes</p>
+                    <button className={`w-full md:w-[300px] h-16 px-2 md:px-4 flex flex-col md:flex-row justify-center items-center gap-1 relative py-2 ${tab === 1 ? 'active' : ''}`} onClick={() => handleTabClick(1)}>
+                        <FaShoppingBasket className='text-2xl md:text-3xl md:mr-2 text-logoGreen font-bold' />
+                        <p className="text-xs md:text-lg text-logoGreen font-bold">Ingredientes</p>
                     </button>
-                    <button className={`w-full md:w-[300px] h-16 px-4 flex flex-row justify-center items-center gap-1 relative py-2 ${tab === 2 ? 'active' : ''}`} onClick={() => handleTabClick(2)}>
+                    <button className={`w-full md:w-[300px] h-16 px-2 md:px-4 flex flex-col md:flex-row justify-center items-center gap-1 relative py-2 ${tab === 2 ? 'active' : ''}`} onClick={() => handleTabClick(2)}>
                         <FaTasks className='text-xl md:mr-2 text-logoGreen font-bold' />
-                        <p className="hidden md:flex text-logoGreen text-lg font-bold">Procedimiento</p>
+                        <p className="text-xs md:text-lg text-logoGreen font-bold">Procedimiento</p>
                     </button>
-                    <button className={`w-full md:w-[300px] h-16 px-4 flex flex-row justify-center items-center gap-1 relative py-2 ${tab === 3 ? 'active' : ''}`} onClick={() => handleTabClick(3)}>
+                    <button className={`w-full md:w-[300px] h-16 px-2 md:px-4 flex flex-col md:flex-row justify-center items-center gap-1 relative py-2 ${tab === 3 ? 'active' : ''}`} onClick={() => handleTabClick(3)}>
                         <FaVideo className='text-2xl md:mr-2 text-logoGreen font-bold' />
-                        <p className="hidden md:flex text-logoGreen text-lg font-bold">Videos</p>
+                        <p className="text-xs md:text-lg text-logoGreen font-bold">Videos</p>
                     </button>
                     <div role="indicator" className={`absolute left-0 bottom-0 transition-all duration-200 ease-in-out bg-logoGreen w-1/3 md:w-[300px] h-0.5 rounded-t-full`} style={{ transform: `translateX(${tab === 1 ? '0%' : tab === 2 ? '100%' : '200%'})` }}>
                     </div>

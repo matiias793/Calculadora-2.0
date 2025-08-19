@@ -23,9 +23,9 @@ export async function generateMetadata( { params }: Props ): Promise<Metadata> {
 
 const page = ( { params } : Props ) => {
   return (
-    <div className="mx-auto max-w-screen-xl w-full">
-        <span className="font-bold text-3xl text-logoGreen text-center mt-5 w-full flex flex-col">
-            <span className="lg:pl-32 md:pl-20 flex flex-col items-start justify-start mb-4">
+    <div className="mx-auto max-w-screen-xl w-full px-2 sm:px-4">
+        <span className="font-bold text-2xl sm:text-3xl text-logoGreen text-center mt-4 sm:mt-5 w-full flex flex-col">
+            <span className="pl-2 sm:pl-4 md:pl-20 lg:pl-32 flex flex-col items-start justify-start mb-4">
               <BackButton/>
             </span>
             { params.option === 'desayunos-meriendas' && 'Desayunos y meriendas' }

@@ -17,7 +17,7 @@ const BackButton = ({ href }: BackButtonProps) => {
     return (
       <Link href={href}>
         <IoArrowBackCircle 
-            className='font-bold text-5xl text-logoGreen hover:cursor-pointer hover:text-logoGreenHover'
+            className='font-bold text-4xl sm:text-5xl text-logoGreen hover:cursor-pointer hover:text-logoGreenHover transition-colors duration-200'
         />
       </Link>
     );
@@ -25,7 +25,7 @@ const BackButton = ({ href }: BackButtonProps) => {
 
   return (
     <IoArrowBackCircle 
-        className='font-bold text-5xl text-logoGreen hover:cursor-pointer hover:text-logoGreenHover'
+        className='font-bold text-4xl sm:text-5xl text-logoGreen hover:cursor-pointer hover:text-logoGreenHover transition-colors duration-200'
         onClick={ handleBack }
     />
   )

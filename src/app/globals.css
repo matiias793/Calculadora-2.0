@@ -57,3 +57,39 @@ select:focus option:hover {
   color: black !important;
   background-color: #f3f4f6 !important;
 }
+
+/* Mejoras para experiencia móvil */
+@media (max-width: 640px) {
+  /* Mejorar el tamaño de los botones táctiles */
+  button {
+    min-height: 44px;
+  }
+  
+  /* Optimizar espaciado en móvil */
+  .tabs button {
+    min-height: 60px;
+  }
+  
+  /* Mejorar legibilidad del texto */
+  h1, h2, h3 {
+    line-height: 1.2;
+  }
+  
+  /* Optimizar imágenes responsivas */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Mejorar la experiencia de scroll en móvil */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Optimizar para pantallas táctiles */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:shadow-lg:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+}

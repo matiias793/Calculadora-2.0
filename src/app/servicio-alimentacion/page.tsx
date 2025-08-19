@@ -55,19 +55,19 @@ const options = [
 
 export default function ServicioAlimentacion() {
   return (
-    <div className="mx-auto max-w-screen-xl px-4 w-full mt-10">
+    <div className="mx-auto max-w-screen-xl px-2 sm:px-4 w-full mt-6 sm:mt-10">
       <div className="flex flex-col items-start">
-        <span className="lg:pl-32 md:pl-20 flex flex-col items-start justify-start mb-4">
+        <span className="pl-2 sm:pl-4 md:pl-20 lg:pl-32 flex flex-col items-start justify-start mb-4">
           <BackButton/>
         </span>
       </div>
-      <span className="font-bold text-3xl text-logoGreen text-center mt-5 w-full flex flex-col">
+      <span className="font-bold text-2xl sm:text-3xl text-logoGreen text-center mt-4 sm:mt-5 w-full flex flex-col">
         Servicio de alimentación
       </span>
-      <span className="mb-8 text-center text-gray-800 w-full flex flex-col mt-3 text-lg">
+      <span className="mb-6 sm:mb-8 text-center text-gray-800 w-full flex flex-col mt-2 sm:mt-3 text-base sm:text-lg">
         ¿Qué vas a cocinar?
       </span>
-      <div className="flex flex-row flex-wrap justify-center gap-5 mt-10 w-full px-4 md:px-0 mb-8">
+      <div className="flex flex-row flex-wrap justify-center gap-3 sm:gap-5 mt-8 sm:mt-10 w-full mb-6 sm:mb-8">
         {
           options.map(option => (
             <OptionCard key={option.title} {...option} />
