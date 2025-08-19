@@ -12,7 +12,7 @@ const otrasOpciones = [
       <Image
         src="/images/actualiza-datos.png"
         fill
-        style={{ objectFit: "cover" }}
+        style={{ objectFit: "contain" }}
         alt="Actualizar mis datos"
       />
     ),
@@ -24,7 +24,7 @@ const otrasOpciones = [
       <Image
         src="/images/admin-panel.png"
         fill
-        style={{ objectFit: "cover" }}
+        style={{ objectFit: "contain" }}
         alt="Panel de Administrador"
       />
     ),

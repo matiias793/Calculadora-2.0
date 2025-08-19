@@ -8,7 +8,7 @@ const options = [
       <Image
         src="/images/merienda.jpg"
         fill
-        style={{ objectFit: "cover" }}
+        style={{ objectFit: "contain" }}
         alt="Desayunos y meriendas"
       />
     ),
@@ -20,7 +20,7 @@ const options = [
       <Image
         src="/images/almuerzo.jpg"
         fill
-        style={{ objectFit: "cover" }}
+        style={{ objectFit: "contain" }}
         alt="Almuerzos y cenas"
       />
     ),
@@ -32,7 +32,7 @@ const options = [
       <Image
         src="/images/copa-leche.jpg"
         fill
-        style={{ objectFit: "cover" }}
+        style={{ objectFit: "contain" }}
         alt="Copa de leche"
       />
     ),
@@ -44,7 +44,7 @@ const options = [
       <Image
         src="/images/menu-semanal.png"
         fill
-        style={{ objectFit: "cover" }}
+        style={{ objectFit: "contain" }}
         alt="Menú semanal"
       />
     ),

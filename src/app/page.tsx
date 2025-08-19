@@ -6,9 +6,12 @@ import OptionCard from "@/components/main/OptionCard";
 const options = [
   {
     image: (
-      <div className="w-full h-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center">
-        <span className="text-white text-4xl font-bold">🍽️</span>
-      </div>
+      <Image
+        src="/images/servicio.jpg"
+        fill
+        style={{ objectFit: "cover" }}
+        alt="Servicio de alimentación"
+      />
     ),
     title: 'Servicio de alimentación',
     url: '/servicio-alimentacion'
@@ -18,7 +21,7 @@ const options = [
       <Image
         src="/images/otras.png"
         fill
-        style={{ objectFit: "cover" }}
+        style={{ objectFit: "contain" }}
         alt="Otras funciones"
       />
     ),
