@@ -49,6 +49,8 @@ const AdminDashboard = () => {
   const [showExportModal, setShowExportModal] = useState(false);
   const [opcionesEscuelas, setOpcionesEscuelas] = useState<string[]>([]);
   const [escuelaFilter, setEscuelaFilter] = useState('');
+  const [tareaFilter, setTareaFilter] = useState('');
+  const [viewUser, setViewUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -57,7 +59,7 @@ const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
-    // Filtrar usuarios basado en el término de búsqueda y departamento
+    // Filtrar usuarios basado en el término de búsqueda, departamento, escuela y tarea
     let filtered = users;
     
     // Filtrar por departamento si está seleccionado
@@ -74,6 +76,13 @@ const AdminDashboard = () => {
       );
     }
     
+    // Filtrar por tarea si está seleccionada
+    if (tareaFilter) {
+      filtered = filtered.filter(user =>
+        user.tarea.toLowerCase() === tareaFilter.toLowerCase()
+      );
+    }
+    
     // Filtrar por término de búsqueda
     if (searchTerm) {
       filtered = filtered.filter(user =>
@@ -81,23 +90,34 @@ const AdminDashboard = () => {
         user.primer_apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.documento.includes(searchTerm) ||
         user.escuela.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.departamento.toLowerCase().includes(searchTerm.toLowerCase())
+        user.departamento.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.tarea.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     
     setFilteredUsers(filtered);
-  }, [searchTerm, users, departamentoFilter, escuelaFilter]);
+  }, [searchTerm, users, departamentoFilter, escuelaFilter, tareaFilter]);
 
   useEffect(() => {
-    // Filtrar uniformes basado en el departamento
+    // Filtrar uniformes basado en el departamento y escuela
     let filtered = uniformes;
+    
+    // Filtrar por departamento si está seleccionado
     if (departamentoFilter) {
-      filtered = uniformes.filter(uniforme =>
-        uniforme.departamento.toLowerCase().includes(departamentoFilter.toLowerCase())
+      filtered = filtered.filter(uniforme =>
+        uniforme.departamento.toLowerCase() === departamentoFilter.toLowerCase()
       );
     }
+    
+    // Filtrar por escuela si está seleccionada
+    if (escuelaFilter) {
+      filtered = filtered.filter(uniforme =>
+        uniforme.escuela.toLowerCase().includes(escuelaFilter.toLowerCase())
+      );
+    }
+    
     setFilteredUniformes(filtered);
-  }, [departamentoFilter, uniformes]);
+  }, [departamentoFilter, escuelaFilter, uniformes]);
 
   const fetchUsers = async () => {
     try {
@@ -164,6 +184,7 @@ const AdminDashboard = () => {
         departamento: editingUser.departamento,
         escuela: editingUser.escuela,
         celular: editingUser.celular,
+        tarea: editingUser.tarea,
         ...(editingUser.password && { password: editingUser.password })
       };
 
@@ -272,7 +293,7 @@ const AdminDashboard = () => {
               u.talle_tunica,
               u.talle_calzado,
               u.tipo_uniforme === 'cocina' ? 'Cocina' : 
-               u.tipo_uniforme === 'limpieza' ? 'Limpieza' : 'Ambos'
+               u.tipo_uniforme === 'limpieza' ? 'Limpieza' : 'Cocina y Limpieza'
             ]),
             styles: {
               fontSize: 8,
@@ -305,6 +326,73 @@ const AdminDashboard = () => {
       });
     } catch (error) {
       console.error('Error in exportUniformesToPDF:', error);
+      setError('Error al generar el PDF');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  const exportUsersToPDF = () => {
+    try {
+      import('jspdf').then(({ default: jsPDF }) => {
+        import('jspdf-autotable').then((autoTable) => {
+          const doc = new jsPDF();
+
+          // Título
+          doc.setFontSize(18);
+          doc.text('Reporte de Usuarios', 14, 20);
+
+          // Filtros aplicados
+          doc.setFontSize(12);
+          let yPosition = 30;
+          if (departamentoFilter) {
+            doc.text(`Departamento: ${departamentoFilter}`, 14, yPosition); yPosition += 6;
+          }
+          if (escuelaFilter) {
+            doc.text(`Escuela: ${escuelaFilter}`, 14, yPosition); yPosition += 6;
+          }
+          if (tareaFilter) {
+            doc.text(`Tarea: ${tareaFilter}`, 14, yPosition); yPosition += 6;
+          }
+          if (searchTerm) {
+            doc.text(`Búsqueda: ${searchTerm}`, 14, yPosition); yPosition += 6;
+          }
+          doc.text(`Fecha de exportación: ${new Date().toLocaleDateString('es-ES')}`, 14, yPosition + 6);
+
+          // Datos (ya filtrados en UI)
+          const usersToExport = filteredUsers;
+          if (usersToExport.length === 0) {
+            setError('No hay usuarios que coincidan con los filtros seleccionados');
+            setTimeout(() => setError(''), 3000);
+            return;
+          }
+
+          autoTable.default(doc, {
+            startY: yPosition + 15,
+            head: [['Usuario', 'Documento', 'Departamento', 'Escuela', 'Tarea', 'Celular', 'Fecha Registro']],
+            body: usersToExport.map(u => [
+              `${u.primer_nombre} ${u.primer_apellido}`,
+              u.documento,
+              u.departamento,
+              u.escuela,
+              u.tarea === 'cocina' ? 'Cocina' : u.tarea === 'limpieza' ? 'Limpieza' : 'Cocina y Limpieza',
+              u.celular,
+              u.created_at ? new Date(u.created_at).toLocaleDateString('es-ES') : 'N/A'
+            ]),
+            styles: { fontSize: 8, cellPadding: 2 },
+            headStyles: { fillColor: [34, 197, 94], textColor: 255 }
+          });
+
+          const fileName = `usuarios_${departamentoFilter || 'todos'}_${new Date().toISOString().split('T')[0]}.pdf`;
+          doc.save(fileName);
+        }).catch(() => {
+          setError('Error al preparar la tabla para PDF');
+          setTimeout(() => setError(''), 3000);
+        });
+      }).catch(() => {
+        setError('Error al generar el PDF');
+        setTimeout(() => setError(''), 3000);
+      });
+    } catch (error) {
       setError('Error al generar el PDF');
       setTimeout(() => setError(''), 3000);
     }
@@ -374,57 +462,7 @@ const AdminDashboard = () => {
           </nav>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <span className="text-blue-600 text-xl">👥</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Usuarios</p>
-                <p className="text-2xl font-bold text-gray-900">{users.length}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <span className="text-green-600 text-xl">👔</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Uniformes Registrados</p>
-                <p className="text-2xl font-bold text-gray-900">{uniformes.length}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <span className="text-yellow-600 text-xl">🏫</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Escuelas Únicas</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {new Set(users.map(user => user.escuela)).size}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <span className="text-purple-600 text-xl">📍</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Departamentos</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {new Set(users.map(user => user.departamento)).size}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         {/* Content based on active tab */}
         {activeTab === 'users' ? (
@@ -469,6 +507,30 @@ const AdminDashboard = () => {
                         </option>
                       ))}
                     </select>
+                    <select
+                      value={tareaFilter}
+                      onChange={(e) => setTareaFilter(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    >
+                      <option value="">Todas las tareas</option>
+                      <option value="cocina">Cocina</option>
+                      <option value="limpieza">Limpieza</option>
+                      <option value="cocina y limpieza">Cocina y Limpieza</option>
+                    </select>
+                    {(departamentoFilter || escuelaFilter || tareaFilter) && (
+                      <button
+                        onClick={() => {
+                          setDepartamentoFilter('');
+                          setEscuelaFilter('');
+                          setTareaFilter('');
+                          setOpcionesEscuelas([]);
+                        }}
+                        className="px-3 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                      >
+                        <Filter className="inline-block w-4 h-4 mr-1" />
+                        Limpiar
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -479,24 +541,56 @@ const AdminDashboard = () => {
             {/* Search and Actions for Uniformes */}
             <div className="bg-white rounded-lg shadow mb-6">
               <div className="p-6 border-b border-gray-200">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                    <input
-                      type="text"
-                      placeholder="Filtrar por departamento..."
+                <div className="flex flex-col lg:flex-row gap-4">
+                  <div className="flex flex-col sm:flex-row gap-2 flex-1">
+                    <select
                       value={departamentoFilter}
-                      onChange={(e) => setDepartamentoFilter(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                      onChange={(e) => handleDepartamentoFilterChange(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Todos los departamentos</option>
+                      {DEPARTAMENTOS_URUGUAY.map((departamento) => (
+                        <option key={departamento} value={departamento}>
+                          {departamento}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={escuelaFilter}
+                      onChange={(e) => setEscuelaFilter(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      disabled={!departamentoFilter}
+                    >
+                      <option value="">Todas las escuelas</option>
+                      {opcionesEscuelas.map((escuela) => (
+                        <option key={escuela} value={escuela}>
+                          {escuela}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  <button
-                    onClick={() => setShowExportModal(true)}
-                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Exportar PDF
-                  </button>
+                  <div className="flex gap-2">
+                    {(departamentoFilter || escuelaFilter) && (
+                      <button
+                        onClick={() => {
+                          setDepartamentoFilter('');
+                          setEscuelaFilter('');
+                          setOpcionesEscuelas([]);
+                        }}
+                        className="flex items-center px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                      >
+                        <Filter className="mr-2 h-4 w-4" />
+                        Limpiar Filtros
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setShowExportModal(true)}
+                      className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Exportar PDF
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -520,6 +614,21 @@ const AdminDashboard = () => {
           <>
             {/* Users Table */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Usuarios ({filteredUsers.length} de {users.length})
+                  </h3>
+                  {(departamentoFilter || escuelaFilter || tareaFilter) && (
+                    <div className="text-sm text-gray-600">
+                      Filtros aplicados: 
+                      {departamentoFilter && <span className="ml-1 px-2 py-1 bg-blue-100 text-blue-800 rounded">Departamento: {departamentoFilter}</span>}
+                      {escuelaFilter && <span className="ml-1 px-2 py-1 bg-green-100 text-green-800 rounded">Escuela: {escuelaFilter}</span>}
+                      {tareaFilter && <span className="ml-1 px-2 py-1 bg-purple-100 text-purple-800 rounded">Tarea: {tareaFilter}</span>}
+                    </div>
+                  )}
+                </div>
+              </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -532,6 +641,9 @@ const AdminDashboard = () => {
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Ubicación
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Tarea
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Contacto
@@ -571,6 +683,16 @@ const AdminDashboard = () => {
                           <div className="text-sm text-gray-500">{user.escuela}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            user.tarea === 'cocina' ? 'bg-orange-100 text-orange-800' :
+                            user.tarea === 'limpieza' ? 'bg-purple-100 text-purple-800' :
+                            'bg-indigo-100 text-indigo-800'
+                          }`}>
+                            {user.tarea === 'cocina' ? 'Cocina' :
+                             user.tarea === 'limpieza' ? 'Limpieza' : 'Cocina y Limpieza'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {user.celular}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -578,6 +700,13 @@ const AdminDashboard = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
+                            <button
+                              onClick={() => setViewUser(user)}
+                              className="text-gray-600 hover:text-gray-900"
+                              title="Ver usuario"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
                             <button
                               onClick={() => handleEditUser(user)}
                               className="text-indigo-600 hover:text-indigo-900"
@@ -597,6 +726,15 @@ const AdminDashboard = () => {
                   </tbody>
                 </table>
               </div>
+              <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+                <button
+                  onClick={exportUsersToPDF}
+                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Exportar usuarios (PDF)
+                </button>
+              </div>
             </div>
 
             {filteredUsers.length === 0 && !loading && (
@@ -609,6 +747,20 @@ const AdminDashboard = () => {
           <>
             {/* Uniformes Table */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Uniformes ({filteredUniformes.length} de {uniformes.length})
+                  </h3>
+                  {(departamentoFilter || escuelaFilter) && (
+                    <div className="text-sm text-gray-600">
+                      Filtros aplicados: 
+                      {departamentoFilter && <span className="ml-1 px-2 py-1 bg-blue-100 text-blue-800 rounded">Departamento: {departamentoFilter}</span>}
+                      {escuelaFilter && <span className="ml-1 px-2 py-1 bg-green-100 text-green-800 rounded">Escuela: {escuelaFilter}</span>}
+                    </div>
+                  )}
+                </div>
+              </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -679,7 +831,7 @@ const AdminDashboard = () => {
                             'bg-indigo-100 text-indigo-800'
                           }`}>
                             {uniforme.tipo_uniforme === 'cocina' ? 'Cocina' :
-                             uniforme.tipo_uniforme === 'limpieza' ? 'Limpieza' : 'Ambos'}
+                             uniforme.tipo_uniforme === 'limpieza' ? 'Limpieza' : 'Cocina y Limpieza'}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -818,6 +970,21 @@ const AdminDashboard = () => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tarea que desempeña
+                </label>
+                <select
+                  value={editingUser.tarea}
+                  onChange={(e) => setEditingUser({...editingUser, tarea: e.target.value})}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                >
+                  <option value="cocina">Cocina</option>
+                  <option value="limpieza">Limpieza</option>
+                  <option value="cocina y limpieza">Cocina y Limpieza</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nueva Contraseña (opcional)
                 </label>
                 <div className="relative">
@@ -856,6 +1023,38 @@ const AdminDashboard = () => {
               >
                 Guardar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View User Modal */}
+      {viewUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Datos del Usuario</h3>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <span className="text-gray-500">Documento</span>
+                <span className="font-medium">{viewUser.documento}</span>
+                <span className="text-gray-500">Nombre</span>
+                <span className="font-medium">{viewUser.primer_nombre} {viewUser.segundo_nombre}</span>
+                <span className="text-gray-500">Apellido</span>
+                <span className="font-medium">{viewUser.primer_apellido} {viewUser.segundo_apellido}</span>
+                <span className="text-gray-500">Departamento</span>
+                <span className="font-medium">{viewUser.departamento}</span>
+                <span className="text-gray-500">Escuela</span>
+                <span className="font-medium">{viewUser.escuela}</span>
+                <span className="text-gray-500">Tarea</span>
+                <span className="font-medium">{viewUser.tarea === 'cocina' ? 'Cocina' : viewUser.tarea === 'limpieza' ? 'Limpieza' : 'Cocina y Limpieza'}</span>
+                <span className="text-gray-500">Celular</span>
+                <span className="font-medium">{viewUser.celular}</span>
+                <span className="text-gray-500">Fecha Registro</span>
+                <span className="font-medium">{viewUser.created_at ? new Date(viewUser.created_at).toLocaleDateString('es-ES') : 'N/A'}</span>
+              </div>
+            </div>
+            <div className="flex justify-end mt-6">
+              <button onClick={() => setViewUser(null)} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">Cerrar</button>
             </div>
           </div>
         </div>

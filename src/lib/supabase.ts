@@ -16,6 +16,7 @@ export interface User {
   departamento: string;
   escuela: string;
   celular: string;
+  tarea: string;
   password: string;
   created_at?: string;
   updated_at?: string;
@@ -125,7 +126,7 @@ export interface Uniforme {
   documento: string;
   talle_tunica: string;
   talle_calzado: string;
-  tipo_uniforme: 'cocina' | 'limpieza' | 'ambos';
+  tipo_uniforme: 'cocina' | 'limpieza' | 'cocina y limpieza';
   fecha_ultima_actualizacion?: string;
 }
 
@@ -159,18 +160,53 @@ export const uniformeService = {
   // Actualizar uniforme
   async updateUniforme(uniformeData: Omit<Uniforme, 'id' | 'fecha_ultima_actualizacion'>) {
     try {
-      const { data, error } = await supabase
+      // Primero verificar si ya existe un uniforme para este documento
+      const { data: existingUniforme, error: checkError } = await supabase
         .from('uniformes')
-        .upsert([{
-          ...uniformeData,
-          fecha_ultima_actualizacion: new Date().toISOString()
-        }])
-        .select()
+        .select('*')
+        .eq('documento', uniformeData.documento)
         .single();
 
-      if (error) throw error;
-      return { data, error: null };
+      if (checkError && checkError.code !== 'PGRST116') {
+        // PGRST116 = no rows returned, que es normal si no existe
+        throw checkError;
+      }
+
+      let result;
+      if (existingUniforme) {
+        // Si existe, hacer UPDATE
+        const { data, error } = await supabase
+          .from('uniformes')
+          .update({
+            talle_tunica: uniformeData.talle_tunica,
+            talle_calzado: uniformeData.talle_calzado,
+            tipo_uniforme: uniformeData.tipo_uniforme,
+            fecha_ultima_actualizacion: new Date().toISOString()
+          })
+          .eq('documento', uniformeData.documento)
+          .select()
+          .single();
+
+        if (error) throw error;
+        result = { data, error: null };
+      } else {
+        // Si no existe, hacer INSERT
+        const { data, error } = await supabase
+          .from('uniformes')
+          .insert([{
+            ...uniformeData,
+            fecha_ultima_actualizacion: new Date().toISOString()
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+        result = { data, error: null };
+      }
+
+      return result;
     } catch (error) {
+      console.error('Error en updateUniforme:', error);
       return { data: null, error };
     }
   },

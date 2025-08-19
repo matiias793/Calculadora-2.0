@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import OptionCard from "@/components/main/OptionCard";
+import BackButton from "@/components/shared/BackButton";
 
 const otrasOpciones = [
   {
@@ -28,10 +29,11 @@ const otrasOpciones = [
 const OtrasFunciones = () => {
   return (
     <div className="mx-auto max-w-screen-xl w-full">
-      <Link href="/" className="flex items-center text-logoGreen hover:underline mb-4">
-        <ArrowLeft className="mr-2" />
-        Volver al inicio
-      </Link>
+      <div className="flex flex-col items-start">
+        <span className="lg:pl-32 md:pl-20 flex flex-col items-start justify-start mb-4">
+          <BackButton/>
+        </span>
+      </div>
 
       <h2 className="text-2xl font-bold text-logoGreen text-center mb-4">Otras Funciones</h2>
       

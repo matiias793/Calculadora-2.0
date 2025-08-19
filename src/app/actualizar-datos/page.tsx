@@ -37,6 +37,7 @@ interface User {
   departamento: string;
   escuela: string;
   celular: string;
+  tarea: string;
   password: string;
 }
 
@@ -62,6 +63,7 @@ export default function ActualizarDatos() {
     departamento: '',
     escuela: '',
     celular: '',
+    tarea: 'cocina',
     password: '',
     confirmPassword: ''
   });
@@ -75,6 +77,7 @@ export default function ActualizarDatos() {
     departamento: '',
     escuela: '',
     celular: '',
+    tarea: 'cocina',
     password: '',
     confirmPassword: ''
   });
@@ -114,6 +117,7 @@ export default function ActualizarDatos() {
           departamento: data.departamento,
           escuela: data.escuela,
           celular: data.celular,
+          tarea: data.tarea || 'cocina',
           password: ''
         });
         
@@ -126,9 +130,18 @@ export default function ActualizarDatos() {
           departamento: data.departamento,
           escuela: data.escuela,
           celular: data.celular,
+          tarea: data.tarea || 'cocina',
           password: '',
           confirmPassword: ''
         });
+
+        // Cargar opciones de escuelas para el departamento del usuario
+        if (data.departamento) {
+          console.log('Cargando opciones de escuelas para departamento:', data.departamento);
+          const opciones = generarOpcionesEscuelas(data.departamento);
+          console.log('Opciones de escuelas cargadas:', opciones.length, opciones.slice(0, 5));
+          setOpcionesEscuelas(opciones);
+        }
 
         // Cargar datos de uniforme existentes
         loadUniformeData(data.documento);
@@ -175,7 +188,14 @@ export default function ActualizarDatos() {
     setSavingUniforme(true);
 
     try {
-      const { error } = await uniformeService.updateUniforme({
+      console.log('Intentando guardar uniforme:', {
+        documento: currentUser.documento,
+        talle_tunica: uniformeData.talle_tunica,
+        talle_calzado: uniformeData.talle_calzado,
+        tipo_uniforme: uniformeData.tipo_uniforme
+      });
+
+      const { data, error } = await uniformeService.updateUniforme({
         documento: currentUser.documento,
         talle_tunica: uniformeData.talle_tunica!,
         talle_calzado: uniformeData.talle_calzado!,
@@ -184,14 +204,21 @@ export default function ActualizarDatos() {
 
       if (error) {
         console.error('Error de Supabase:', error);
-        setUniformeError('Error al guardar los datos. Intenta nuevamente.');
+        console.error('Detalles del error:', {
+          message: (error as any).message,
+          details: (error as any).details,
+          hint: (error as any).hint,
+          code: (error as any).code
+        });
+        setUniformeError(`Error al guardar los datos: ${(error as any).message || 'Error desconocido'}`);
       } else {
+        console.log('Uniforme guardado exitosamente:', data);
         setUniformeSuccess('Datos de uniforme actualizados correctamente');
         setTimeout(() => setUniformeSuccess(''), 3000);
       }
     } catch (error) {
-      console.error('Error:', error);
-      setUniformeError('Error al guardar los datos. Intenta nuevamente.');
+      console.error('Error general:', error);
+      setUniformeError(`Error al guardar los datos: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     } finally {
       setSavingUniforme(false);
     }
@@ -214,6 +241,7 @@ export default function ActualizarDatos() {
         departamento: registerData.departamento,
         escuela: registerData.escuela,
         celular: registerData.celular,
+        tarea: registerData.tarea,
         password: registerData.password
       };
       
@@ -236,6 +264,7 @@ export default function ActualizarDatos() {
           departamento: '',
           escuela: '',
           celular: '',
+          tarea: 'cocina',
           password: '',
           confirmPassword: ''
         });
@@ -263,7 +292,8 @@ export default function ActualizarDatos() {
         segundo_apellido: updateData.segundo_apellido || undefined,
         departamento: updateData.departamento,
         escuela: updateData.escuela,
-        celular: updateData.celular
+        celular: updateData.celular,
+        tarea: updateData.tarea
       };
       
       // Solo actualizar contraseña si se proporcionó una nueva
@@ -290,6 +320,7 @@ export default function ActualizarDatos() {
           departamento: data.departamento,
           escuela: data.escuela,
           celular: data.celular,
+          tarea: data.tarea || 'cocina',
           password: ''
         });
       }
@@ -307,7 +338,9 @@ export default function ActualizarDatos() {
 
   // Función para actualizar opciones de escuelas cuando cambia el departamento
   const handleDepartamentoChange = (departamento: string, isRegister: boolean = false) => {
+    console.log('Cambiando departamento a:', departamento);
     const opciones = generarOpcionesEscuelas(departamento);
+    console.log('Opciones de escuelas generadas:', opciones.length, opciones.slice(0, 5));
     setOpcionesEscuelas(opciones);
     
     if (isRegister) {
@@ -512,6 +545,21 @@ export default function ActualizarDatos() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Tarea que desempeña *
+                      </label>
+                      <select
+                        required
+                        value={registerData.tarea}
+                        onChange={(e) => setRegisterData({...registerData, tarea: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                      >
+                        <option value="cocina">Cocina</option>
+                        <option value="limpieza">Limpieza</option>
+                        <option value="cocina y limpieza">Cocina y Limpieza</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Contraseña *
                       </label>
                       <input
@@ -523,19 +571,19 @@ export default function ActualizarDatos() {
                         placeholder="Mínimo 6 caracteres"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Confirmar Contraseña *
-                      </label>
-                      <input
-                        type="password"
-                        required
-                        value={registerData.confirmPassword}
-                        onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                        placeholder="Repite tu contraseña"
-                      />
-                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Confirmar Contraseña *
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={registerData.confirmPassword}
+                      onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                      placeholder="Repite tu contraseña"
+                    />
                   </div>
                   <button
                     type="submit"
@@ -681,6 +729,10 @@ export default function ActualizarDatos() {
                           {escuela}
                         </option>
                       ))}
+                      {/* Debug: mostrar cantidad de opciones */}
+                      {opcionesEscuelas.length > 0 && (
+                        <option disabled>Debug: {opcionesEscuelas.length} escuelas disponibles</option>
+                      )}
                     </select>
                   </div>
                 </div>
@@ -700,16 +752,31 @@ export default function ActualizarDatos() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nueva Contraseña (opcional)
+                      Tarea que desempeña *
                     </label>
-                    <input
-                      type="password"
-                      value={updateData.password}
-                      onChange={(e) => setUpdateData({...updateData, password: e.target.value})}
+                    <select
+                      required
+                      value={updateData.tarea}
+                      onChange={(e) => setUpdateData({...updateData, tarea: e.target.value})}
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                      placeholder="Deja vacío para mantener la actual"
-                    />
+                    >
+                      <option value="cocina">Cocina</option>
+                      <option value="limpieza">Limpieza</option>
+                      <option value="cocina y limpieza">Cocina y Limpieza</option>
+                    </select>
                   </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nueva Contraseña (opcional)
+                  </label>
+                  <input
+                    type="password"
+                    value={updateData.password}
+                    onChange={(e) => setUpdateData({...updateData, password: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                    placeholder="Deja vacío para mantener la actual"
+                  />
                 </div>
                 {updateData.password && (
                   <div>
@@ -834,7 +901,7 @@ export default function ActualizarDatos() {
                           <option value="">Selecciona el tipo</option>
                           <option value="cocina">Cocina</option>
                           <option value="limpieza">Limpieza</option>
-                          <option value="ambos">Ambos</option>
+                          <option value="cocina y limpieza">Cocina y Limpieza</option>
                         </select>
                       </div>
 

@@ -17,7 +17,7 @@ const MenuSemanal = () => {
       principal: '',
       acompanamiento: '',
       sinMenu: false,
-      porciones: { chica: 0, mediana: 0, grande: 0 }
+      porciones: { chica: '', mediana: '', grande: '' }
     }))
   );
 
@@ -29,7 +29,8 @@ const MenuSemanal = () => {
 
   const manejarCambioPorciones = (index: number, tipo: TipoComensal, valor: string) => {
     const nuevoMenu = [...menu];
-    nuevoMenu[index].porciones[tipo] = Number(valor);
+    // Permitir string vacío o números
+    nuevoMenu[index].porciones[tipo] = valor;
     setMenu(nuevoMenu);
   };
 
@@ -39,9 +40,18 @@ const MenuSemanal = () => {
     if (valor) {
       nuevoMenu[index].principal = '';
       nuevoMenu[index].acompanamiento = '';
-      nuevoMenu[index].porciones = { chica: 0, mediana: 0, grande: 0 };
+      nuevoMenu[index].porciones = { chica: '', mediana: '', grande: '' };
     }
     setMenu(nuevoMenu);
+  };
+
+  // Función para convertir las porciones a números para el PDF
+  const getPorcionesNumericas = (porciones: { chica: string; mediana: string; grande: string }) => {
+    return {
+      chica: Number(porciones.chica) || 0,
+      mediana: Number(porciones.mediana) || 0,
+      grande: Number(porciones.grande) || 0
+    };
   };
 
   return (
@@ -59,12 +69,12 @@ const MenuSemanal = () => {
 
           <div className="mt-2 w-full max-w-md">
             <label className="block mb-1 text-sm text-black">Receta principal</label>
-                         <select
-               disabled={item.sinMenu}
-               value={item.principal}
-               onChange={(e) => manejarCambio(index, 'principal', e.target.value)}
-               className="w-full p-2 border rounded text-black"
-             >
+            <select
+              disabled={item.sinMenu}
+              value={item.principal}
+              onChange={(e) => manejarCambio(index, 'principal', e.target.value)}
+              className="w-full p-2 border rounded text-black"
+            >
               <option value="">Seleccionar...</option>
               {nombresRecetasAlmuerzo.map((nombre) => (
                 <option key={nombre} value={nombre}>{nombre}</option>
@@ -74,12 +84,12 @@ const MenuSemanal = () => {
 
           <div className="mt-2 w-full max-w-md">
             <label className="block mb-1 text-sm text-black">Acompañamiento</label>
-                         <select
-               disabled={item.sinMenu}
-               value={item.acompanamiento}
-               onChange={(e) => manejarCambio(index, 'acompanamiento', e.target.value)}
-               className="w-full p-2 border rounded text-black"
-             >
+            <select
+              disabled={item.sinMenu}
+              value={item.acompanamiento}
+              onChange={(e) => manejarCambio(index, 'acompanamiento', e.target.value)}
+              className="w-full p-2 border rounded text-black"
+            >
               <option value="">Seleccionar...</option>
               {nombresAcompanamientos.map((nombre) => (
                 <option key={nombre} value={nombre}>{nombre}</option>
@@ -91,14 +101,15 @@ const MenuSemanal = () => {
             {(['chica', 'mediana', 'grande'] as TipoComensal[]).map((tipo) => (
               <div key={tipo}>
                 <label className="block text-sm text-black">Porciones {tipo}</label>
-                                 <input
-                   type="number"
-                   disabled={item.sinMenu}
-                   value={item.porciones[tipo]}
-                   onChange={(e) => manejarCambioPorciones(index, tipo, e.target.value)}
-                   className="w-full p-2 border rounded text-black"
-                   min={0}
-                 />
+                <input
+                  type="number"
+                  disabled={item.sinMenu}
+                  value={item.porciones[tipo]}
+                  onChange={(e) => manejarCambioPorciones(index, tipo, e.target.value)}
+                  className="w-full p-2 border rounded text-black"
+                  min={0}
+                  placeholder="0"
+                />
               </div>
             ))}
           </div>
@@ -119,7 +130,14 @@ const MenuSemanal = () => {
 
       <div className="mt-6 flex justify-end">
         <button
-          onClick={() => exportMenuToPDF(menu)}
+          onClick={() => {
+            // Convertir las porciones a números antes de exportar
+            const menuConNumeros = menu.map(item => ({
+              ...item,
+              porciones: getPorcionesNumericas(item.porciones)
+            }));
+            exportMenuToPDF(menuConNumeros);
+          }}
           className="flex items-center gap-2 bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-2 px-4 rounded"
         >
           <FaFilePdf className="text-white" />

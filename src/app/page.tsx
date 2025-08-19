@@ -1,60 +1,17 @@
 import Image from "next/image";
 import logo from '@/assets/images/logo.png';
-import almuerzo from '@/assets/images/almuerzo.jpg';
-import merienda from '@/assets/images/merienda.jpg';
-import copaLeche from '@/assets/images/copa-leche.jpg';
-import menuSemanal from '@/assets/images/menu-semanal.png';
 
 import OptionCard from "@/components/main/OptionCard";
 
 const options = [
   {
     image: (
-      <Image
-        src={merienda}
-        layout="fill"
-        objectFit="cover"
-        alt="Desayunos y meriendas"
-      />
+      <div className="w-full h-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center">
+        <span className="text-white text-4xl font-bold">🍽️</span>
+      </div>
     ),
-    title: 'Desayunos y meriendas',
-    url: '/desayunos-meriendas'
-  },
-  {
-    image: (
-      <Image
-        src={almuerzo}
-        layout="fill"
-        objectFit="cover"
-        alt="Almuerzos y cenas"
-      />
-    ),
-    title: 'Almuerzos y cenas',
-    url: '/almuerzos-cenas'
-  },
-  {
-    image: (
-      <Image
-        src={copaLeche}
-        layout="fill"
-        objectFit="cover"
-        alt="Copa de leche"
-      />
-    ),
-    title: 'Copa de Leche',
-    url: '/copa-leche'
-  },
-  {
-    image: (
-      <Image
-        src={menuSemanal}
-        layout="fill"
-        objectFit="cover"
-        alt="Menú semanal"
-      />
-    ),
-    title: 'Planificación semanal',
-    url: '/menu-semanal',
+    title: 'Servicio de alimentación',
+    url: '/servicio-alimentacion'
   },
   {
     image: (
@@ -82,7 +39,7 @@ export default function Home() {
         Calculadora de Ingredientes
       </span>
       <span className="mb-8 text-center text-gray-800 w-full flex flex-col mt-3 text-lg">
-        ¿Qué vas a cocinar?
+        ¿Qué necesitas hacer?
       </span>
       <div className="flex flex-row flex-wrap justify-center gap-5 mt-10 w-full px-4 md:px-0 mb-8">
         {

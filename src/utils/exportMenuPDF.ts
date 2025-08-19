@@ -126,10 +126,10 @@ interface DiaMenu {
 export function exportMenuToPDF(menu: DiaMenu[]) {
   const doc = new jsPDF();
 
-  doc.setFontSize(18);
+  // Página 1: Título y tabla resumen
+  doc.setFontSize(16);
   doc.text('Menú Semanal', 14, 20);
 
-  // 1. Tabla resumen
   autoTable(doc, {
     startY: 30,
     head: [['Día', 'Principal', 'Acompañamiento', 'Chicas', 'Medianas', 'Grandes']],
@@ -141,6 +141,8 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
       sinMenu ? '-' : porciones.mediana.toString(),
       sinMenu ? '-' : porciones.grande.toString(),
     ]),
+    styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [34, 197, 94], textColor: 255 }
   });
 
   // Objeto para acumular ingredientes semanales
@@ -164,7 +166,6 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
           cantidadFinal = cantidadFinal.toFixed(2);
         }
 
-        // Acumular para el total semanal
         const clave = `${name}-${unidadFinal}`;
         if (!acumuladorIngredientes[clave]) {
           acumuladorIngredientes[clave] = { cantidad: 0, unidad: unidadFinal };
@@ -176,51 +177,120 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
     });
   };
 
-  // 2. Por día
-  menu.forEach(({ dia, principal, acompanamiento, sinMenu, porciones }) => {
-    if (sinMenu || (!principal && !acompanamiento)) return;
+  const pageWidth = doc.internal.pageSize.width;
+  const centerX = pageWidth / 2;
 
+  // Dibuja línea vertical a lo largo de la página
+  const drawVerticalDivider = (fromY = 20, toY = 280) => {
+    doc.setDrawColor(200, 200, 200);
+    doc.line(centerX, fromY, centerX, toY);
+  };
+
+  // Render de ingredientes en columna
+  const renderIngredientes = (titulo: string, totalPersonas: number, xOffset: number, maxWidth: number, startY: number) => {
+    const ingredientes = calcularIngredientes(titulo, totalPersonas);
+
+    const ingredientesOrdenados = ingredientes.sort((a, b) => {
+      const ordenA = obtenerOrdenIngrediente(a[0] as string);
+      const ordenB = obtenerOrdenIngrediente(b[0] as string);
+      return ordenA - ordenB;
+    });
+
+    doc.setFontSize(12);
+    doc.text(`${titulo}`, xOffset, startY);
+    const tableStartY = startY + 8;
+
+    autoTable(doc, {
+      startY: tableStartY,
+      head: [['Ingrediente', 'Cantidad', 'Unidad']],
+      body: ingredientesOrdenados,
+      styles: { fontSize: 7, cellPadding: 1 },
+      headStyles: { fillColor: [34, 197, 94], textColor: 255, fontSize: 8 },
+      margin: { left: xOffset },
+      tableWidth: maxWidth
+    });
+
+    return (doc as any).lastAutoTable?.finalY + 5;
+  };
+
+  // Render de un día (dos columnas: principal izquierda, acompañamiento derecha)
+  const renderDia = (diaMenu: DiaMenu, yOffset: number) => {
+    const { dia, principal, acompanamiento, sinMenu, porciones } = diaMenu;
+    if (sinMenu || (!principal && !acompanamiento)) return yOffset;
+
+    doc.setFontSize(14);
+    doc.text(`${dia}`, 14, yOffset);
+
+    doc.setFontSize(10);
+    doc.text(`Porciones - Chicas: ${porciones.chica}, Medianas: ${porciones.mediana}, Grandes: ${porciones.grande}`, 14, yOffset + 10);
     const totalPersonas = porciones.chica * 0.67 + porciones.mediana + porciones.grande * 1.33;
+    doc.text(`Total de personas equivalentes: ${totalPersonas.toFixed(2)}`, 14, yOffset + 17);
 
-    const render = (titulo: string) => {
-      const ingredientes = calcularIngredientes(titulo, totalPersonas);
+    // Columna izquierda/derecha
+    const sectionStartY = yOffset + 25;
+    const leftWidth = centerX - 20;
+    const rightX = centerX + 5;
+    const rightWidth = centerX - 20;
 
-      const lastY = (doc as any).lastAutoTable?.finalY ?? 30;
+    // Renderizar columnas
+    if (principal) {
+      renderIngredientes(principal, totalPersonas, 14, leftWidth, sectionStartY);
+    }
+    if (acompanamiento) {
+      renderIngredientes(acompanamiento, totalPersonas, rightX, rightWidth, sectionStartY);
+    }
 
-      autoTable(doc, {
-        startY: lastY + 10,
-        head: [[`${dia} - ${titulo}`]],
-        body: [],
-        theme: 'plain'
-      });
+    return (doc as any).lastAutoTable?.finalY + 10 || sectionStartY + 10;
+  };
 
-      // Ordenar ingredientes por día también
-      const ingredientesOrdenados = ingredientes.sort((a, b) => {
-        const ordenA = obtenerOrdenIngrediente(a[0] as string);
-        const ordenB = obtenerOrdenIngrediente(b[0] as string);
-        return ordenA - ordenB;
-      });
+  // 1) Lunes debajo del resumen en la misma página
+  const resumenFinalY = (doc as any).lastAutoTable?.finalY || 30;
+  const lunes = menu[0];
+  const lunesTieneContenido = lunes && !lunes.sinMenu && (lunes.principal || lunes.acompanamiento);
+  if (lunesTieneContenido) {
+    drawVerticalDivider(Math.max(resumenFinalY + 5, 20));
+    renderDia(lunes, resumenFinalY + 10);
+  }
 
-      autoTable(doc, {
-        startY: (doc as any).lastAutoTable?.finalY + 2,
-        head: [['Ingrediente', 'Cantidad', 'Unidad']],
-        body: ingredientesOrdenados,
-      });
-    };
+  // 2) Martes + Miércoles en la misma página
+  const martes = menu[1];
+  const miercoles = menu[2];
+  if ((martes && (martes.principal || martes.acompanamiento) && !martes.sinMenu) ||
+      (miercoles && (miercoles.principal || miercoles.acompanamiento) && !miercoles.sinMenu)) {
+    doc.addPage();
+    drawVerticalDivider(20, 280);
+    let nextY = 20;
+    if (martes && !martes.sinMenu && (martes.principal || martes.acompanamiento)) {
+      nextY = renderDia(martes, 20);
+    }
+    // Asegura separación para el segundo bloque
+    const baseY = Math.max(nextY + 10, 150);
+    if (miercoles && !miercoles.sinMenu && (miercoles.principal || miercoles.acompanamiento)) {
+      renderDia(miercoles, baseY);
+    }
+  }
 
-    if (principal) render(principal);
-    if (acompanamiento) render(acompanamiento);
-  });
+  // 3) Jueves + Viernes en la misma página
+  const jueves = menu[3];
+  const viernes = menu[4];
+  if ((jueves && (jueves.principal || jueves.acompanamiento) && !jueves.sinMenu) ||
+      (viernes && (viernes.principal || viernes.acompanamiento) && !viernes.sinMenu)) {
+    doc.addPage();
+    drawVerticalDivider(20, 280);
+    let nextY = 20;
+    if (jueves && !jueves.sinMenu && (jueves.principal || jueves.acompanamiento)) {
+      nextY = renderDia(jueves, 20);
+    }
+    const baseY = Math.max(nextY + 10, 150);
+    if (viernes && !viernes.sinMenu && (viernes.principal || viernes.acompanamiento)) {
+      renderDia(viernes, baseY);
+    }
+  }
 
-  // 3. Tabla total de la semana
-  const totalY = (doc as any).lastAutoTable?.finalY ?? 30;
-
-  autoTable(doc, {
-    startY: totalY + 15,
-    head: [['INGREDIENTES TOTALES PARA TODA LA SEMANA']],
-    body: [],
-    theme: 'plain',
-  });
+  // 4) Totales de la semana en su propia página
+  doc.addPage();
+  doc.setFontSize(16);
+  doc.text('INGREDIENTES TOTALES PARA TODA LA SEMANA', 14, 20);
 
   const totalIngredientesArray = Object.entries(acumuladorIngredientes)
     .map(([clave, { cantidad, unidad }]) => {
@@ -234,9 +304,11 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
     });
 
   autoTable(doc, {
-    startY: (doc as any).lastAutoTable?.finalY + 2,
+    startY: 30,
     head: [['Ingrediente', 'Cantidad total', 'Unidad']],
     body: totalIngredientesArray,
+    styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [34, 197, 94], textColor: 255 }
   });
 
   doc.save('menu-semanal.pdf');
