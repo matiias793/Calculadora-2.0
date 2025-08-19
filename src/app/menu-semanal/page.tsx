@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { exportMenuToPDF } from '@/utils/exportMenuPDF';
 import { FaFilePdf } from 'react-icons/fa';
 import { nombresRecetasAlmuerzo, nombresAcompanamientos } from '@/utils/recetas-almuerzo';
+import NavigationButtons from '@/components/shared/NavigationButtons';
 
 type TipoComensal = 'chica' | 'mediana' | 'grande';
 
@@ -56,10 +57,9 @@ const MenuSemanal = () => {
 
   return (
     <div className="p-6 bg-white shadow rounded-xl">
-      <Link href="/" className="flex items-center text-logoGreen hover:underline mb-4">
-        <ArrowLeft className="mr-2" />
-        Volver al inicio
-      </Link>
+      <div className="mb-4">
+        <NavigationButtons />
+      </div>
 
       <h2 className="text-2xl font-bold text-logoGreen mb-4">Menú Semanal</h2>
 
