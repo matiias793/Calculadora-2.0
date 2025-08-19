@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 import OptionCard from "@/components/main/OptionCard";
-import BackButton from "@/components/shared/BackButton";
+import NavigationButtons from "@/components/shared/NavigationButtons";
 
 const otrasOpciones = [
   {
@@ -38,7 +38,7 @@ const OtrasFunciones = () => {
     <div className="mx-auto max-w-screen-xl px-2 sm:px-4 w-full mt-6 sm:mt-10">
       <div className="flex flex-col items-start">
         <span className="pl-2 sm:pl-4 md:pl-20 lg:pl-32 flex flex-col items-start justify-start mb-4">
-          <BackButton/>
+          <NavigationButtons />
         </span>
       </div>
 

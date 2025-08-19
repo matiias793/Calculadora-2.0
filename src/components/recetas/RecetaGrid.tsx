@@ -10,7 +10,7 @@ import { FaShoppingBasket, FaTasks, FaVideo } from "react-icons/fa"
 import ProcedimientoCard from './ProcedimientoCard'
 import TipsVariantesCol from './TipsVariantesCol'
 import { Procedimiento } from '@/models/Procedimiento'
-import BackButton from '../shared/BackButton'
+import NavigationButtons from '../shared/NavigationButtons'
 import VideosContainer from './VideosContainer'
 import UnidadesCard from './UnidadesCard'
 import { UnidadMasa } from '@/utils/enums/unidad-masa'
@@ -94,7 +94,7 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
         <div className="mx-auto max-w-screen-xl w-full px-2 sm:px-4">
             <span className="font-bold text-2xl sm:text-3xl text-logoGreen text-center mt-4 sm:mt-5 w-full flex flex-col h-auto">
                 <span className="flex flex-col items-start justify-start mb-4">
-                    <BackButton />
+                    <NavigationButtons />
                 </span>
                 <span className='text-center w-full'>
                     {receta.title}

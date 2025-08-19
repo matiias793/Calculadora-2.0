@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import NavigationButtons from '@/components/shared/NavigationButtons';
 
 const AdminLogin = () => {
   const [credentials, setCredentials] = useState({
@@ -93,10 +94,9 @@ const AdminLogin = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link href="/" className="flex items-center text-logoGreen hover:underline mb-6">
-            <ArrowLeft className="mr-2" />
-            Volver al Inicio
-          </Link>
+          <div className="mb-6">
+            <NavigationButtons />
+          </div>
           
           <div className="text-center">
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">

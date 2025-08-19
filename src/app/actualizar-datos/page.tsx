@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import BackButton from '@/components/shared/BackButton';
+import NavigationButtons from '@/components/shared/NavigationButtons';
 import { authService, uniformeService, User as SupabaseUser, Uniforme } from '@/lib/supabase';
 import { generarOpcionesEscuelas, validarEscuela, formatearNumeroEscuela } from '@/utils/escuelas-por-departamento';
 
@@ -353,7 +353,9 @@ export default function ActualizarDatos() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4">
-        <BackButton href="/otras-funciones" />
+        <div className="mb-6">
+          <NavigationButtons />
+        </div>
         
         <div className="bg-white rounded-lg shadow-md p-6 mt-6">
           <h1 className="text-3xl font-bold text-center text-logoGreen mb-8">
