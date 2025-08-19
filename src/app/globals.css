@@ -93,3 +93,57 @@ html {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
 }
+
+/* Mejoras específicas para selectores en móvil */
+@media (max-width: 768px) {
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+  }
+  
+  /* Mejorar la visibilidad del texto seleccionado */
+  select option {
+    color: #111827 !important;
+    background-color: white !important;
+    padding: 8px 12px;
+  }
+  
+  select option:checked {
+    background-color: #f3f4f6 !important;
+    font-weight: 500;
+  }
+  
+  /* Indicador visual para filtros activos */
+  select[style*="font-weight: 500"] {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+  }
+}
+
+/* Mejorar la experiencia de los selectores en general */
+select {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Estilos para opciones de select */
+select option {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+select option:hover {
+  background-color: #f3f4f6;
+}

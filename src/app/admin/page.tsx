@@ -93,9 +93,9 @@ const AdminLogin = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link href="/otras-funciones" className="flex items-center text-logoGreen hover:underline mb-6">
+          <Link href="/" className="flex items-center text-logoGreen hover:underline mb-6">
             <ArrowLeft className="mr-2" />
-            Volver
+            Volver al Inicio
           </Link>
           
           <div className="text-center">
