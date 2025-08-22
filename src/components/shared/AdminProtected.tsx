@@ -26,8 +26,8 @@ const AdminProtected = ({ children }: AdminProtectedProps) => {
         const adminUser = localStorage.getItem('adminUser');
         const authTimestamp = localStorage.getItem('authTimestamp');
 
-        // Validar que todos los datos necesarios estén presentes
-        if (!isAdmin || !adminUser || !authTimestamp) {
+        // Validar que los datos básicos estén presentes
+        if (!isAdmin || !adminUser) {
           throw new Error('Datos de autenticación incompletos');
         }
 
@@ -41,17 +41,22 @@ const AdminProtected = ({ children }: AdminProtectedProps) => {
           throw new Error('Usuario administrador inválido');
         }
 
-        // Verificar que la sesión no haya expirado (24 horas)
-        const timestamp = parseInt(authTimestamp, 10);
-        const now = Date.now();
-        const sessionExpiry = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+        // Si no hay timestamp (usuarios existentes), crear uno
+        if (!authTimestamp) {
+          localStorage.setItem('authTimestamp', Date.now().toString());
+        } else {
+          // Verificar que la sesión no haya expirado (24 horas)
+          const timestamp = parseInt(authTimestamp, 10);
+          const now = Date.now();
+          const sessionExpiry = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
 
-        if (isNaN(timestamp) || (now - timestamp) > sessionExpiry) {
-          // Limpiar datos expirados
-          localStorage.removeItem('isAdmin');
-          localStorage.removeItem('adminUser');
-          localStorage.removeItem('authTimestamp');
-          throw new Error('Sesión expirada');
+          if (isNaN(timestamp) || (now - timestamp) > sessionExpiry) {
+            // Limpiar datos expirados
+            localStorage.removeItem('isAdmin');
+            localStorage.removeItem('adminUser');
+            localStorage.removeItem('authTimestamp');
+            throw new Error('Sesión expirada');
+          }
         }
 
         setIsAuthenticated(true);
