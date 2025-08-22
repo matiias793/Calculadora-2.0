@@ -1,0 +1,5 @@
+[33mec2941a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat: Implementar mejoras de seguridad y precisión en cálculos - Agregar validaciones robustas de autenticación - Implementar sanitización de datos y prevención XSS - Mejorar precisión matemática en cálculos de porciones - Agregar headers de seguridad y CSP - Corregir errores tipográficos en recetas - Actualizar documentación de seguridad - Mejorar configuración de Next.js para producción
+[33ma8f3270[m Agregar navegación mejorada a la página de planificación semanal
+[33m718203f[m Agregar sistema de navegación mejorado con botones de volver atrás e inicio
+[33m24982cc[m Agregar README completo con documentación del proyecto
+[33med0c920[m Actualización de imagen servicio alimentación y ajuste de zoom en todas las imágenes
