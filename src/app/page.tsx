@@ -1,5 +1,5 @@
 import Image from "next/image";
-import logo from '@/assets/images/logo.png';
+import logo from '@/assets/images/iconoazul.png';
 
 import OptionCard from "@/components/main/OptionCard";
 
@@ -36,10 +36,10 @@ export default function Home() {
       <div className="flex flex-col items-center">
         <Image
           src={logo}
-          width={120}
-          height={160}
+          width={150}
+          height={150}
           alt="Logo"
-          className="sm:w-[150px] sm:h-[200px]"
+          className="sm:w-[180px] sm:h-[180px]"
         />
       </div>
       <span className="font-bold text-2xl sm:text-3xl text-logoGreen text-center mt-4 sm:mt-5 w-full flex flex-col">

@@ -3,10 +3,11 @@ import Link from "next/link";
 interface Props {
     image: JSX.Element,
     title: string;
+    subtitle?: string;
     url: string;
 }
 
-const OptionCard = ( { image, title, url }: Props ) => {
+const OptionCard = ( { image, title, subtitle, url }: Props ) => {
   return (
     <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4">
         <Link
@@ -19,6 +20,9 @@ const OptionCard = ( { image, title, url }: Props ) => {
             </div>
                 <div className="p-4 sm:p-6">
                     <h3 className="text-lg sm:text-xl text-logoGreen text-center font-bold">{ title }</h3>
+                    {subtitle && (
+                        <p className="text-xs text-gray-500 text-center mt-1">{ subtitle }</p>
+                    )}
                 </div>
             </div>
         </Link>

@@ -96,9 +96,16 @@ const PorcionesCopaLecheCard = (
                     q = quantity;
                 }
                 else {
-                    if( ['cm3', 'l', 'g', 'kg'].includes( unit ) ) {
+                    // Conversión especial para huevos y yemas
+                    if( name.toLowerCase().includes('huevo') && unit === 'g' ) {
+                        q = Number( ( ( Number( quantity ) * factor ) / 60 ).toFixed(3) );
+                        unit = 'unidad';
+                    } else if( name.toLowerCase().includes('yema') && unit === 'g' ) {
+                        q = Number( ( ( Number( quantity ) * factor ) / 15 ).toFixed(3) );
+                        unit = 'unidad';
+                    } else if( ['ml', 'l', 'g', 'kg'].includes( unit ) ) {
                         
-                        if( unit === 'cm3' && unidadVolumen === UnidadVolumen.LITROS || unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) {
+                        if( ( unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS ) || ( unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) ) {
                                                         
                             q = Number( ( ( Number( quantity ) * factor ) / 1000 ).toFixed(3) );
                         }
@@ -113,7 +120,7 @@ const PorcionesCopaLecheCard = (
                 }
                 let u = unit;
                 if( unit === 'unidad' && ( q != 1 ) ) u = 'unid.';
-                if( unit === 'cm3' && unidadVolumen === UnidadVolumen.LITROS ) u = 'l';
+                if( unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS ) u = 'l';
                 if( unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) u = 'kg';
                 return {
                     name,

@@ -13,10 +13,10 @@ const otrasOpciones = [
         src="/images/actualiza-datos.png"
         fill
         style={{ objectFit: "contain" }}
-        alt="Actualizar mis datos"
+        alt="Funcionarios"
       />
     ),
-    title: 'Actualizar mis datos',
+    title: 'Funcionarios',
     url: '/actualizar-datos'
   },
   {

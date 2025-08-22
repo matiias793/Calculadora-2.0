@@ -3,10 +3,10 @@ export const recetas = {
         title: 'Brownie de porotos negros',
         ingredients: [
             { name: 'Porotos negros crudos', quantity: 60, unit: 'g' },
-            { name: 'Aceite', quantity: 100, unit: 'cm3' },
-            { name: 'Agua', quantity: 150, unit: 'cm3' },
+            { name: 'Aceite', quantity: 100, unit: 'ml' },
+            { name: 'Agua', quantity: 150, unit: 'ml' },
             { name: 'Huevo', quantity: 1, unit: 'unidad' },
-            { name: 'Vainilla', quantity: 12, unit: 'cm3' },
+            { name: 'Vainilla', quantity: 12, unit: 'ml' },
             { name: 'Avena', quantity: 70, unit: 'g' },
             { name: 'Azúcar', quantity: 100, unit: 'g' },
             { name: 'Almidón de maíz', quantity: 80, unit: 'g' },
@@ -22,9 +22,9 @@ export const recetas = {
             { name: 'Harina', quantity: 140, unit: 'g' },
             { name: 'Banana', quantity: 125, unit: 'g' },
             { name: 'Azúcar', quantity: 90, unit: 'g' },
-            { name: 'Aceite', quantity: 70, unit: 'cm3' },
+            { name: 'Aceite', quantity: 70, unit: 'ml' },
             { name: 'Polvo de hornear', quantity: 10, unit: 'g' },
-            { name: 'Vainilla', quantity: 7.5, unit: 'cm3' }
+            { name: 'Vainilla', quantity: 7.5, unit: 'ml' }
         ]
     },
     3: {
@@ -33,9 +33,9 @@ export const recetas = {
             { name: 'Huevos', quantity: 2, unit: 'unidad' },
             { name: 'Harina', quantity: 160, unit: 'g' },
             { name: 'Polvo de hornear', quantity: 10, unit: 'g' },
-            { name: 'Leche', quantity: 120, unit: 'cm3' },
-            { name: 'Agua', quantity: 50, unit: 'cm3' },
-            { name: 'Aceite', quantity: 60, unit: 'cm3' },
+            { name: 'Leche', quantity: 120, unit: 'ml' },
+            { name: 'Agua', quantity: 50, unit: 'ml' },
+            { name: 'Aceite', quantity: 60, unit: 'ml' },
             { name: 'Zanahoria', quantity: 125, unit: 'g' },
             { name: 'Queso rallado', quantity: 50, unit: 'g' },
             { name: 'Sal', quantity: 3, unit: 'g' }
@@ -47,7 +47,7 @@ export const recetas = {
             { name: 'Huevos', quantity: 1.5, unit: 'unidad' },
             { name: 'Harina', quantity: 200, unit: 'g' },
             { name: 'Azúcar', quantity: 65, unit: 'g' },
-            { name: 'Aceite', quantity: 55, unit: 'cm3' },
+            { name: 'Aceite', quantity: 55, unit: 'ml' },
             { name: 'Polvo de hornear', quantity: 7.5, unit: 'g' },
             { name: 'Ralladura de limón o naranja', quantity: 'c/n', unit: '' },
             { name: 'Dulce de membrillo', quantity: 200, unit: 'g' }
@@ -58,11 +58,11 @@ export const recetas = {
         ingredients: [
             { name: 'Huevo', quantity: 2, unit: 'unidad' },
             { name: 'Azúcar', quantity: 125, unit: 'g' },
-            { name: 'Aceite', quantity: 60, unit: 'cm3' },
+            { name: 'Aceite', quantity: 60, unit: 'ml' },
             { name: 'Harina', quantity: 220, unit: 'g' },
             { name: 'Polvo de hornear', quantity: 5, unit: 'g' },
-            { name: 'Leche', quantity: 160, unit: 'cm3' },
-            { name: 'Vainilla', quantity: 3, unit: 'cm3' }
+            { name: 'Leche', quantity: 160, unit: 'ml' },
+            { name: 'Vainilla', quantity: 3, unit: 'ml' }
         ],
         variants: [
             { name: 'Manzana, pera, durazno, ciruela', quantity: 300, unit: 'g' },
@@ -76,7 +76,7 @@ export const recetas = {
         title: 'Torta de calabaza',
         ingredients: [
             { name: 'Huevos', quantity: 1, unit: 'unidad' },
-            { name: 'Aceite', quantity: 100, unit: 'cm3' },
+            { name: 'Aceite', quantity: 100, unit: 'ml' },
             { name: 'Azúcar', quantity: 110, unit: 'g' },
             { name: 'Calabaza', quantity: 200, unit: 'g' },
             { name: 'Harina', quantity: 180, unit: 'g' },
@@ -91,7 +91,7 @@ export const recetas = {
             { name: 'Harina', quantity: 160, unit: 'g' },
             { name: 'Polvo de hornear', quantity: 10, unit: 'g' },
             { name: 'Huevo', quantity: 3, unit: 'unidad' },
-            { name: 'Aceite', quantity: 110, unit: 'cm3' },
+            { name: 'Aceite', quantity: 110, unit: 'ml' },
             { name: 'Azúcar', quantity: 125, unit: 'g' }
         ]
     },
@@ -101,8 +101,8 @@ export const recetas = {
             { name: 'Harina', quantity: 300, unit: 'g' },
             { name: 'Levadura seca', quantity: 5, unit: 'g' },
             { name: 'Azúcar', quantity: 5, unit: 'g' },
-            { name: 'Aceite', quantity: 10, unit: 'cm3' },
-            { name: 'Agua tibia', quantity: 200, unit: 'cm3' },
+            { name: 'Aceite', quantity: 10, unit: 'ml' },
+            { name: 'Agua tibia', quantity: 200, unit: 'ml' },
             { name: 'Sal', quantity: 2.5, unit: 'g' }
         ],
         variants: [
@@ -118,9 +118,9 @@ export const recetas = {
         title: 'Pan de calabaza',
         ingredients: [
             { name: 'Harina', quantity: 300, unit: 'g' },
-            { name: 'Leche', quantity: 150, unit: 'cm3' },
+            { name: 'Leche', quantity: 150, unit: 'ml' },
             { name: 'Calabaza', quantity: 80, unit: 'g' },
-            { name: 'Aceite', quantity: 50, unit: 'cm3' },
+            { name: 'Aceite', quantity: 50, unit: 'ml' },
             { name: 'Huevo', quantity: 1, unit: 'unidad' },
             { name: 'Polvo de hornear', quantity: 25, unit: 'g' },
             { name: 'Sal', quantity: 2.5, unit: 'g' }
@@ -130,8 +130,8 @@ export const recetas = {
         title: 'Scones de queso',
         ingredients: [
             { name: 'Harina', quantity: 360, unit: 'g' },
-            { name: 'Aceite', quantity: 60, unit: 'cm3' },
-            { name: 'Leche', quantity: 175, unit: 'cm3' },
+            { name: 'Aceite', quantity: 60, unit: 'ml' },
+            { name: 'Leche', quantity: 175, unit: 'ml' },
             { name: 'Polvo de hornear', quantity: 15, unit: 'g' },
             { name: 'Sal', quantity: 3.5, unit: 'g' },
             { name: 'Queso rallado', quantity: 40, unit: 'g' }
@@ -148,28 +148,28 @@ export const recetas = {
         ingredients: [
             { name: 'Harina', quantity: 225, unit: 'g' },
             { name: 'Azúcar', quantity: 75, unit: 'g' },
-            { name: 'Aceite', quantity: 50, unit: 'cm3' },
+            { name: 'Aceite', quantity: 50, unit: 'ml' },
             { name: 'Polvo de hornear', quantity: 10, unit: 'g' },
             { name: 'Sal', quantity: 1.25, unit: 'g' },
-            { name: 'Leche', quantity: 110, unit: 'cm3' },
-            { name: 'Vainilla', quantity: 10, unit: 'cm3' }
+            { name: 'Leche', quantity: 110, unit: 'ml' },
+            { name: 'Vainilla', quantity: 10, unit: 'ml' }
         ]
     },
     12: {
         title: 'Hummus',
         ingredients: [
             { name: 'Garbanzos', quantity: 140, unit: 'g' },
-            { name: 'Jugo de limón', quantity: 2.5, unit: 'cm3' },
-            { name: 'Aceite', quantity: 50, unit: 'cm3' },
+            { name: 'Jugo de limón', quantity: 2.5, unit: 'ml' },
+            { name: 'Aceite', quantity: 50, unit: 'ml' },
             { name: 'Sal', quantity: 1, unit: 'g' },
-            { name: 'Agua de cocción', quantity: 'c/n', unit: 'cm3' }
+            { name: 'Agua de cocción', quantity: 'c/n', unit: 'ml' }
         ]
     },
     13: {
         title: 'Untable de ricota',
         ingredients: [
             { name: 'Ricota', quantity: 170, unit: 'g' },
-            { name: 'Aceite', quantity: 30, unit: 'cm3' },
+            { name: 'Aceite', quantity: 30, unit: 'ml' },
             { name: 'Sal', quantity: 1, unit: 'g' }
         ],
         variants:  [
@@ -180,10 +180,10 @@ export const recetas = {
         title: 'Untable de zanahoria',
         ingredients: [
             { name: 'Zanahoria', quantity: 150, unit: 'g' },
-            { name: 'Jugo de limón', quantity: 2.5, unit: 'cm3' },
-            { name: 'Aceite', quantity: 50, unit: 'cm3' },
+            { name: 'Jugo de limón', quantity: 2.5, unit: 'ml' },
+            { name: 'Aceite', quantity: 50, unit: 'ml' },
             { name: 'Sal', quantity: 1, unit: 'g' },
-            { name: 'Agua de cocción', quantity: 'c/n', unit: 'cm3' }
+            { name: 'Agua de cocción', quantity: 'c/n', unit: 'ml' }
         ],
         variants: [
             { name: 'Jengibre fresco', quantity: 1, unit: 'g' }
@@ -199,7 +199,7 @@ export const recetas = {
             { name: 'Pasas de uva', quantity: 50, unit: 'g' },
             { name: 'Aceite', quantity: 60, unit: 'g' },
             { name: 'Polvo de hornear', quantity: 5, unit: 'g' },
-            { name: 'Vainilla', quantity: 3, unit: 'cm3' },
+            { name: 'Vainilla', quantity: 3, unit: 'ml' },
             { name: 'Ralladura de limón', quantity: 'c/n', unit: '' }
         ]
     },
@@ -208,8 +208,8 @@ export const recetas = {
         ingredients: [
             { name: 'Queso fresco rallado', quantity: 45, unit: 'g' },
             { name: 'Avena', quantity: 240, unit: 'g' },
-            { name: 'Aceite', quantity: 60, unit: 'cm3' },
-            { name: 'Agua', quantity: 180, unit: 'cm3' },
+            { name: 'Aceite', quantity: 60, unit: 'ml' },
+            { name: 'Agua', quantity: 180, unit: 'ml' },
             { name: 'Leche en polvo', quantity: 60, unit: 'g' },
             { name: 'Semillas de lino', quantity: 25, unit: 'g' },
             { name: 'Semillas de sésamo', quantity: 25, unit: 'g' },
@@ -228,8 +228,8 @@ export const recetas = {
             { name: 'Jugo de limón', quantity: 0.5, unit: 'unid.' },
             { name: 'Ralladura de naranja', quantity: 0.5, unit: 'unid.' },
             { name: 'Ralladura de limón', quantity: 0.5, unit: 'unid.' },
-            { name: 'Leche', quantity: 35, unit: 'cm3' },
-            { name: 'Vainilla', quantity: 5, unit: 'cm3' }
+            { name: 'Leche', quantity: 35, unit: 'ml' },
+            { name: 'Vainilla', quantity: 5, unit: 'ml' }
         ]
     },
     18: {
@@ -241,7 +241,7 @@ export const recetas = {
             { name: 'Almidón de maíz', quantity: 45, unit: 'g' },
             { name: 'Harina', quantity: 120, unit: 'g' },
             { name: 'Polvo de hornear', quantity: 3.5, unit: 'g' },
-            { name: 'Vainilla', quantity: 2, unit: 'cm3' },
+            { name: 'Vainilla', quantity: 2, unit: 'ml' },
             { name: 'Dulce de membrillo', quantity: 100, unit: 'g' }
         ]
     },
@@ -254,7 +254,7 @@ export const recetas = {
             { name: 'Almidón de maíz', quantity: 110, unit: 'g' },
             { name: 'Harina', quantity: 90, unit: 'g' },
             { name: 'Polvo de hornear', quantity: 3.5, unit: 'g' },
-            { name: 'Vainilla', quantity: 2, unit: 'cm3' },
+            { name: 'Vainilla', quantity: 2, unit: 'ml' },
             { name: 'Ralladura de limón', quantity: 2, unit: 'g' },
             { name: 'Dulce de leche', quantity: 150, unit: 'g' },
             { name: 'Coco rallado', quantity: 20, unit: 'g' }
@@ -286,7 +286,7 @@ export const recetas = {
     22: {
         title: 'Crema de vainilla',
         ingredients: [
-            { name: 'Leche', quantity: 1500, unit: 'cm3' },
+            { name: 'Leche', quantity: 1500, unit: 'ml' },
             { name: 'Almidón de maíz', quantity: 90, unit: 'g' },
             { name: 'Azúcar', quantity: 150, unit: 'g' },
             { name: 'Vainilla', quantity: 5, unit: 'g' },
@@ -297,7 +297,7 @@ export const recetas = {
     23: {
         title: 'Licuado de leche y fruta',
         ingredients: [
-            { name: 'Leche', quantity: 1500, unit: 'cm3' },
+            { name: 'Leche', quantity: 1500, unit: 'ml' },
             { name: 'Fruta', quantity: 300, unit: 'g' },
             { name: 'Azúcar', quantity: 80, unit: 'g' }
         ]
@@ -309,8 +309,8 @@ export const recetas = {
             { name: 'Huevo', quantity: 1, unit: 'unid.' },
             { name: 'Azúcar', quantity: 100, unit: 'g' },
             { name: 'Dulce de leche', quantity: 100, unit: 'g' },
-            { name: 'Aceite', quantity: 140, unit: 'cm3' },
-            { name: 'Vainilla', quantity: 1, unit: 'cm3' }
+            { name: 'Aceite', quantity: 140, unit: 'ml' },
+            { name: 'Vainilla', quantity: 1, unit: 'ml' }
         ]
     }
 };

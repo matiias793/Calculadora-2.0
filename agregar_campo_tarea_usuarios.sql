@@ -35,3 +35,5 @@ SELECT 'Registros de ejemplo:' as info;
 SELECT documento, primer_nombre, primer_apellido, tarea 
 FROM usuarios 
 LIMIT 5;
+
+

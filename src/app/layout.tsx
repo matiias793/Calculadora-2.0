@@ -48,11 +48,11 @@ export default function RootLayout({
           <div className="w-1/6 bg-blue-400"></div>
           <div className="w-1/6 bg-orange-400"></div>
           <div className="w-1/6 bg-red-400"></div>
-          <div className="w-1/6 bg-green-400"></div>
+          <div className="w-1/6 bg-blue-400"></div>
           <div className="w-1/6 bg-yellow-300"></div>
           <div className="w-1/6 bg-violet-400"></div>
         </div>
-        <div className="bg-green-50 min-h-screen py-2 sm:py-4 md:py-8 px-2 sm:px-4">
+        <div className="bg-blue-50 min-h-screen py-2 sm:py-4 md:py-8 px-2 sm:px-4">
           <Providers>
             { children }
           </Providers>

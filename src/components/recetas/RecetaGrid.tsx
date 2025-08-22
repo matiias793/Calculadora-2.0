@@ -38,8 +38,8 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
             if (isNaN(Number(quantity))) {
                 q = quantity;
             } else {
-                if (["cm3", "ml", "l", "g", "kg"].includes(unit)) {
-                    if ((["cm3", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) || (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS)) {
+                if (["ml", "ml", "l", "g", "kg"].includes(unit)) {
+                    if ((["ml", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) || (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS)) {
                         q = Number(((Number(quantity) * 1) / 1000).toFixed(3));
                     } else {
                         q = Number(quantity) * 1;
@@ -50,7 +50,7 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
             }
             let u = unit;
             if (unit === "unidad" && q != 1) u = "unid.";
-            if (["cm3", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) u = "l";
+            if (["ml", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) u = "l";
             if (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS) u = "kg";
             return { name, quantity: q, unit: u };
         });
@@ -60,8 +60,8 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
             if (isNaN(Number(quantity))) {
                 q = quantity;
             } else {
-                if (["cm3", "ml", "l", "g", "kg"].includes(unit)) {
-                    if ((["cm3", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) || (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS)) {
+                if (["ml", "ml", "l", "g", "kg"].includes(unit)) {
+                    if ((["ml", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) || (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS)) {
                         q = Number(((Number(quantity) * 1) / 1000).toFixed(3));
                     } else {
                         q = Number(quantity) * 1;
@@ -72,7 +72,7 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
             }
             let u = unit;
             if (unit === "unidad" && q != 1) u = "unid.";
-            if (["cm3", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) u = "l";
+            if (["ml", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) u = "l";
             if (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS) u = "kg";
             return { name, quantity: q, unit: u };
         });

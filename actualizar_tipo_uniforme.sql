@@ -44,3 +44,5 @@ SELECT
     COUNT(*) as cantidad
 FROM uniformes 
 WHERE tipo_uniforme = 'cocina y limpieza';
+
+

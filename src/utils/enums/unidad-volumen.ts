@@ -1,4 +1,4 @@
 export enum UnidadVolumen {
-    CENTIMETROS_CUBICOS = 'cm3',
+    CENTIMETROS_CUBICOS = 'ml',
     LITROS = 'l'
 }

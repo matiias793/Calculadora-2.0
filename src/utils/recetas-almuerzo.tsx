@@ -507,6 +507,95 @@ export const recetasAlmuerzo =  {
             { name: 'Aceite', quantity: 5, unit: 'ml' },
             { name: 'Sal', quantity: 0.5, unit: 'g' }
         ]
+    },
+    139: {
+        title: 'Arroz con leche',
+        ingredients: [
+            { name: 'Leche', quantity: 150, unit: 'ml' },
+            { name: 'Arroz', quantity: 15, unit: 'g' },
+            { name: 'Azúcar', quantity: 15, unit: 'g' },
+            { name: 'Yemas', quantity: 7.5, unit: 'g' },
+            { name: 'Vainilla', quantity: 0.5, unit: 'g' },
+            { name: 'Canela', quantity: 0.25, unit: 'g' }
+        ]
+    },
+    140: {
+        title: 'Crema de naranja',
+        ingredients: [
+            { name: 'Leche', quantity: 100, unit: 'ml' },
+            { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
+            { name: 'Azúcar', quantity: 15, unit: 'g' },
+            { name: 'Huevo', quantity: 11, unit: 'g' },
+            { name: 'Naranja', quantity: 50, unit: 'ml' }
+        ]
+    },
+    141: {
+        title: 'Crema de vainilla',
+        ingredients: [
+            { name: 'Leche', quantity: 150, unit: 'ml' },
+            { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
+            { name: 'Azúcar', quantity: 15, unit: 'g' },
+            { name: 'Vainilla', quantity: 0.5, unit: 'g' }
+        ]
+    },
+    142: {
+        title: 'Budín de zapallo y coco',
+        ingredients: [
+            { name: 'Zapallo Cabutia', quantity: 85, unit: 'g' },
+            { name: 'Leche', quantity: 40, unit: 'ml' },
+            { name: 'Almidón de maíz', quantity: 3, unit: 'g' },
+            { name: 'Azúcar', quantity: 12, unit: 'g' },
+            { name: 'Coco rallado', quantity: 6, unit: 'g' },
+            { name: 'Vainilla', quantity: 0.4, unit: 'ml' },
+            { name: 'Canela en rama', quantity: 'c/n', unit: '' }
+        ]
+    },
+    143: {
+        title: 'Budín de harina de maíz',
+        ingredients: [
+            { name: 'Leche', quantity: 125, unit: 'g' },
+            { name: 'Harina de maíz', quantity: 10, unit: 'g' },
+            { name: 'Azúcar', quantity: 10, unit: 'g' },
+            { name: 'Huevo', quantity: 11, unit: 'g' },
+            { name: 'Vainilla', quantity: 0.5, unit: 'g' },
+            { name: 'Cáscara de naranja', quantity: 'c/n', unit: '' }
+        ]
+    },
+    144: {
+        title: 'Caramelo',
+        ingredients: [
+            { name: 'Azúcar', quantity: 12, unit: 'g' },
+            { name: 'Agua', quantity: 9, unit: 'ml' }
+        ]
+    },
+    145: {
+        title: 'Polenta/plato principal',
+        ingredients: [
+            { name: 'Harina de maíz', quantity: 50, unit: 'g' },
+            { name: 'Leche fluida', quantity: 120, unit: 'ml' },
+            { name: 'Agua', quantity: 150, unit: 'ml' },
+            { name: 'Sal', quantity: 0.5, unit: 'g' }
+        ]
+    },
+    146: {
+        title: 'Masa básica para tortas',
+        ingredients: [
+            { name: 'Harina', quantity: 50, unit: 'g' },
+            { name: 'Aceite', quantity: 5, unit: 'ml' },
+            { name: 'Agua', quantity: 20, unit: 'ml' },
+            { name: 'Polvo de hornear', quantity: 0.3, unit: 'g' },
+            { name: 'Sal', quantity: 0.25, unit: 'g' }
+        ]
+    },
+    147: {
+        title: 'Filloas',
+        ingredients: [
+            { name: 'Leche', quantity: 100, unit: 'ml' },
+            { name: 'Harina de trigo', quantity: 50, unit: 'g' },
+            { name: 'Huevo', quantity: 1, unit: 'unidad' },
+            { name: 'Aceite', quantity: 5, unit: 'cc' },
+            { name: 'Sal', quantity: 0.25, unit: 'g' }
+        ]
     }
 }
 export const nombresRecetasAlmuerzo = [
@@ -534,6 +623,20 @@ export const nombresRecetasAlmuerzo = [
   'Torta de atún',
   'Arroz plato principal',
   'Fideos plato principal'
+];
+
+export const nombresRecetasBase = [
+  'Polenta/plato principal',
+  'Masa básica para tortas',
+  'Filloas'
+];
+
+export const nombresPostres = [
+  'Arroz con leche',
+  'Crema de naranja',
+  'Crema de vainilla',
+  'Budín de zapallo y coco',
+  'Budín de harina de maíz'
 ];
 
 export const nombresAcompanamientos = [

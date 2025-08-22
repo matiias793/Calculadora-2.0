@@ -57,3 +57,5 @@ ON CONFLICT (documento) DO NOTHING;
 -- 10. Verificar todos los usuarios
 SELECT 'Todos los usuarios:' as info;
 SELECT documento, primer_nombre, primer_apellido, departamento, escuela FROM usuarios ORDER BY documento;
+
+

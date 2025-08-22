@@ -16,7 +16,7 @@ import untableZanahoria from "@/assets/images/untable-zanahoria.png";
 import galletasAvenaPasas from "@/assets/images/galletas-avena-pasas.png";
 import galletasAvenaQueso from "@/assets/images/galletas-avena-queso.png";
 import galletitasCitricas from "@/assets/images/galletitas-citricas.png";
-import ojitosCaseros from "@/assets/images/ojitos-caseros.png";
+import ojitosCaseros from "@/assets/images/ojistos-jardin-115.jpg";
 import alfajoresMaicena from "@/assets/images/alfajores-maicena.png";
 import barraCereales from "@/assets/images/barra-cereales.png";
 import mixFrutosSecos from "@/assets/images/mix-frutos-secos.png";
@@ -203,6 +203,7 @@ export const opcionesDesayunosMeriendas = [
               alt=""
             ></Image>,
       title: 'Ojitos caseros',
+      subtitle: 'Foto: Jardín N°115 de Paysandú',
       url: '/recetas/18'
     },
     {

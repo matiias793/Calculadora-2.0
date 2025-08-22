@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Search, Edit, Trash2, Plus, LogOut, Eye, EyeOff, Users, Shirt, Download, Filter } from 'lucide-react';
+import { ArrowLeft, Search, Edit, Trash2, Plus, LogOut, Eye, EyeOff, Users, Shirt, Download, Filter, ChefHat } from 'lucide-react';
 import { authService, uniformeService, User, UniformeConUsuario } from '@/lib/supabase';
 import AdminProtected from '@/components/shared/AdminProtected';
 import NavigationButtons from '@/components/shared/NavigationButtons';
@@ -44,7 +44,7 @@ const AdminDashboard = () => {
   const [editingUserOpcionesEscuelas, setEditingUserOpcionesEscuelas] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [activeTab, setActiveTab] = useState<'users' | 'uniformes'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'uniformes' | 'recetas'>('users');
   const [exportFilterDepartamento, setExportFilterDepartamento] = useState('');
   const [exportFilterEscuela, setExportFilterEscuela] = useState('');
   const [showExportModal, setShowExportModal] = useState(false);
@@ -60,7 +60,7 @@ const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
-    // Filtrar usuarios basado en el término de búsqueda, departamento, escuela y tarea
+    // Filtrar funcionarios basado en el término de búsqueda, departamento, escuela y tarea
     let filtered = users;
     
     // Filtrar por departamento si está seleccionado
@@ -73,7 +73,7 @@ const AdminDashboard = () => {
     // Filtrar por escuela si está seleccionada
     if (escuelaFilter) {
       filtered = filtered.filter(user =>
-        user.escuela.toLowerCase().includes(escuelaFilter.toLowerCase())
+        user.escuela.toLowerCase() === escuelaFilter.toLowerCase()
       );
     }
     
@@ -113,7 +113,7 @@ const AdminDashboard = () => {
     // Filtrar por escuela si está seleccionada
     if (escuelaFilter) {
       filtered = filtered.filter(uniforme =>
-        uniforme.escuela.toLowerCase().includes(escuelaFilter.toLowerCase())
+        uniforme.escuela.toLowerCase() === escuelaFilter.toLowerCase()
       );
     }
     
@@ -127,7 +127,7 @@ const AdminDashboard = () => {
       setUsers(data || []);
     } catch (error) {
       console.error('Error fetching users:', error);
-      setError('Error al cargar los usuarios');
+              setError('Error al cargar los funcionarios');
     } finally {
       setLoading(false);
     }
@@ -340,7 +340,7 @@ const AdminDashboard = () => {
 
           // Título
           doc.setFontSize(18);
-          doc.text('Reporte de Usuarios', 14, 20);
+          doc.text('Reporte de Funcionarios', 14, 20);
 
           // Filtros aplicados
           doc.setFontSize(12);
@@ -362,7 +362,7 @@ const AdminDashboard = () => {
           // Datos (ya filtrados en UI)
           const usersToExport = filteredUsers;
           if (usersToExport.length === 0) {
-            setError('No hay usuarios que coincidan con los filtros seleccionados');
+            setError('No hay funcionarios que coincidan con los filtros seleccionados');
             setTimeout(() => setError(''), 3000);
             return;
           }
@@ -383,7 +383,7 @@ const AdminDashboard = () => {
             headStyles: { fillColor: [34, 197, 94], textColor: 255 }
           });
 
-          const fileName = `usuarios_${departamentoFilter || 'todos'}_${new Date().toISOString().split('T')[0]}.pdf`;
+          const fileName = `funcionarios_${departamentoFilter || 'todos'}_${new Date().toISOString().split('T')[0]}.pdf`;
           doc.save(fileName);
         }).catch(() => {
           setError('Error al preparar la tabla para PDF');
@@ -404,7 +404,7 @@ const AdminDashboard = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando usuarios...</p>
+          <p className="mt-4 text-gray-600">Cargando funcionarios...</p>
         </div>
       </div>
     );
@@ -422,7 +422,7 @@ const AdminDashboard = () => {
             </div>
             <div className="text-center sm:text-left">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Panel de Administrador</h1>
-              <p className="text-gray-600 text-sm sm:text-base">Gestión de usuarios registrados</p>
+              <p className="text-gray-600 text-sm sm:text-base">Gestión de funcionarios registrados</p>
             </div>
           </div>
           <button
@@ -446,8 +446,8 @@ const AdminDashboard = () => {
               }`}
             >
               <Users className="inline-block w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Usuarios</span>
-              <span className="sm:hidden">Usuarios</span>
+                      <span className="hidden sm:inline">Funcionarios</span>
+        <span className="sm:hidden">Funcionarios</span>
               <span className="ml-1">({users.length})</span>
             </button>
             <button
@@ -462,6 +462,18 @@ const AdminDashboard = () => {
               <span className="hidden sm:inline">Uniformes</span>
               <span className="sm:hidden">Uniformes</span>
               <span className="ml-1">({uniformes.length})</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('recetas')}
+              className={`py-2 px-1 border-b-2 font-medium text-xs sm:text-sm flex-1 sm:flex-none ${
+                activeTab === 'recetas'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <ChefHat className="inline-block w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Recetas</span>
+              <span className="sm:hidden">Recetas</span>
             </button>
           </nav>
         </div>
@@ -479,7 +491,7 @@ const AdminDashboard = () => {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                     <input
                       type="text"
-                      placeholder="Buscar usuarios por nombre, documento, escuela..."
+                      placeholder="Buscar funcionarios por nombre, documento, escuela..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -527,7 +539,7 @@ const AdminDashboard = () => {
                         ))}
                       </select>
                       {escuelaFilter && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"></div>
                       )}
                     </div>
                     <div className="relative">
@@ -563,6 +575,13 @@ const AdminDashboard = () => {
                         Limpiar
                       </button>
                     )}
+                    <button
+                      onClick={exportUsersToPDF}
+                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Exportar funcionarios (PDF)
+                    </button>
                   </div>
                 </div>
               </div>
@@ -616,7 +635,7 @@ const AdminDashboard = () => {
                         ))}
                       </select>
                       {escuelaFilter && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"></div>
                       )}
                     </div>
                   </div>
@@ -636,7 +655,7 @@ const AdminDashboard = () => {
                     )}
                     <button
                       onClick={() => setShowExportModal(true)}
-                      className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       Exportar PDF
@@ -655,7 +674,7 @@ const AdminDashboard = () => {
           </div>
         )}
         {success && (
-          <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
+          <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-md">
             {success}
           </div>
         )}
@@ -668,13 +687,13 @@ const AdminDashboard = () => {
               <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                   <h3 className="text-base sm:text-lg font-medium text-gray-900">
-                    Usuarios ({filteredUsers.length} de {users.length})
+                    Funcionarios ({filteredUsers.length} de {users.length})
                   </h3>
                   {(departamentoFilter || escuelaFilter || tareaFilter) && (
                     <div className="text-xs sm:text-sm text-gray-600 flex flex-wrap gap-1">
                       Filtros aplicados: 
                       {departamentoFilter && <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">Departamento: {departamentoFilter}</span>}
-                      {escuelaFilter && <span className="px-2 py-1 bg-green-100 text-green-800 rounded">Escuela: {escuelaFilter}</span>}
+                      {escuelaFilter && <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">Escuela: {escuelaFilter}</span>}
                       {tareaFilter && <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded">Tarea: {tareaFilter}</span>}
                     </div>
                   )}
@@ -777,24 +796,16 @@ const AdminDashboard = () => {
                   </tbody>
                 </table>
               </div>
-              <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
-                <button
-                  onClick={exportUsersToPDF}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Exportar usuarios (PDF)
-                </button>
-              </div>
+
             </div>
 
             {filteredUsers.length === 0 && !loading && (
               <div className="text-center py-12">
-                <p className="text-gray-500">No se encontraron usuarios</p>
+                <p className="text-gray-500">No se encontraron funcionarios</p>
               </div>
             )}
           </>
-        ) : (
+        ) : activeTab === 'uniformes' ? (
           <>
             {/* Uniformes Table */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -807,7 +818,7 @@ const AdminDashboard = () => {
                     <div className="text-xs sm:text-sm text-gray-600 flex flex-wrap gap-1">
                       Filtros aplicados: 
                       {departamentoFilter && <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">Departamento: {departamentoFilter}</span>}
-                      {escuelaFilter && <span className="px-2 py-1 bg-green-100 text-green-800 rounded">Escuela: {escuelaFilter}</span>}
+                      {escuelaFilter && <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">Escuela: {escuelaFilter}</span>}
                     </div>
                   )}
                 </div>
@@ -845,7 +856,7 @@ const AdminDashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10">
-                              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center">
+                              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                                 <span className="text-white font-medium text-sm">
                                   {uniforme.primer_nombre.charAt(0)}{uniforme.primer_apellido.charAt(0)}
                                 </span>
@@ -871,7 +882,7 @@ const AdminDashboard = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             {uniforme.talle_calzado}
                           </span>
                         </td>
@@ -900,6 +911,103 @@ const AdminDashboard = () => {
                 <p className="text-gray-500">No se encontraron uniformes</p>
               </div>
             )}
+          </>
+        ) : (
+          <>
+            {/* Recetas Content */}
+            <div className="bg-white rounded-lg shadow mb-6">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex flex-col lg:flex-row gap-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Gestión de Recetas</h3>
+                    <p className="text-gray-600 mb-4">
+                      Administra las recetas del sistema. Puedes crear, editar y eliminar recetas, así como gestionar sus ingredientes y procedimientos.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={() => router.push('/admin/recetas')}
+                        className="flex items-center gap-2 bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-2 px-4 rounded"
+                      >
+                        <ChefHat className="w-4 h-4" />
+                        Gestionar Recetas
+                      </button>
+                      <button
+                        onClick={() => router.push('/admin/recetas/nueva')}
+                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Nueva Receta
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <ChefHat className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Total Recetas</p>
+                    <p className="text-2xl font-semibold text-gray-900">0</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <ChefHat className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Recetas Activas</p>
+                    <p className="text-2xl font-semibold text-gray-900">0</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-yellow-100 rounded-lg">
+                    <ChefHat className="w-6 h-6 text-yellow-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Categorías</p>
+                    <p className="text-2xl font-semibold text-gray-900">5</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Categories Overview */}
+            <div className="bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900">Categorías de Recetas</h3>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { name: 'Almuerzos', count: 0, color: 'blue' },
+                    { name: 'Desayunos', count: 0, color: 'green' },
+                    { name: 'Copa de Leche', count: 0, color: 'yellow' },
+                    { name: 'Recetas Base', count: 0, color: 'purple' },
+                    { name: 'Postres', count: 0, color: 'pink' }
+                  ].map((category) => (
+                    <div key={category.name} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-900">{category.name}</h4>
+                          <p className="text-sm text-gray-600">{category.count} recetas</p>
+                        </div>
+                        <div className={`w-3 h-3 rounded-full bg-${category.color}-500`}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </>
         )}
       </div>
@@ -1179,7 +1287,7 @@ const AdminDashboard = () => {
               </button>
               <button
                 onClick={exportUniformesToPDF}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
                 Exportar PDF
               </button>

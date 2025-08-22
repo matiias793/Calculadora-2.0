@@ -43,3 +43,5 @@ ON CONFLICT (documento) DO UPDATE SET
 
 -- 7. Verificar que el insert funcionó
 SELECT * FROM uniformes WHERE documento = '12345678';
+
+

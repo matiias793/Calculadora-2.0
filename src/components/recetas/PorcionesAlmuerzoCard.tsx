@@ -17,11 +17,36 @@ const PorcionesAlmuerzoCard = () => {
     const [ counter, setCounter ] = useState( porciones );
     const [ tamanio, setTamanio ] = useState( TamanioEnum.MEDIANA );
   
+    // Constantes para cálculos precisos
+    const MAX_PORCIONES = 1000;
+    const MIN_PORCIONES = 1;
+    const FACTOR_CHICA = 0.67; // 1 - 0.33
+    const FACTOR_GRANDE = 1.33; // 1 + 0.33
+  
     const tamanios: Tamanio[] = [
       { tamanio: TamanioEnum.CHICA },
       { tamanio: TamanioEnum.MEDIANA },
       { tamanio: TamanioEnum.GRANDE },
     ]
+
+    // Función para validar y limitar valores
+    const validateAndLimit = (value: number): number => {
+      if (isNaN(value) || value < MIN_PORCIONES) return MIN_PORCIONES;
+      if (value > MAX_PORCIONES) return MAX_PORCIONES;
+      return Math.round(value);
+    };
+
+    // Función para calcular factor de tamaño
+    const getTamanioFactor = (tamanio: TamanioEnum): number => {
+      switch (tamanio) {
+        case TamanioEnum.CHICA:
+          return FACTOR_CHICA;
+        case TamanioEnum.GRANDE:
+          return FACTOR_GRANDE;
+        default:
+          return 1; // MEDIANA
+      }
+    };
   
     useEffect(() => {
       if (!unidadVolumen || !unidadMasa || !recetaOriginal || !recetaOriginal.ingredients) return;
@@ -35,16 +60,16 @@ const PorcionesAlmuerzoCard = () => {
     const handlePorcionesChange = ( e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
       
-      const parsedValue = value.length == 0 ? 0: Number( value );
+      const parsedValue = value.length == 0 ? MIN_PORCIONES : Number( value );
       if ( isNaN( parsedValue ) ) {
           return;
       }
       else {
-          setCounter( Number( parsedValue ) );
-          dispatch( setPorciones( parsedValue ) );
-          recalculate( parsedValue );
+          const validatedValue = validateAndLimit(parsedValue);
+          setCounter( validatedValue );
+          dispatch( setPorciones( validatedValue ) );
+          recalculate( validatedValue );
       }
-  
     }
   
     useEffect(() => {
@@ -53,109 +78,90 @@ const PorcionesAlmuerzoCard = () => {
     }, [unidadVolumen, unidadMasa]);
   
     const handleDecrement = () => {
-      setCounter( counter - 1 );
+      const newValue = validateAndLimit(counter - 1);
+      setCounter( newValue );
       dispatch( decrement( 1 ) );
-      recalculate( counter - 1 );
+      recalculate( newValue );
     }
   
     const handleIncrement = () => {
-      setCounter( counter + 1 );
+      const newValue = validateAndLimit(counter + 1);
+      setCounter( newValue );
       dispatch( increment( 1 ) );
-      recalculate( counter + 1 );
+      recalculate( newValue );
     }
+
+    // Función para procesar ingredientes con validación
+    const processIngredient = (name: string, quantity: string | number, unit: string, factor: number) => {
+      let q: string | number = "";
+      let u = unit;
+
+      if (isNaN(Number(quantity))) {
+        q = quantity;
+      } else {
+        const numQuantity = Number(quantity);
+        
+        // Conversión especial para huevos y yemas
+        if (name.toLowerCase().includes('huevo') && unit === 'g') {
+          q = parseFloat(((numQuantity * factor) / 60).toFixed(3));
+          u = 'unidad';
+        } else if (name.toLowerCase().includes('yema') && unit === 'g') {
+          q = parseFloat(((numQuantity * factor) / 15).toFixed(3));
+          u = 'unidad';
+        } else if (['ml', 'ml', 'l', 'g', 'kg'].includes(unit)) {
+          if ((['ml', 'ml'].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) || 
+              (unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS)) {
+            q = parseFloat(((numQuantity * factor) / 1000).toFixed(3));
+          } else {
+            q = parseFloat((numQuantity * factor).toFixed(3));
+          }
+        } else {
+          q = parseFloat((numQuantity * factor).toFixed(3));
+        }
+
+        // Aplicar factor de tamaño
+        const tamanioFactor = getTamanioFactor(tamanio);
+        if (!isNaN(Number(q))) {
+          q = parseFloat((Number(q) * tamanioFactor).toFixed(3));
+        }
+      }
+
+      // Ajustar unidad según conversiones
+      if (unit === 'unidad' && Number(q) !== 1) u = 'unid.';
+      if (['ml', 'ml'].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) u = 'l';
+      if (unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS) u = 'kg';
+
+      return { name, quantity: q, unit: u };
+    };
   
     const recalculate = ( factor: number, changeUnit: boolean = false ) => {  
+      if (!recetaOriginal || !recetaOriginal.ingredients) {
+        console.warn('Receta original no disponible para recalcular');
+        return;
+      }
+
+      // Validar que el factor sea un número válido
+      if (isNaN(factor) || factor < 0) {
+        console.warn('Factor de cálculo inválido:', factor);
+        return;
+      }
               
-      const ingredients = recetaOriginal!.ingredients.map(
-          ( { name, quantity, unit } ) => {
-              let q: string | number = "";
-              if( isNaN(Number(quantity)) ) {
-                  q = quantity;
-              }
-              else {
-                  if( ['cm3', 'ml', 'l', 'g', 'kg'].includes( unit ) ) {
-                      
-                      if( [ 'cm3', 'ml' ].includes( unit ) && unidadVolumen === UnidadVolumen.LITROS || unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) {
-                          
-                          q = Number( ( ( Number( quantity ) * factor ) / 1000 ).toFixed(3) );
-                      }
-                      else {                        
-                          q = Number( quantity ) * factor;
-                      }
-                          
-                  }
-                  else {
-                      q = Number( quantity ) * factor;
-                  }            
-              }
-              let u = unit;
-              if( unit === 'unidad' && ( q != 1 ) ) u = 'unid.';
-              if( [ 'cm3', 'ml' ].includes( unit ) && unidadVolumen === UnidadVolumen.LITROS ) u = 'l';
-              if( unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) u = 'kg';
-              if( !isNaN( Number( q ) ) ) {
-                  let thirtyThree = Number( q ) * 0.33;
-                  if( tamanio === TamanioEnum.CHICA ) q = Number( ( Number( q ) - thirtyThree ).toFixed(3) );
-                  if( tamanio === TamanioEnum.GRANDE ) q = Number( ( Number( q ) + thirtyThree ).toFixed(3) );
-              }
-              
-              return {
-                  name,
-                  quantity:  q,
-                  unit: u  
-              };
-          }
-              
-      )
+      const ingredients = recetaOriginal.ingredients.map(
+        ({ name, quantity, unit }) => processIngredient(name, quantity, unit, factor)
+      );
   
       const variants = recetaOriginal?.variants?.map(
-          ( { name, quantity, unit } ) => {
-              let q: string | number = "";
-              if( isNaN(Number(quantity)) ) {
-                  q = quantity;
-              }
-              else {
-                  if( ['cm3', 'ml', 'l', 'g', 'kg'].includes( unit ) ) {
-                      
-                      if( [ 'cm3', 'ml' ].includes( unit ) && unidadVolumen === UnidadVolumen.LITROS && unidadVolumen === UnidadVolumen.LITROS || unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) {
-                          
-                          q = Number( ( ( Number( quantity ) * factor ) / 1000 ).toFixed(3) );
-                      }
-                      else {                        
-                          q = Number( quantity ) * factor;
-                      }
-                          
-                  }
-                  else {
-                      q = Number( quantity ) * factor;
-                  }            
-              }
-              let u = unit;
-              if( unit === 'unidad' && ( q != 1 ) ) u = 'unid.';
-              if( [ 'cm3', 'ml' ].includes( unit ) && unidadVolumen === UnidadVolumen.LITROS ) u = 'l';
-              if( unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) u = 'kg';
-              if( !isNaN( Number( q ) ) ) {
-                  let thirtyThree = Number( q ) * 0.33;
-                  if( tamanio === TamanioEnum.CHICA ) q = Number( ( Number( q ) - thirtyThree ).toFixed(3) );
-                  if( tamanio === TamanioEnum.GRANDE ) q = Number( ( Number( q ) + thirtyThree ).toFixed(3) );
-              }
-              return {
-                  name,
-                  quantity: q,
-                  unit: u  
-              };
-          }
-              
-      )
+        ({ name, quantity, unit }) => processIngredient(name, quantity, unit, factor)
+      );
       
       const newReceta: Receta = {
-          title: recetaOriginal!.title,
-          ingredients
+        title: recetaOriginal.title,
+        ingredients
       }
   
-      variants && ( newReceta.variants = variants );
+      if (variants) newReceta.variants = variants;
   
       dispatch( setRecetaPorciones( newReceta ) );
-      
     }
   
     const handleTamanioChange = ( e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -168,9 +174,10 @@ const PorcionesAlmuerzoCard = () => {
           <div className="p-6 overflow-hidden rounded-xl bg-white bg-clip-border text-gray-700 shadow-md h-auto">
               <h4 className="text-lg text-logoGreen font-bold">Cantidad de porciones</h4>
               <div className="flex flex-row gap-5 mt-7 mb-7">
-                  <button className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-2 px-4 rounded"
-                      onClick={ handleDecrement }
-                      disabled={ porciones <= 1 }>
+                  <button 
+                    className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-2 px-4 rounded"
+                    onClick={ handleDecrement }
+                    disabled={ counter <= MIN_PORCIONES }>
                       -
                   </button>
                   <input
@@ -179,14 +186,21 @@ const PorcionesAlmuerzoCard = () => {
                       value = { counter }
                       onChange={ handlePorcionesChange }
                       className="py-1 text-xl text-center w-full px-0 mt-0 bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 focus:border-logoGreen border-gray-200"
+                      min={MIN_PORCIONES}
+                      max={MAX_PORCIONES}
                   />                
-                  <button className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-2 px-4 rounded"
-                      onClick={ handleIncrement }>
+                  <button 
+                    className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-2 px-4 rounded"
+                    onClick={ handleIncrement }
+                    disabled={ counter >= MAX_PORCIONES }>
                       +
                   </button>
-  
               </div>
+              <p className="text-xs text-gray-500 text-center">
+                Mínimo: {MIN_PORCIONES}, Máximo: {MAX_PORCIONES}
+              </p>
           </div>
+
           <div className="p-6 overflow-hidden rounded-xl bg-white bg-clip-border text-gray-700 shadow-md h-auto">
               <h4 className="text-lg text-logoGreen font-bold">Tamaño de porciones</h4>
               <div className="flex flex-row gap-5 mt-7 mb-7 w-full">
@@ -207,6 +221,16 @@ const PorcionesAlmuerzoCard = () => {
                           )
                       }
                   </select>
+              </div>
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-700">
+                  <strong>Factor de tamaño actual:</strong> {getTamanioFactor(tamanio)}x
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {tamanio === TamanioEnum.CHICA && 'Porciones más pequeñas (67% del tamaño mediano)'}
+                  {tamanio === TamanioEnum.MEDIANA && 'Porciones de tamaño estándar'}
+                  {tamanio === TamanioEnum.GRANDE && 'Porciones más grandes (133% del tamaño mediano)'}
+                </p>
               </div>
           </div>
       </div>

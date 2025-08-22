@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { exportMenuToPDF } from '@/utils/exportMenuPDF';
 import { FaFilePdf } from 'react-icons/fa';
-import { nombresRecetasAlmuerzo, nombresAcompanamientos } from '@/utils/recetas-almuerzo';
+import { nombresRecetasAlmuerzo, nombresAcompanamientos, nombresRecetasBase, nombresPostres } from '@/utils/recetas-almuerzo';
 import NavigationButtons from '@/components/shared/NavigationButtons';
 
 type TipoComensal = 'chica' | 'mediana' | 'grande';
@@ -17,12 +17,17 @@ const MenuSemanal = () => {
       dia,
       principal: '',
       acompanamiento: '',
+      recetaBase: '',
+      postre: '',
       sinMenu: false,
       porciones: { chica: '', mediana: '', grande: '' }
     }))
   );
 
-  const manejarCambio = (index: number, campo: 'principal' | 'acompanamiento', valor: string) => {
+  const [mostrarRecetaBase, setMostrarRecetaBase] = useState(false);
+  const [mostrarPostre, setMostrarPostre] = useState(false);
+
+  const manejarCambio = (index: number, campo: 'principal' | 'acompanamiento' | 'recetaBase' | 'postre', valor: string) => {
     const nuevoMenu = [...menu];
     nuevoMenu[index][campo] = valor;
     setMenu(nuevoMenu);
@@ -41,6 +46,8 @@ const MenuSemanal = () => {
     if (valor) {
       nuevoMenu[index].principal = '';
       nuevoMenu[index].acompanamiento = '';
+      nuevoMenu[index].recetaBase = '';
+      nuevoMenu[index].postre = '';
       nuevoMenu[index].porciones = { chica: '', mediana: '', grande: '' };
     }
     setMenu(nuevoMenu);
@@ -62,6 +69,29 @@ const MenuSemanal = () => {
       </div>
 
       <h2 className="text-2xl font-bold text-logoGreen mb-4">Menú Semanal</h2>
+
+      <div className="mb-4 flex gap-4">
+        <button
+          onClick={() => setMostrarRecetaBase(!mostrarRecetaBase)}
+          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            mostrarRecetaBase 
+              ? 'bg-logoGreen text-white' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {mostrarRecetaBase ? 'Ocultar' : 'Mostrar'} Receta Base
+        </button>
+        <button
+          onClick={() => setMostrarPostre(!mostrarPostre)}
+          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            mostrarPostre 
+              ? 'bg-logoGreen text-white' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {mostrarPostre ? 'Ocultar' : 'Mostrar'} Postre
+        </button>
+      </div>
 
       {menu.map((item, index) => (
         <div key={item.dia} className="mb-4 border-b pb-4">
@@ -96,6 +126,40 @@ const MenuSemanal = () => {
               ))}
             </select>
           </div>
+
+          {mostrarRecetaBase && (
+            <div className="mt-2 w-full max-w-md">
+              <label className="block mb-1 text-sm text-black">Receta base</label>
+              <select
+                disabled={item.sinMenu}
+                value={item.recetaBase}
+                onChange={(e) => manejarCambio(index, 'recetaBase', e.target.value)}
+                className="w-full p-2 border rounded text-black"
+              >
+                <option value="">Seleccionar...</option>
+                {nombresRecetasBase.map((nombre) => (
+                  <option key={nombre} value={nombre}>{nombre}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {mostrarPostre && (
+            <div className="mt-2 w-full max-w-md">
+              <label className="block mb-1 text-sm text-black">Postre</label>
+              <select
+                disabled={item.sinMenu}
+                value={item.postre}
+                onChange={(e) => manejarCambio(index, 'postre', e.target.value)}
+                className="w-full p-2 border rounded text-black"
+              >
+                <option value="">Seleccionar...</option>
+                {nombresPostres.map((nombre) => (
+                  <option key={nombre} value={nombre}>{nombre}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="mt-2 grid grid-cols-3 gap-2 max-w-md">
             {(['chica', 'mediana', 'grande'] as TipoComensal[]).map((tipo) => (

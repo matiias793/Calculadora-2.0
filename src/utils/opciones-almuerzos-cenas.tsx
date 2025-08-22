@@ -37,6 +37,15 @@ import hortalizas from "../assets/images/33-HORTALIZAS-ASADAS.jpg";
 import salsaBlanca from "../assets/images/34-SALSA-BLANCA.jpg";
 import arrozPrincipal from "../assets/images/35-ARROZ-PRINCIPAL.jpg";
 import fideosPrincipal from "../assets/images/36-FIDEOS-PRINCIPAL.jpg";
+// Imágenes para postres
+import arrozConLeche from "../assets/images/arroz-con-leche.jpg";
+import cremaNaranja from "../assets/images/cremanaranja.jpg";
+import budinCalabaza from "../assets/images/budincalabaza_vertical.jpg";
+import budinMaiz from "../assets/images/budin-maiz.jpg";
+// Imágenes para recetas base
+import polenta from "../assets/images/polenta.jpg";
+import masaBasica from "../assets/images/masa-basica.jpg";
+import filloas from "../assets/images/filloas.webp";
 
 
 export const opcionesAlmuerzosCenas = [
@@ -217,7 +226,7 @@ export const opcionesAlmuerzosCenas = [
                 objectFit="cover"
                 alt=""
               ></Image>,
-        title: 'PasteL de carne y berenjenas',
+        title: 'Pastel de carne y berenjenas',
         url: '/recetas/118'
     },
     {
@@ -419,5 +428,85 @@ export const opcionesAlmuerzosCenas = [
               ></Image>,
         title: 'Fideos plato principal',
         url: '/recetas/138'
+    },
+    {
+        image: <Image
+                src = { arrozConLeche }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Arroz con leche',
+        url: '/recetas/139'
+    },
+    {
+        image: <Image
+                src = { cremaNaranja }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Crema de naranja',
+        url: '/recetas/140'
+    },
+    {
+        image: <Image
+                src = { cremaNaranja }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Crema de vainilla',
+        url: '/recetas/141'
+    },
+    {
+        image: <Image
+                src = { budinCalabaza }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Budín de zapallo y coco',
+        url: '/recetas/142'
+    },
+    {
+        image: <Image
+                src = { budinMaiz }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Budín de harina de maíz',
+        url: '/recetas/143'
+    },
+    {
+        image: <Image
+                src = { polenta }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Polenta/plato principal',
+        url: '/recetas/145'
+    },
+    {
+        image: <Image
+                src = { masaBasica }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Masa básica para tortas',
+        url: '/recetas/146'
+    },
+    {
+        image: <Image
+                src = { filloas }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Filloas',
+        url: '/recetas/147'
     },
 ]

@@ -799,5 +799,95 @@ export const procedimientosAlmuerzo = {
                 ]
             }
         ]
+    },
+    139 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    // Procedimiento pendiente
+                ]
+            }
+        ]
+    },
+    140 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    // Procedimiento pendiente
+                ]
+            }
+        ]
+    },
+    141 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    // Procedimiento pendiente
+                ]
+            }
+        ]
+    },
+    142 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    // Procedimiento pendiente
+                ]
+            }
+        ]
+    },
+    143 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    // Procedimiento pendiente
+                ]
+            }
+        ]
+    },
+    144 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    // Procedimiento pendiente
+                ]
+            }
+        ]
+    },
+    145 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    // Procedimiento pendiente
+                ]
+            }
+        ]
+    },
+    146 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    // Procedimiento pendiente
+                ]
+            }
+        ]
+    },
+    147 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    // Procedimiento pendiente
+                ]
+            }
+        ]
     }    
 }

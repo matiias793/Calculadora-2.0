@@ -13,12 +13,28 @@ Aplicación web para gestión de recetas y planificación de comidas en comedore
 - **📅 Planificación Semanal**: Menú semanal con exportación
 - **👤 Gestión de Usuarios**: Registro, actualización y administración
 - **👔 Gestión de Uniformes**: Tallas y tipos de uniforme
+- **🔒 Seguridad Avanzada**: Múltiples capas de protección
+- **🧮 Cálculos Precisos**: Validación y precisión matemática
 
 ### 🎨 Mejoras de UX/UI
 - **Navegación intuitiva**: Botones de retorno optimizados
 - **Indicadores visuales**: Filtros activos con puntos de colores
 - **Imágenes optimizadas**: Zoom ajustado para mejor visualización
 - **Tabs responsivos**: Mejor experiencia en dispositivos móviles
+
+### 🔒 Mejoras de Seguridad (Nueva)
+- **Autenticación robusta**: Validación de sesiones con expiración
+- **Sanitización de datos**: Prevención de XSS e inyección SQL
+- **Headers de seguridad**: CSP, HSTS, X-Frame-Options
+- **Validación de inputs**: Límites y formatos estrictos
+- **Variables de entorno**: Configuración segura
+
+### 🧮 Mejoras de Cálculos (Nueva)
+- **Precisión matemática**: Redondeo a 2-3 decimales
+- **Validación de porciones**: Límites de 1-1000 porciones
+- **Prevención de errores**: División por cero y valores inválidos
+- **Factores de tamaño**: 0.67x (chica), 1x (mediana), 1.33x (grande)
+- **Cálculos en tiempo real**: Actualización automática de ingredientes
 
 ## 🛠️ Stack Tecnológico
 
@@ -38,6 +54,12 @@ Aplicación web para gestión de recetas y planificación de comidas en comedore
 - **Vercel**: Despliegue automático
 - **PWA**: Soporte para aplicación web progresiva
 - **jsPDF**: Generación de reportes PDF
+
+### Seguridad (Nueva)
+- **OWASP Top 10**: Cumplimiento de estándares
+- **Content Security Policy**: Política de contenido seguro
+- **Input Sanitization**: Sanitización de entradas
+- **Session Management**: Gestión segura de sesiones
 
 ## 📁 Estructura del Proyecto
 
@@ -88,6 +110,8 @@ npm install
 # Crear archivo .env.local
 NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima
+NEXT_PUBLIC_APP_ENV=production
+NEXT_PUBLIC_SESSION_TIMEOUT=86400000
 ```
 
 4. **Ejecutar en desarrollo**
@@ -121,6 +145,53 @@ http://localhost:3000
 - **Actualización**: Modificación de datos personales
 - **Uniformes**: Gestión de tallas y tipos
 - **Autenticación**: Sistema seguro de login
+
+### Sistema de Cálculos (Nueva)
+- **Porciones precisas**: Cálculo automático con validación
+- **Factores de tamaño**: Chica (0.67x), Mediana (1x), Grande (1.33x)
+- **Conversiones automáticas**: Unidades de medida
+- **Límites de seguridad**: Prevención de cálculos excesivos
+- **Validación en tiempo real**: Verificación de valores
+
+## 🔒 Seguridad Implementada
+
+### Autenticación y Autorización
+- **Validación robusta**: Verificación de credenciales
+- **Expiración de sesiones**: 24 horas automática
+- **Sanitización de inputs**: Prevención de XSS
+- **Validación de documentos**: Formato específico
+
+### Protección de Datos
+- **Headers de seguridad**: CSP, HSTS, X-Frame-Options
+- **Sanitización de datos**: Limpieza de entradas
+- **Validación de variables**: Verificación de entorno
+- **Prevención SQL Injection**: Parámetros preparados
+
+### Configuración de Seguridad
+- **Content Security Policy**: Política estricta de contenido
+- **Strict Transport Security**: HTTPS obligatorio
+- **XSS Protection**: Protección contra ataques XSS
+- **Frame Options**: Prevención de clickjacking
+
+## 🧮 Sistema de Cálculos Mejorado
+
+### Precisión Matemática
+- **Redondeo controlado**: 2-3 decimales para precisión
+- **Factores exactos**: 0.67, 1.0, 1.33 para tamaños
+- **Validación de rangos**: 1-1000 porciones máximo
+- **Prevención de errores**: División por cero y valores inválidos
+
+### Validaciones Implementadas
+- **Límites de entrada**: Valores mínimos y máximos
+- **Tipos de datos**: Verificación de números válidos
+- **Rangos de porciones**: Control de cantidades
+- **Factores de tamaño**: Validación de multiplicadores
+
+### Conversiones Automáticas
+- **Unidades de masa**: Gramos a kilogramos
+- **Unidades de volumen**: Mililitros a litros
+- **Huevos y yemas**: Conversión de gramos a unidades
+- **Ingredientes especiales**: Tratamiento específico
 
 ## 🎨 Mejoras de Responsive Design
 
@@ -163,6 +234,8 @@ http://localhost:3000
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=tu_url_produccion
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_produccion
+NEXT_PUBLIC_APP_ENV=production
+NEXT_PUBLIC_SESSION_TIMEOUT=86400000
 ```
 
 ## 🐛 Problemas Resueltos
@@ -181,6 +254,18 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_produccion
 - **Fondo mejorado**: Gris claro para mejor contraste
 - **Consistencia**: Todas las imágenes con mismo comportamiento
 
+### Seguridad (Nueva)
+- **Vulnerabilidades XSS**: Sanitización implementada
+- **Inyección SQL**: Parámetros preparados
+- **Exposición de datos**: Variables de entorno protegidas
+- **Autenticación débil**: Validación robusta implementada
+
+### Cálculos (Nueva)
+- **Imprecisión matemática**: Redondeo controlado
+- **Valores inválidos**: Validación de rangos
+- **División por cero**: Prevención implementada
+- **Cálculos excesivos**: Límites de seguridad
+
 ## 📈 Próximas Mejoras
 
 ### Funcionalidades Planificadas
@@ -196,6 +281,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_produccion
 - [ ] Performance monitoring
 - [ ] SEO mejorado
 
+### Seguridad (Nueva)
+- [ ] Autenticación de dos factores
+- [ ] Auditoría de logs
+- [ ] Monitoreo de amenazas
+- [ ] Backup de seguridad
+
 ## 🤝 Contribución
 
 ### Cómo Contribuir
@@ -210,6 +301,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_produccion
 - **ESLint**: Linting automático
 - **Prettier**: Formateo de código
 - **Commits descriptivos**: Mensajes claros
+- **Validación de seguridad**: Revisión de vulnerabilidades
 
 ## 📞 Soporte
 
@@ -217,6 +309,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_produccion
 - **Repositorio**: [GitHub](https://github.com/matiias793/Calculadora-2.0.git)
 - **Despliegue**: [Vercel](tu_url_de_vercel)
 - **Documentación**: Este README
+- **Seguridad**: [SECURITY.md](./SECURITY.md)
 
 ### Credenciales de Prueba
 - **Admin**: usuario: `admin`, contraseña: `admin`
@@ -226,6 +319,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_produccion
 
 Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
+## 🔒 Política de Seguridad
+
+Para reportar vulnerabilidades de seguridad, consulta nuestro archivo [SECURITY.md](./SECURITY.md).
+
 ---
 
 **Desarrollado con ❤️ para comedores escolares**
+
+**Versión**: 2.0.0 - Seguridad y Precisión Mejoradas

@@ -10,13 +10,19 @@ const ORDEN_INGREDIENTES = [
   'Carne de cerdo magra',
   'Carne vacuna picada',
   'Carne vacuna entera',
+  'Carne en cubos',
+  'Carne picada o en cubos',
+  'Carne entera',
   'Huevos',
   'Milanesa de carne',
   'Milanesa de pescado',
   'Milanesa de pollo',
   'Pescado',
   'Pollo suprema',
+  'Suprema',
+  'Suprema de pollo',
   'Aceite',
+  'Aceite (asadera)',
   'Almidón de Maíz',
   'Arroz',
   'Arvejas',
@@ -29,10 +35,12 @@ const ORDEN_INGREDIENTES = [
   'Polvo Crema',
   'Flan',
   'Pulpa tomate',
+  'Pulpa de tomate',
   'Puré papas',
   'Queso rallado',
   'Queso fresco',
   'Pasta fresca',
+  'Pan rallado',
   'Sal',
   'Vinagre',
   'Limón',
@@ -45,6 +53,8 @@ const ORDEN_INGREDIENTES = [
   'Albahaca',
   'Perejil',
   'Ciboulette',
+  'Hierbas (orégano, albahaca, tomillo, perejil)',
+  'Mix de verdes (perejil, ciboulette)',
   'Acelga',
   'Espinaca',
   'Zapallito',
@@ -55,12 +65,14 @@ const ORDEN_INGREDIENTES = [
   'Lechuga',
   'Morrón',
   'Papa',
+  'Papa/boniato',
   'Boniato',
   'Repollo',
   'Remolacha',
   'Tomate',
   'Zanahoria',
   'Zapallo',
+  'Zapallo/calabaza',
   'Calabaza',
   'Banana',
   'Ciruela',
@@ -79,14 +91,17 @@ const ORDEN_INGREDIENTES = [
   'Ricota',
   'Puerro',
   'Apio',
-  'Laurel'
+  'Laurel',
+  'Mayonesa',
+  'Agua',
+  'Otros'
 ];
 
 // Función para obtener el orden de un ingrediente
 function obtenerOrdenIngrediente(nombre: string): number {
   const nombreNormalizado = nombre.toLowerCase().trim();
   
-  // Buscar coincidencias exactas o parciales
+  // Buscar coincidencias exactas primero
   for (let i = 0; i < ORDEN_INGREDIENTES.length; i++) {
     const ingredienteOrden = ORDEN_INGREDIENTES[i].toLowerCase();
     
@@ -94,15 +109,40 @@ function obtenerOrdenIngrediente(nombre: string): number {
     if (nombreNormalizado === ingredienteOrden) {
       return i;
     }
-    
-    // Coincidencia parcial (para casos como "carne vacuna" vs "carne vacuna picada")
-    if (nombreNormalizado.includes(ingredienteOrden) || ingredienteOrden.includes(nombreNormalizado)) {
-      return i;
-    }
   }
   
-  // Si no se encuentra, poner al final
-  return ORDEN_INGREDIENTES.length + 1;
+  // Si no hay coincidencia exacta, buscar coincidencias parciales más específicas
+  for (let i = 0; i < ORDEN_INGREDIENTES.length; i++) {
+    const ingredienteOrden = ORDEN_INGREDIENTES[i].toLowerCase();
+    
+    // Para carnes: buscar "carne" + tipo específico
+    if (ingredienteOrden.includes('carne') && nombreNormalizado.includes('carne')) {
+      if (ingredienteOrden.includes('cerdo') && nombreNormalizado.includes('cerdo')) return i;
+      if (ingredienteOrden.includes('vacuna') && nombreNormalizado.includes('vacuna')) return i;
+    }
+    
+    // Para otros ingredientes específicos
+    if (ingredienteOrden.includes('pollo') && nombreNormalizado.includes('pollo')) return i;
+    if (ingredienteOrden.includes('pescado') && nombreNormalizado.includes('pescado')) return i;
+    if (ingredienteOrden.includes('atún') && nombreNormalizado.includes('atún')) return i;
+    if (ingredienteOrden.includes('huevo') && nombreNormalizado.includes('huevo')) return i;
+    if (ingredienteOrden.includes('yema') && nombreNormalizado.includes('yema')) return i;
+    if (ingredienteOrden.includes('leche') && nombreNormalizado.includes('leche')) return i;
+    if (ingredienteOrden.includes('milanesa') && nombreNormalizado.includes('milanesa')) return i;
+    if (ingredienteOrden.includes('arroz') && nombreNormalizado.includes('arroz')) return i;
+    if (ingredienteOrden.includes('fideos') && nombreNormalizado.includes('fideos')) return i;
+    if (ingredienteOrden.includes('aceite') && nombreNormalizado.includes('aceite')) return i;
+    if (ingredienteOrden.includes('sal') && nombreNormalizado.includes('sal')) return i;
+    if (ingredienteOrden.includes('azúcar') && nombreNormalizado.includes('azúcar')) return i;
+    if (ingredienteOrden.includes('cebolla') && nombreNormalizado.includes('cebolla')) return i;
+    if (ingredienteOrden.includes('papa') && nombreNormalizado.includes('papa')) return i;
+    if (ingredienteOrden.includes('tomate') && nombreNormalizado.includes('tomate')) return i;
+    if (ingredienteOrden.includes('zanahoria') && nombreNormalizado.includes('zanahoria')) return i;
+    if (ingredienteOrden.includes('zapallo') && nombreNormalizado.includes('zapallo')) return i;
+  }
+  
+  // Si no se encuentra, poner al final (después de "Otros")
+  return ORDEN_INGREDIENTES.length;
 }
 
 declare module 'jspdf' {
@@ -115,6 +155,8 @@ interface DiaMenu {
   dia: string;
   principal: string;
   acompanamiento: string;
+  recetaBase: string;
+  postre: string;
   sinMenu: boolean;
   porciones: {
     chica: number;
@@ -132,16 +174,18 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
 
   autoTable(doc, {
     startY: 30,
-    head: [['Día', 'Principal', 'Acompañamiento', 'Chicas', 'Medianas', 'Grandes']],
-    body: menu.map(({ dia, principal, acompanamiento, sinMenu, porciones }) => [
+    head: [['Día', 'Principal', 'Acompañamiento', 'Receta Base', 'Postre', 'Chicas', 'Medianas', 'Grandes']],
+    body: menu.map(({ dia, principal, acompanamiento, recetaBase, postre, sinMenu, porciones }) => [
       dia,
       sinMenu ? 'No se cocina' : principal || '-',
       sinMenu ? '—' : acompanamiento || '-',
+      sinMenu ? '—' : recetaBase || '-',
+      sinMenu ? '—' : postre || '-',
       sinMenu ? '-' : porciones.chica.toString(),
       sinMenu ? '-' : porciones.mediana.toString(),
       sinMenu ? '-' : porciones.grande.toString(),
     ]),
-    styles: { fontSize: 8, cellPadding: 2 },
+    styles: { fontSize: 7, cellPadding: 1 },
     headStyles: { fillColor: [34, 197, 94], textColor: 255 }
   });
 
@@ -162,6 +206,9 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
         if (name.toLowerCase().includes('huevo') && unit === 'g') {
           cantidadFinal = (cantidadFinal / 60).toFixed(2);
           unidadFinal = 'unidad/es';
+        } else if (name.toLowerCase().includes('yema') && unit === 'g') {
+          cantidadFinal = (cantidadFinal / 15).toFixed(2);
+          unidadFinal = 'unidad/es';
         } else {
           cantidadFinal = cantidadFinal.toFixed(2);
         }
@@ -178,13 +225,6 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
   };
 
   const pageWidth = doc.internal.pageSize.width;
-  const centerX = pageWidth / 2;
-
-  // Dibuja línea vertical a lo largo de la página
-  const drawVerticalDivider = (fromY = 20, toY = 280) => {
-    doc.setDrawColor(200, 200, 200);
-    doc.line(centerX, fromY, centerX, toY);
-  };
 
   // Render de ingredientes en columna
   const renderIngredientes = (titulo: string, totalPersonas: number, xOffset: number, maxWidth: number, startY: number) => {
@@ -196,27 +236,27 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
       return ordenA - ordenB;
     });
 
-    doc.setFontSize(12);
+    doc.setFontSize(10);
     doc.text(`${titulo}`, xOffset, startY);
-    const tableStartY = startY + 8;
+    const tableStartY = startY + 6;
 
     autoTable(doc, {
       startY: tableStartY,
       head: [['Ingrediente', 'Cantidad', 'Unidad']],
       body: ingredientesOrdenados,
-      styles: { fontSize: 7, cellPadding: 1 },
-      headStyles: { fillColor: [34, 197, 94], textColor: 255, fontSize: 8 },
+      styles: { fontSize: 6, cellPadding: 1 },
+      headStyles: { fillColor: [34, 197, 94], textColor: 255, fontSize: 7 },
       margin: { left: xOffset },
       tableWidth: maxWidth
     });
 
-    return (doc as any).lastAutoTable?.finalY + 5;
+    return (doc as any).lastAutoTable?.finalY || startY + 20;
   };
 
-  // Render de un día (dos columnas: principal izquierda, acompañamiento derecha)
+  // Render de un día (cuatro columnas: principal, acompañamiento, receta base, postre)
   const renderDia = (diaMenu: DiaMenu, yOffset: number) => {
-    const { dia, principal, acompanamiento, sinMenu, porciones } = diaMenu;
-    if (sinMenu || (!principal && !acompanamiento)) return yOffset;
+    const { dia, principal, acompanamiento, recetaBase, postre, sinMenu, porciones } = diaMenu;
+    if (sinMenu || (!principal && !acompanamiento && !recetaBase && !postre)) return yOffset;
 
     doc.setFontSize(14);
     doc.text(`${dia}`, 14, yOffset);
@@ -226,66 +266,39 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
     const totalPersonas = porciones.chica * 0.67 + porciones.mediana + porciones.grande * 1.33;
     doc.text(`Total de personas equivalentes: ${totalPersonas.toFixed(2)}`, 14, yOffset + 17);
 
-    // Columna izquierda/derecha
-    const sectionStartY = yOffset + 25;
-    const leftWidth = centerX - 20;
-    const rightX = centerX + 5;
-    const rightWidth = centerX - 20;
+      // Layout vertical organizado por categorías
+  const sectionStartY = yOffset + 25;
+  const tableWidth = pageWidth - 28; // Margen de 14px a cada lado
+  let currentY = sectionStartY;
 
-    // Renderizar columnas
-    if (principal) {
-      renderIngredientes(principal, totalPersonas, 14, leftWidth, sectionStartY);
-    }
-    if (acompanamiento) {
-      renderIngredientes(acompanamiento, totalPersonas, rightX, rightWidth, sectionStartY);
-    }
+  // Renderizar cada categoría en su propia sección
+  if (principal) {
+    currentY = renderIngredientes(principal, totalPersonas, 14, tableWidth, currentY);
+    currentY += 10; // Espacio entre secciones
+  }
+  if (acompanamiento) {
+    currentY = renderIngredientes(acompanamiento, totalPersonas, 14, tableWidth, currentY);
+    currentY += 10; // Espacio entre secciones
+  }
+  if (recetaBase) {
+    currentY = renderIngredientes(recetaBase, totalPersonas, 14, tableWidth, currentY);
+    currentY += 10; // Espacio entre secciones
+  }
+  if (postre) {
+    currentY = renderIngredientes(postre, totalPersonas, 14, tableWidth, currentY);
+  }
 
-    return (doc as any).lastAutoTable?.finalY + 10 || sectionStartY + 10;
+    return currentY + 10;
   };
 
-  // 1) Lunes debajo del resumen en la misma página
-  const resumenFinalY = (doc as any).lastAutoTable?.finalY || 30;
-  const lunes = menu[0];
-  const lunesTieneContenido = lunes && !lunes.sinMenu && (lunes.principal || lunes.acompanamiento);
-  if (lunesTieneContenido) {
-    drawVerticalDivider(Math.max(resumenFinalY + 5, 20));
-    renderDia(lunes, resumenFinalY + 10);
-  }
-
-  // 2) Martes + Miércoles en la misma página
-  const martes = menu[1];
-  const miercoles = menu[2];
-  if ((martes && (martes.principal || martes.acompanamiento) && !martes.sinMenu) ||
-      (miercoles && (miercoles.principal || miercoles.acompanamiento) && !miercoles.sinMenu)) {
-    doc.addPage();
-    drawVerticalDivider(20, 280);
-    let nextY = 20;
-    if (martes && !martes.sinMenu && (martes.principal || martes.acompanamiento)) {
-      nextY = renderDia(martes, 20);
+  // Renderizar cada día en su propia página para evitar superposiciones
+  menu.forEach((diaMenu, index) => {
+    if (diaMenu && !diaMenu.sinMenu && (diaMenu.principal || diaMenu.acompanamiento || diaMenu.recetaBase || diaMenu.postre)) {
+      // Siempre agregar nueva página para cada día (incluyendo el primero)
+      doc.addPage();
+      renderDia(diaMenu, 20);
     }
-    // Asegura separación para el segundo bloque
-    const baseY = Math.max(nextY + 10, 150);
-    if (miercoles && !miercoles.sinMenu && (miercoles.principal || miercoles.acompanamiento)) {
-      renderDia(miercoles, baseY);
-    }
-  }
-
-  // 3) Jueves + Viernes en la misma página
-  const jueves = menu[3];
-  const viernes = menu[4];
-  if ((jueves && (jueves.principal || jueves.acompanamiento) && !jueves.sinMenu) ||
-      (viernes && (viernes.principal || viernes.acompanamiento) && !viernes.sinMenu)) {
-    doc.addPage();
-    drawVerticalDivider(20, 280);
-    let nextY = 20;
-    if (jueves && !jueves.sinMenu && (jueves.principal || jueves.acompanamiento)) {
-      nextY = renderDia(jueves, 20);
-    }
-    const baseY = Math.max(nextY + 10, 150);
-    if (viernes && !viernes.sinMenu && (viernes.principal || viernes.acompanamiento)) {
-      renderDia(viernes, baseY);
-    }
-  }
+  });
 
   // 4) Totales de la semana en su propia página
   doc.addPage();

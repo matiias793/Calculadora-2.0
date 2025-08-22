@@ -41,3 +41,5 @@ SELECT * FROM uniformes WHERE documento = 'TEST123';
 
 -- 8. Limpiar el test
 DELETE FROM uniformes WHERE documento = 'TEST123';
+
+

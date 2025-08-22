@@ -62,7 +62,7 @@ const UnidadesCard = () => {
                         <input
                             type="radio"
                             name="volumen"
-                            value="cm3"
+                            value="ml"
                             checked={volumen === UnidadVolumen.CENTIMETROS_CUBICOS}
                             onChange={ () => handleChangeUnidadVolumen( UnidadVolumen.CENTIMETROS_CUBICOS ) }
                             className="hidden peer"
@@ -70,7 +70,7 @@ const UnidadesCard = () => {
                         <div className="w-5 h-5 border-2 border-logoGreen rounded-full flex items-center justify-center peer-checked:bg-logoGreen">
                             <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
                         </div>
-                        <span className="text-gray-800 ml-3">Centímetros cúbicos</span>
+                        <span className="text-gray-800 ml-3">Mililitros</span>
                     </label>
                     <label className="flex items-center cursor-pointer">
                         <input
