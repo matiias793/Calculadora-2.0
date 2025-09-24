@@ -32,8 +32,27 @@ export const metadata: Metadata = {
   description: "Recetario para comedores escolares",
   manifest: "/manifest.json",
   icons: {
-    icon: "/images/LOGOAPPPNG.png",
-    apple: "/images/LOGOAPPPNG.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/images/LOGOAPPPNG.png", type: "image/png", sizes: "512x512" },
+      { url: "/images/LOGOAPPPNG.png", type: "image/png", sizes: "192x192" }
+    ],
+    apple: [
+      { url: "/images/LOGOAPPPNG.png", sizes: "180x180", type: "image/png" }
+    ],
+    shortcut: "/favicon.ico"
+  },
+  openGraph: {
+    title: "Calculadora de Ingredientes",
+    description: "Recetario para comedores escolares",
+    images: ["/images/LOGOAPPPNG.png"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Calculadora de Ingredientes",
+    description: "Recetario para comedores escolares",
+    images: ["/images/LOGOAPPPNG.png"],
   },
   viewport: "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
 };

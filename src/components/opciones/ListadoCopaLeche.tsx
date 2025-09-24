@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import React from 'react'
 
-const lecheEnPolvo = '/images/copa-leche.jpg';
-const lecheFluida = '/images/copa-leche.jpg';
+import lecheEnPolvo from '@/assets/images/leche-en-polvo.png';
+import lecheFluida from '@/assets/images/leche-fluida.png';
 import OptionCard from '../main/OptionCard';
 
 const ListadoCopaLeche = () => {

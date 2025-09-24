@@ -42,18 +42,6 @@ const options = [
   {
     image: (
       <Image
-        src="/images/copa-leche.jpg"
-        fill
-        style={{ objectFit: "contain" }}
-        alt="Leche en polvo"
-      />
-    ),
-    title: 'Leche en Polvo',
-    url: '/leche-polvo'
-  },
-  {
-    image: (
-      <Image
         src="/images/menu-semanal.png"
         fill
         style={{ objectFit: "contain" }}
