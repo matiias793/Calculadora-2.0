@@ -1,17 +1,29 @@
 {
-    "theme_color":"#60A5FA",
-    "background_color":"#60A5FA",
+    "theme_color":"#22C55E",
+    "background_color":"#22C55E",
     "icons":[
         {
             "purpose":"maskable",
+            "sizes":"192x192",
+            "src":"/images/LOGOAPPPNG.png",
+            "type":"image/png"
+        },
+        {
+            "purpose":"maskable",
             "sizes":"512x512",
-            "src":"/images/iconoazul.png",
+            "src":"/images/LOGOAPPPNG.png",
+            "type":"image/png"
+        },
+        {
+            "purpose":"any",
+            "sizes":"192x192",
+            "src":"/images/LOGOAPPPNG.png",
             "type":"image/png"
         },
         {
             "purpose":"any",
             "sizes":"512x512",
-            "src":"/images/iconoazul.png",
+            "src":"/images/LOGOAPPPNG.png",
             "type":"image/png"
         }
     ],

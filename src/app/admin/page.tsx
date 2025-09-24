@@ -165,21 +165,13 @@ const AdminLogin = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-logoGreen hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-logoGreen disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-logoGreen hover:bg-logoGreenHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-logoGreen disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
               </button>
             </div>
           </form>
 
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-md p-4">
-            <h3 className="text-sm font-medium text-blue-800 mb-2">Credenciales de Prueba:</h3>
-            <div className="text-sm text-blue-700 space-y-1">
-              <p><strong>Admin (Hardcoded):</strong> usuario: admin, contraseña: admin</p>
-              <p><strong>Super Admin (Hardcoded):</strong> usuario: superadmin, contraseña: superadmin123</p>
-              <p><strong>Base de Datos:</strong> Cualquier administrador registrado en la tabla 'administradores'</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

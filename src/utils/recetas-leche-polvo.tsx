@@ -25,5 +25,13 @@ export const recetasLecheEnPolvo = {
             { name: 'Azúcar', quantity: 8, unit: 'g' },
             { name: 'Vainilla', quantity: 2, unit: 'ml' }
         ]
+    },
+    4: {
+        title: 'Leche en polvo simple',
+        ingredients: [
+            { name: 'Leche en polvo', quantity: 20, unit: 'g' },
+            { name: 'Agua hervida y entibiada', quantity: 180, unit: 'ml' },
+            { name: 'Azúcar', quantity: 6, unit: 'g' }
+        ]
     }
 }

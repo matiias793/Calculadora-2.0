@@ -97,6 +97,60 @@ const ORDEN_INGREDIENTES = [
   'Otros'
 ];
 
+// Función para normalizar nombres de ingredientes y agrupar duplicados
+function normalizarNombreIngrediente(nombre: string): string {
+  const nombreNormalizado = nombre.toLowerCase().trim();
+  
+  // Mapeo de variaciones de nombres a un nombre estándar
+  const mapeoVariaciones: Record<string, string> = {
+    'suprema': 'suprema de pollo',
+    'suprema de pollo': 'suprema de pollo',
+    'pollo suprema': 'suprema de pollo',
+    'pollo': 'pollo',
+    'aceite': 'aceite',
+    'aceite (asadera)': 'aceite',
+    'pulpa tomate': 'pulpa de tomate',
+    'pulpa de tomate': 'pulpa de tomate',
+    'tomate': 'tomate'
+  };
+  
+  // Buscar coincidencia exacta en el mapeo
+  if (mapeoVariaciones[nombreNormalizado]) {
+    return mapeoVariaciones[nombreNormalizado];
+  }
+  
+  // Buscar coincidencias parciales más inteligentes
+  for (const [variacion, estandar] of Object.entries(mapeoVariaciones)) {
+    const variacionLower = variacion.toLowerCase();
+    
+    // Para pollo/suprema: manejar casos especiales
+    if ((variacionLower.includes('pollo') && nombreNormalizado.includes('pollo')) ||
+        (variacionLower.includes('suprema') && nombreNormalizado.includes('suprema'))) {
+      // Si contiene "suprema" en cualquier forma, normalizar a "suprema de pollo"
+      if (nombreNormalizado.includes('suprema')) {
+        return 'suprema de pollo';
+      }
+      // Si es solo "pollo", mantener como "pollo"
+      if (nombreNormalizado === 'pollo') {
+        return 'pollo';
+      }
+    }
+    
+    // Para aceite: agrupar todas las variaciones
+    if (nombreNormalizado.includes('aceite')) {
+      return 'aceite';
+    }
+    
+    // Para pulpa de tomate: agrupar variaciones
+    if (nombreNormalizado.includes('pulpa') && nombreNormalizado.includes('tomate')) {
+      return 'pulpa de tomate';
+    }
+  }
+  
+  // Si no hay mapeo, devolver el nombre original
+  return nombre;
+}
+
 // Función para obtener el orden de un ingrediente
 function obtenerOrdenIngrediente(nombre: string): number {
   const nombreNormalizado = nombre.toLowerCase().trim();
@@ -213,7 +267,10 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
           cantidadFinal = cantidadFinal.toFixed(2);
         }
 
-        const clave = `${name}-${unidadFinal}`;
+        // Usar nombre normalizado para agrupar ingredientes similares
+        const nombreNormalizado = normalizarNombreIngrediente(name);
+        const clave = `${nombreNormalizado}-${unidadFinal}`;
+        
         if (!acumuladorIngredientes[clave]) {
           acumuladorIngredientes[clave] = { cantidad: 0, unidad: unidadFinal };
         }
@@ -308,7 +365,9 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
   const totalIngredientesArray = Object.entries(acumuladorIngredientes)
     .map(([clave, { cantidad, unidad }]) => {
       const [nombre] = clave.split('-');
-      return [nombre, cantidad.toFixed(2), unidad];
+      // Usar el nombre normalizado para mostrar en el PDF
+      const nombreParaMostrar = normalizarNombreIngrediente(nombre);
+      return [nombreParaMostrar, cantidad.toFixed(2), unidad];
     })
     .sort((a, b) => {
       const ordenA = obtenerOrdenIngrediente(a[0] as string);

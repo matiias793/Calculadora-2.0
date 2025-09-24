@@ -81,3 +81,4 @@ SELECT
 FROM procedimientos p
 LEFT JOIN recetas r ON p.receta_id = r.id
 WHERE r.id IS NULL;
+

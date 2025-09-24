@@ -31,6 +31,10 @@ export const metadata: Metadata = {
   title: "Calculadora de Ingredientes",
   description: "Recetario para comedores escolares",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/images/LOGOAPPPNG.png",
+    apple: "/images/LOGOAPPPNG.png",
+  },
   viewport: "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
 };
 
@@ -45,14 +49,14 @@ export default function RootLayout({
         className={`${ poppinsFont.className } ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="flex flex-row h-2">
-          <div className="w-1/6 bg-blue-400"></div>
+          <div className="w-1/6 bg-green-400"></div>
           <div className="w-1/6 bg-orange-400"></div>
           <div className="w-1/6 bg-red-400"></div>
-          <div className="w-1/6 bg-blue-400"></div>
+          <div className="w-1/6 bg-green-400"></div>
           <div className="w-1/6 bg-yellow-300"></div>
           <div className="w-1/6 bg-violet-400"></div>
         </div>
-        <div className="bg-blue-50 min-h-screen py-2 sm:py-4 md:py-8 px-2 sm:px-4">
+        <div className="bg-green-50 min-h-screen py-2 sm:py-4 md:py-8 px-2 sm:px-4">
           <Providers>
             { children }
           </Providers>

@@ -6,26 +6,14 @@ const options = [
   {
     image: (
       <Image
-        src="/images/merienda.jpg"
+        src="/images/copa-leche.jpg"
         fill
         style={{ objectFit: "contain" }}
-        alt="Desayunos y meriendas"
+        alt="Leche en polvo con cocoa"
       />
     ),
-    title: 'Desayunos y meriendas',
-    url: '/desayunos-meriendas'
-  },
-  {
-    image: (
-      <Image
-        src="/images/almuerzo.jpg"
-        fill
-        style={{ objectFit: "contain" }}
-        alt="Almuerzos y cenas"
-      />
-    ),
-    title: 'Almuerzos y cenas',
-    url: '/almuerzos-cenas'
+    title: 'Leche en polvo con cocoa',
+    url: '/leche-polvo/1'
   },
   {
     image: (
@@ -33,11 +21,11 @@ const options = [
         src="/images/copa-leche.jpg"
         fill
         style={{ objectFit: "contain" }}
-        alt="Copa de leche"
+        alt="Leche en polvo con cebada"
       />
     ),
-    title: 'Copa de Leche',
-    url: '/copa-leche'
+    title: 'Leche en polvo con cebada instantánea',
+    url: '/leche-polvo/2'
   },
   {
     image: (
@@ -45,27 +33,27 @@ const options = [
         src="/images/copa-leche.jpg"
         fill
         style={{ objectFit: "contain" }}
-        alt="Leche en polvo"
+        alt="Leche en polvo con vainilla"
       />
     ),
-    title: 'Leche en Polvo',
-    url: '/leche-polvo'
+    title: 'Leche en polvo con vainilla',
+    url: '/leche-polvo/3'
   },
   {
     image: (
       <Image
-        src="/images/menu-semanal.png"
+        src="/images/copa-leche.jpg"
         fill
         style={{ objectFit: "contain" }}
-        alt="Menú semanal"
+        alt="Leche en polvo simple"
       />
     ),
-    title: 'Planificación semanal',
-    url: '/menu-semanal',
+    title: 'Leche en polvo simple',
+    url: '/leche-polvo/4'
   }
 ];
 
-export default function ServicioAlimentacion() {
+export default function LechePolvo() {
   return (
     <div className="mx-auto max-w-screen-xl px-2 sm:px-4 w-full mt-6 sm:mt-10">
       <div className="flex flex-col items-start">
@@ -74,10 +62,10 @@ export default function ServicioAlimentacion() {
         </span>
       </div>
       <span className="font-bold text-2xl sm:text-3xl text-logoGreen text-center mt-4 sm:mt-5 w-full flex flex-col">
-        Servicio de alimentación
+        Cálculo de Leche en Polvo
       </span>
       <span className="mb-6 sm:mb-8 text-center text-gray-800 w-full flex flex-col mt-2 sm:mt-3 text-base sm:text-lg">
-        ¿Qué vas a cocinar?
+        Selecciona el tipo de preparación
       </span>
       <div className="flex flex-row flex-wrap justify-center gap-3 sm:gap-5 mt-8 sm:mt-10 w-full mb-6 sm:mb-8">
         {
@@ -89,3 +77,4 @@ export default function ServicioAlimentacion() {
     </div>
   );
 }
+

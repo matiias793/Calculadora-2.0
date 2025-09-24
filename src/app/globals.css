@@ -121,8 +121,8 @@ html {
   
   /* Indicador visual para filtros activos */
   select[style*="font-weight: 500"] {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 1px #3b82f6;
+    border-color: #22C55E;
+    box-shadow: 0 0 0 1px #22C55E;
   }
 }
 
@@ -134,8 +134,8 @@ select {
 
 select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #22C55E;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 /* Estilos para opciones de select */

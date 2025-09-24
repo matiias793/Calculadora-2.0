@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import React from 'react'
 
-import lecheEnPolvo from '@/assets/images/leche-en-polvo.png';
-import lecheFluida from '@/assets/images/leche-fluida.png';
+const lecheEnPolvo = '/images/copa-leche.jpg';
+const lecheFluida = '/images/copa-leche.jpg';
 import OptionCard from '../main/OptionCard';
 
 const ListadoCopaLeche = () => {
@@ -10,21 +10,21 @@ const ListadoCopaLeche = () => {
     const options = [
         {
             image: <Image
-                    src = { lecheEnPolvo }
-                    layout="fill"
-                    objectFit="cover"
-                    alt=""
-                ></Image>,
+                    src={lecheEnPolvo}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    alt="Leche en polvo"
+                />,
             title: 'Leche en polvo',
             url: '/copa-leche/1'
           },
           {
             image: <Image
-                    src = { lecheFluida }
-                    layout="fill"
-                    objectFit="cover"
-                    alt=""
-                  ></Image>,
+                    src={lecheFluida}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    alt="Leche fluida"
+                  />,
             title: 'Lecha fluída',
             url: '/copa-leche/2'
           }

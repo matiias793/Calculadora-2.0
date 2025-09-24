@@ -89,3 +89,4 @@ UNION ALL
 SELECT 'Procedimientos totales después de limpieza:', COUNT(*) FROM procedimientos
 UNION ALL
 SELECT 'Ingredientes de recetas totales después de limpieza:', COUNT(*) FROM receta_ingredientes;
+

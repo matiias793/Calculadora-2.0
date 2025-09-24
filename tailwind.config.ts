@@ -11,9 +11,9 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        logoGreen: '#60A5FA',
-        logoGreenHover: '#3B82F6',
-        logoGreenDisabled: '#93C5FD'
+        logoGreen: '#22C55E',
+        logoGreenHover: '#16A34A',
+        logoGreenDisabled: '#86EFAC'
       },
     },
   },

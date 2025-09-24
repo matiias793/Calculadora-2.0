@@ -1,5 +1,5 @@
 import Image from "next/image";
-import logo from '@/assets/images/iconoazul.png';
+const logo = '/images/LOGOAPPPNG.png';
 
 import OptionCard from "@/components/main/OptionCard";
 
@@ -40,6 +40,8 @@ export default function Home() {
           height={150}
           alt="Logo"
           className="sm:w-[180px] sm:h-[180px]"
+          priority={true}
+          unoptimized={true}
         />
       </div>
       <span className="font-bold text-2xl sm:text-3xl text-logoGreen text-center mt-4 sm:mt-5 w-full flex flex-col">
