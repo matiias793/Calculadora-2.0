@@ -1,5 +1,5 @@
 import Image from "next/image";
-const logo = '/images/LOGOAPPPNG.png';
+const logo = '/images/logo inicio sin fondo.png?v=2';
 
 import OptionCard from "@/components/main/OptionCard";
 
