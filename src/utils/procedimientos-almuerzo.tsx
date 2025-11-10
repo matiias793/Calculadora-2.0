@@ -825,7 +825,67 @@ export const procedimientosAlmuerzo = {
             {
                 title: "",
                 pasos: [
-                    // Procedimiento pendiente
+                    "Disolver el almidón de maíz y el azúcar en 1/3 de la leche fría.",
+                    "Calentar los 2/3 de leche restantes.",
+                    "Incorporar la mezcla de almidón y azúcar a la leche caliente, revolviendo constantemente.",
+                    "Cocinar a fuego suave hasta que espese y rompa el hervor.",
+                    "Apagar el fuego, agregar la vainilla y mezclar."
+                ]
+            }
+        ]
+    },
+    148 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    "Mezclar el cacao/cocoa con el almidón de maíz y el azúcar en 1/3 de la leche fría hasta disolver.",
+                    "Calentar los 2/3 de leche restantes.",
+                    "Incorporar la mezcla a la leche caliente, revolviendo constantemente.",
+                    "Cocinar a fuego suave hasta que espese y rompa el hervor.",
+                    "Apagar el fuego, agregar la vainilla y mezclar."
+                ]
+            }
+        ]
+    },
+    149 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    "Disolver el almidón de maíz y el azúcar en 1/3 de la leche fría.",
+                    "Calentar los 2/3 de leche restantes.",
+                    "Incorporar la mezcla de almidón y azúcar a la leche caliente, revolviendo constantemente.",
+                    "Cocinar a fuego suave hasta que espese y rompa el hervor.",
+                    "Apagar el fuego, agregar la vainilla y mezclar. Opcional: agregar coco rallado al final."
+                ]
+            }
+        ]
+    },
+    150 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    "Disolver el almidón de maíz y el azúcar en 1/3 de la leche fría.",
+                    "Agregar cáscara de naranja limpia a los 2/3 de leche que se calientan.",
+                    "Retirar la cáscara de naranja antes de incorporar la mezcla de almidón.",
+                    "Incorporar la mezcla a la leche caliente, revolviendo constantemente.",
+                    "Cocinar a fuego suave hasta que espese y rompa el hervor. Apagar el fuego y mezclar."
+                ]
+            }
+        ]
+    },
+    151 : {
+        opciones: [
+            {
+                title: "",
+                pasos: [
+                    "Preparar caramelo según receta (ver Budín de harina de maíz / Caramelo).",
+                    "Disolver el almidón de maíz y el azúcar en 1/3 de la leche fría.",
+                    "Calentar los 2/3 de leche restantes con el caramelo para integrar el sabor.",
+                    "Incorporar la mezcla de almidón y azúcar a la leche caliente, revolviendo constantemente.",
+                    "Cocinar a fuego suave hasta que espese y rompa el hervor."
                 ]
             }
         ]

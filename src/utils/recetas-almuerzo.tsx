@@ -538,6 +538,42 @@ export const recetasAlmuerzo =  {
             { name: 'Vainilla', quantity: 0.5, unit: 'g' }
         ]
     },
+    148: {
+        title: 'Crema de vainilla - chocolate',
+        ingredients: [
+            { name: 'Leche', quantity: 150, unit: 'ml' },
+            { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
+            { name: 'Azúcar', quantity: 15, unit: 'g' },
+            { name: 'Vainilla', quantity: 0.5, unit: 'g' }
+        ]
+    },
+    149: {
+        title: 'Crema de vainilla - coco',
+        ingredients: [
+            { name: 'Leche', quantity: 150, unit: 'ml' },
+            { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
+            { name: 'Azúcar', quantity: 15, unit: 'g' },
+            { name: 'Vainilla', quantity: 0.5, unit: 'g' }
+        ]
+    },
+    150: {
+        title: 'Crema de vainilla - cáscara de naranja',
+        ingredients: [
+            { name: 'Leche', quantity: 150, unit: 'ml' },
+            { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
+            { name: 'Azúcar', quantity: 15, unit: 'g' },
+            { name: 'Vainilla', quantity: 0.5, unit: 'g' }
+        ]
+    },
+    151: {
+        title: 'Crema de vainilla - caramelo',
+        ingredients: [
+            { name: 'Leche', quantity: 150, unit: 'ml' },
+            { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
+            { name: 'Azúcar', quantity: 15, unit: 'g' },
+            { name: 'Vainilla', quantity: 0.5, unit: 'g' }
+        ]
+    },
     142: {
         title: 'Budín de zapallo y coco',
         ingredients: [
@@ -635,6 +671,10 @@ export const nombresPostres = [
   'Arroz con leche',
   'Crema de naranja',
   'Crema de vainilla',
+  'Crema de vainilla - chocolate',
+  'Crema de vainilla - coco',
+  'Crema de vainilla - cáscara de naranja',
+  'Crema de vainilla - caramelo',
   'Budín de zapallo y coco',
   'Budín de harina de maíz'
 ];

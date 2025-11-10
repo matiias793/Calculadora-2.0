@@ -1293,7 +1293,7 @@ const MenuSemanal = () => {
                         </optgroup>
                       )}
                       {postresLecheOtros.length > 0 && (
-                        <optgroup label="Postres de leche">
+                        <optgroup label="Postre de leche">
                           {postresLecheOtros
                             .filter(p => p !== postreEspecifico)
                             .map((nombre) => (
