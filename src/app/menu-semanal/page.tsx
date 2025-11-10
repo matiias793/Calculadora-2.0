@@ -7,6 +7,7 @@ import { FaFilePdf } from 'react-icons/fa';
 import { nombresRecetasAlmuerzo, nombresAcompanamientos, nombresRecetasBase, nombresPostres } from '@/utils/recetas-almuerzo';
 import NavigationButtons from '@/components/shared/NavigationButtons';
 import { FaMagic } from 'react-icons/fa';
+import { getFrutasDeEstacion, obtenerMesActual } from '@/utils/frutas-estacion';
 
 type TipoComensal = 'chica' | 'mediana' | 'grande';
 
@@ -236,17 +237,17 @@ const postresDeLeche = [
   'Arroz con leche',
   'Crema de naranja',
   'Crema de vainilla',
-  'Crema de vainilla - chocolate',
-  'Crema de vainilla - coco',
-  'Crema de vainilla - cáscara de naranja',
-  'Crema de vainilla - caramelo'
+  'Crema de chocolate',
+  'Crema de coco',
+  'Crema con cáscara de naranja',
+  'Crema de caramelo'
 ];
 
-const variantesCremaVainilla = [
-  'Crema de vainilla - chocolate',
-  'Crema de vainilla - coco',
-  'Crema de vainilla - cáscara de naranja',
-  'Crema de vainilla - caramelo'
+const variantesPostreDeLeche = [
+  'Crema de chocolate',
+  'Crema de coco',
+  'Crema con cáscara de naranja',
+  'Crema de caramelo'
 ];
 
 const postresDeFruta = [
@@ -269,8 +270,10 @@ const frutasFrescas = [
   'Mandarina'
 ];
 
-// Frutas de estación (todas las frutas disponibles)
-const frutasEstacion = [...frutasFrescas];
+// Frutas de estación calculadas internamente según el mes actual
+const frutasEstacion = getFrutasDeEstacion(obtenerMesActual(), frutasFrescas).filter(f => frutasFrescas.includes(f));
+
+// Sin selector de mes visible: se usa el mes actual internamente
 
 // Frutas cítricas
 const frutasCitricas = [
@@ -291,10 +294,10 @@ const pesosPostres: Record<string, PesoPostre> = {
   'Arroz con leche': { peso: '130-150', unidad: 'g', tipo: 'leche' },
   'Crema de naranja': { peso: '130-150', unidad: 'g', tipo: 'leche' },
   'Crema de vainilla': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de vainilla - chocolate': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de vainilla - coco': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de vainilla - cáscara de naranja': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de vainilla - caramelo': { peso: '130-150', unidad: 'g', tipo: 'leche' },
+  'Crema de chocolate': { peso: '130-150', unidad: 'g', tipo: 'leche' },
+  'Crema de coco': { peso: '130-150', unidad: 'g', tipo: 'leche' },
+  'Crema con cáscara de naranja': { peso: '130-150', unidad: 'g', tipo: 'leche' },
+  'Crema de caramelo': { peso: '130-150', unidad: 'g', tipo: 'leche' },
   
   // Budines
   'Budín de harina de maíz': { peso: '150', unidad: 'g', tipo: 'fruta' },
@@ -342,6 +345,8 @@ const mezclarArray = <T,>(array: T[]): T[] => {
 
 // Función para generar menú inteligente
 const generarMenuInteligente = () => {
+  // Frutas de estación según mes actual (sugerencia interna)
+  const frutasEstacionLocal = getFrutasDeEstacion(obtenerMesActual(), frutasFrescas).filter(f => frutasFrescas.includes(f));
   // Filtrar recetas que existen en nombresRecetasAlmuerzo
   const recetasPollo = recetasPorTipoCarne.pollo.filter(r => nombresRecetasAlmuerzo.includes(r));
   const recetasVacuna = recetasPorTipoCarne.vacuna.filter(r => nombresRecetasAlmuerzo.includes(r));
@@ -556,7 +561,7 @@ const generarMenuInteligente = () => {
     } else if (receta === 'Pan de Carne / Hamburguesa' || receta === 'Pasta sorpresa') {
       // Para estas recetas, postre puede ser fruta de estación o leche
       const postresLecheDisponibles = postresDeLeche.filter(p => postresDisponibles.includes(p));
-      const postresFrutaDisponibles = frutasEstacion.filter(p => postresDisponibles.includes(p));
+      const postresFrutaDisponibles = frutasEstacionLocal.filter(p => postresDisponibles.includes(p));
       
       // Combinar ambos tipos
       postresCandidatos = [...postresLecheDisponibles, ...postresFrutaDisponibles];
@@ -575,7 +580,7 @@ const generarMenuInteligente = () => {
           postresCandidatos = [...postresDeFruta, ...frutasFrescas].filter(p => postresDisponibles.includes(p));
           break;
         case 'fruta_estacion':
-          postresCandidatos = frutasEstacion.filter(p => postresDisponibles.includes(p));
+          postresCandidatos = frutasEstacionLocal.filter(p => postresDisponibles.includes(p));
           break;
         case 'fruta_citrica':
           postresCandidatos = frutasCitricas.filter(p => postresDisponibles.includes(p));
@@ -632,7 +637,7 @@ const generarMenuInteligente = () => {
   // Separar postres disponibles por tipo
   const postresLecheDisponiblesList = postresDeLeche.filter(p => todosPostresDisponiblesList.includes(p));
   const postresFrutaDisponiblesList = [...postresDeFruta, ...frutasFrescas].filter(p => todosPostresDisponiblesList.includes(p));
-  const frutasEstacionDisponiblesList = frutasEstacion.filter(p => todosPostresDisponiblesList.includes(p));
+  const frutasEstacionDisponiblesList = frutasEstacionLocal.filter(p => todosPostresDisponiblesList.includes(p));
   const frutasCitricasDisponiblesList = frutasCitricas.filter(p => todosPostresDisponiblesList.includes(p));
   
   // Crear el menú semanal con acompañamientos primero, luego postres
@@ -1187,8 +1192,8 @@ const MenuSemanal = () => {
                   
                   // Postres de leche
                   const postresLecheDisponibles = postresDeLeche.filter(p => !postresExcluidos.includes(p));
-                  const variantesVainillaDisponibles = postresLecheDisponibles.filter(p => variantesCremaVainilla.includes(p));
-                  const postresLecheSinVariantes = postresLecheDisponibles.filter(p => !variantesCremaVainilla.includes(p));
+                  const variantesLecheDisponibles = postresLecheDisponibles.filter(p => variantesPostreDeLeche.includes(p));
+                  const postresLecheBase = postresLecheDisponibles.filter(p => !variantesPostreDeLeche.includes(p));
                   // Para Pollo colorido, siempre postres de leche (recomendados)
                   // Para Pan de Carne y Pasta sorpresa, pueden ser leche o fruta (mostrar ambos como recomendados)
                   let postresLecheRecomendados: string[] = [];
@@ -1196,16 +1201,16 @@ const MenuSemanal = () => {
                   
                   if (item.principal === 'Pollo colorido') {
                     // Pollo colorido: solo postres de leche (recomendados)
-                    postresLecheRecomendados = postresLecheSinVariantes;
+                    postresLecheRecomendados = postresLecheBase;
                     postresLecheOtros = [];
                   } else if (item.principal === 'Pan de Carne / Hamburguesa' || item.principal === 'Pasta sorpresa') {
                     // Pan de Carne y Pasta sorpresa: mostrar postres de leche como recomendados junto con frutas
-                    postresLecheRecomendados = postresLecheSinVariantes;
+                    postresLecheRecomendados = postresLecheBase;
                     postresLecheOtros = [];
                   } else {
                     // Lógica normal
-                    postresLecheRecomendados = mostrarRecomendados === 'leche' ? postresLecheSinVariantes : [];
-                    postresLecheOtros = mostrarRecomendados === 'leche' ? [] : postresLecheSinVariantes;
+                    postresLecheRecomendados = mostrarRecomendados === 'leche' ? postresLecheBase : [];
+                    postresLecheOtros = mostrarRecomendados === 'leche' ? [] : postresLecheBase;
                   }
                   
                   // Budines
@@ -1283,9 +1288,9 @@ const MenuSemanal = () => {
                             ))}
                         </optgroup>
                       )}
-                      {variantesVainillaDisponibles.length > 0 && (
-                        <optgroup label="Variantes de crema de vainilla">
-                          {variantesVainillaDisponibles
+                      {variantesLecheDisponibles.length > 0 && (
+                        <optgroup label="Variantes de postre de leche">
+                          {variantesLecheDisponibles
                             .filter(p => p !== postreEspecifico)
                             .map((nombre) => (
                               <option key={nombre} value={nombre}>{nombre}</option>
@@ -1392,7 +1397,7 @@ const MenuSemanal = () => {
                       {pesosPostres[item.postre].unidad === 'g' && '(con cáscara)'}
                     </span>
                   )}
-                  {item.postre.startsWith('Crema de vainilla -') && (
+                  {variantesPostreDeLeche.includes(item.postre) && (
                     <span className="block mt-2 text-[11px] text-gray-600 italic">
                       Consulta el recetario para ver las cantidades de ingredientes de esta variante.
                     </span>

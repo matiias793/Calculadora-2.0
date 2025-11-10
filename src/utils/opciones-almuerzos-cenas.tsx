@@ -40,6 +40,8 @@ import fideosPrincipal from "../assets/images/36-FIDEOS-PRINCIPAL.jpg";
 // Imágenes para postres
 import arrozConLeche from "../assets/images/arroz-con-leche.jpg";
 import cremaNaranja from "../assets/images/cremanaranja.jpg";
+import cremaChocolate from "../assets/images/crema-chocolate.jpg";
+import cremaCoco from "../assets/images/crema-coco.jpg";
 import budinCalabaza from "../assets/images/budincalabaza_vertical.jpg";
 import budinMaiz from "../assets/images/budin-maiz.jpg";
 // Imágenes para recetas base
@@ -458,6 +460,46 @@ export const opcionesAlmuerzosCenas = [
               ></Image>,
         title: 'Crema de vainilla',
         url: '/recetas/141'
+    },
+    {
+        image: <Image
+                src = { cremaChocolate }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Crema de chocolate',
+        url: '/recetas/148'
+    },
+    {
+        image: <Image
+                src = { cremaCoco }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Crema de coco',
+        url: '/recetas/149'
+    },
+    {
+        image: <Image
+                src = { cremaNaranja }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Crema con cáscara de naranja',
+        url: '/recetas/150'
+    },
+    {
+        image: <Image
+                src = { cremaNaranja }
+                layout="fill"
+                objectFit="cover"
+                alt=""
+              ></Image>,
+        title: 'Crema de caramelo',
+        url: '/recetas/151'
     },
     {
         image: <Image

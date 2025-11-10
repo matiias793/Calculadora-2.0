@@ -539,25 +539,25 @@ export const recetasAlmuerzo =  {
         ]
     },
     148: {
-        title: 'Crema de vainilla - chocolate',
+        title: 'Crema de chocolate',
         ingredients: [
             { name: 'Leche', quantity: 150, unit: 'ml' },
             { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
             { name: 'Azúcar', quantity: 15, unit: 'g' },
-            { name: 'Vainilla', quantity: 0.5, unit: 'g' }
+            { name: 'Cocoa/Cacao en polvo', quantity: 5, unit: 'g' }
         ]
     },
     149: {
-        title: 'Crema de vainilla - coco',
+        title: 'Crema de coco',
         ingredients: [
             { name: 'Leche', quantity: 150, unit: 'ml' },
             { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
             { name: 'Azúcar', quantity: 15, unit: 'g' },
-            { name: 'Vainilla', quantity: 0.5, unit: 'g' }
+            { name: 'Coco rallado', quantity: 12, unit: 'g' }
         ]
     },
     150: {
-        title: 'Crema de vainilla - cáscara de naranja',
+        title: 'Crema con cáscara de naranja',
         ingredients: [
             { name: 'Leche', quantity: 150, unit: 'ml' },
             { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
@@ -566,7 +566,7 @@ export const recetasAlmuerzo =  {
         ]
     },
     151: {
-        title: 'Crema de vainilla - caramelo',
+        title: 'Crema de caramelo',
         ingredients: [
             { name: 'Leche', quantity: 150, unit: 'ml' },
             { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
@@ -671,10 +671,10 @@ export const nombresPostres = [
   'Arroz con leche',
   'Crema de naranja',
   'Crema de vainilla',
-  'Crema de vainilla - chocolate',
-  'Crema de vainilla - coco',
-  'Crema de vainilla - cáscara de naranja',
-  'Crema de vainilla - caramelo',
+  'Crema de chocolate',
+  'Crema de coco',
+  'Crema con cáscara de naranja',
+  'Crema de caramelo',
   'Budín de zapallo y coco',
   'Budín de harina de maíz'
 ];
