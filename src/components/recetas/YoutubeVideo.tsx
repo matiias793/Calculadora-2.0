@@ -6,7 +6,9 @@ interface Props {
 
 const YoutubeVideo = ( { videoUrl }: Props ) => {
   return (
-    <ReactPlayer url={videoUrl} controls={true} />
+    <div className="video-wrapper">
+      <ReactPlayer url={videoUrl} controls={true} width="100%" height="100%" className="react-player" />
+    </div>
   )
 }
 

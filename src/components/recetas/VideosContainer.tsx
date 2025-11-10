@@ -23,6 +23,7 @@ const VideosContainer = () => {
                             controls={true}
                             width="100%" 
                             height="100%"
+                            className="react-player"
                         />
                         </div> 
                         <span className="text-md text-black mb-7">Cortesía de <b>{ autor }</b>.</span>

@@ -14,14 +14,14 @@ const OptionCard = ( { image, title, subtitle, url }: Props ) => {
             href = { url }
             passHref
         >
-            <div className="w-full overflow-hidden rounded-xl bg-white bg-clip-border text-gray-700 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:cursor-pointer">
-                            <div className="relative min-h-[150px] sm:min-h-[180px] m-0 overflow-hidden text-gray-700 bg-gray-100 rounded-none shadow-none bg-clip-border">
+            <div className="w-full overflow-hidden rounded-xl bg-white bg-clip-border text-gray-700 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 hover:cursor-pointer active:scale-95">
+                            <div className="relative min-h-[160px] sm:min-h-[200px] md:min-h-[220px] m-0 overflow-hidden bg-gray-50 rounded-t-xl">
                 { image }
             </div>
-                <div className="p-4 sm:p-6">
-                    <h3 className="text-lg sm:text-xl text-logoGreen text-center font-bold">{ title }</h3>
+                <div className="p-5 sm:p-6 md:p-7">
+                    <h3 className="text-lg sm:text-xl md:text-2xl text-logoGreen text-center font-bold leading-tight">{ title }</h3>
                     {subtitle && (
-                        <p className="text-xs text-gray-500 text-center mt-1">{ subtitle }</p>
+                        <p className="text-sm text-gray-600 text-center mt-2">{ subtitle }</p>
                     )}
                 </div>
             </div>

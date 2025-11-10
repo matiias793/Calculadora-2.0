@@ -18,6 +18,8 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @layer utilities {
@@ -80,11 +82,22 @@ select:focus option:hover {
     max-width: 100%;
     height: auto;
   }
+  
+  /* Mejorar contraste de texto verde en móvil */
+  .text-logoGreen {
+    color: #7CB342;
+    text-shadow: 0 1px 2px rgba(124, 179, 66, 0.1);
+  }
 }
 
 /* Mejorar la experiencia de scroll en móvil */
 html {
   scroll-behavior: smooth;
+}
+
+/* Evita zoom de fuente automático en iOS Safari y mejora la escala en móviles */
+@supports (-webkit-touch-callout: none) {
+  html { -webkit-text-size-adjust: 100%; }
 }
 
 /* Optimizar para pantallas táctiles */

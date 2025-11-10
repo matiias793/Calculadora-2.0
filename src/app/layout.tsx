@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     description: "Recetario para comedores escolares",
     images: ["/images/LOGOAPPPNG.png"],
   },
-  viewport: "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
+  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
 };
 
 export default function RootLayout({
@@ -75,7 +75,7 @@ export default function RootLayout({
           <div className="w-1/6 bg-yellow-300"></div>
           <div className="w-1/6 bg-violet-400"></div>
         </div>
-        <div className="bg-green-50 min-h-screen py-2 sm:py-4 md:py-8 px-2 sm:px-4">
+        <div className="bg-gradient-to-b from-green-50 to-white min-h-screen py-3 sm:py-4 md:py-8 px-2 sm:px-4">
           <Providers>
             { children }
           </Providers>
