@@ -896,7 +896,7 @@ const MenuSemanal = () => {
         <NavigationButtons />
       </div>
 
-      <h2 className="text-2xl font-bold text-logoGreen mb-4">Menú Semanal</h2>
+      <h2 className="text-2xl font-bold text-logoGreen mb-6">Planificación semanal / menú inteligente</h2>
 
       <div className="mb-4 flex flex-wrap gap-4 items-center">
         <button
