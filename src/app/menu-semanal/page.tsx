@@ -235,7 +235,18 @@ const recetasPorTipoCarne = {
 const postresDeLeche = [
   'Arroz con leche',
   'Crema de naranja',
-  'Crema de vainilla'
+  'Crema de vainilla',
+  'Crema de vainilla - chocolate',
+  'Crema de vainilla - coco',
+  'Crema de vainilla - cáscara de naranja',
+  'Crema de vainilla - caramelo'
+];
+
+const variantesCremaVainilla = [
+  'Crema de vainilla - chocolate',
+  'Crema de vainilla - coco',
+  'Crema de vainilla - cáscara de naranja',
+  'Crema de vainilla - caramelo'
 ];
 
 const postresDeFruta = [
@@ -280,6 +291,10 @@ const pesosPostres: Record<string, PesoPostre> = {
   'Arroz con leche': { peso: '130-150', unidad: 'g', tipo: 'leche' },
   'Crema de naranja': { peso: '130-150', unidad: 'g', tipo: 'leche' },
   'Crema de vainilla': { peso: '130-150', unidad: 'g', tipo: 'leche' },
+  'Crema de vainilla - chocolate': { peso: '130-150', unidad: 'g', tipo: 'leche' },
+  'Crema de vainilla - coco': { peso: '130-150', unidad: 'g', tipo: 'leche' },
+  'Crema de vainilla - cáscara de naranja': { peso: '130-150', unidad: 'g', tipo: 'leche' },
+  'Crema de vainilla - caramelo': { peso: '130-150', unidad: 'g', tipo: 'leche' },
   
   // Budines
   'Budín de harina de maíz': { peso: '150', unidad: 'g', tipo: 'fruta' },
@@ -896,7 +911,7 @@ const MenuSemanal = () => {
         <NavigationButtons />
       </div>
 
-      <h2 className="text-2xl font-bold text-logoGreen mb-6">Planificación semanal / menú inteligente</h2>
+      <h2 className="text-2xl font-bold text-logoGreen mb-6">Planificación semanal</h2>
 
       <div className="mb-4 flex flex-wrap gap-4 items-center">
         <button
@@ -947,16 +962,7 @@ const MenuSemanal = () => {
         </div>
       </div>
       
-      <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded text-sm text-gray-700">
-        <p className="font-semibold text-blue-800 mb-1">💡 Menú Inteligente:</p>
-        <p className="text-gray-600 mb-2">
-          Genera automáticamente un menú semanal balanceado con: Pollo (2x), Carne vacuna (1x), Pescado/Atún (1x), Cerdo (1x), 
-          Postres de leche (2-3x) y Postres de fruta (2-3x).
-        </p>
-        <p className="text-gray-600 text-xs mt-2">
-          ✨ El menú respeta las recomendaciones de acompañamientos y postres para cada receta.
-        </p>
-      </div>
+      {/* Texto introductorio removido según solicitud */}
 
       {/* Opción para mantener misma cantidad de comensales */}
       <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-white rounded-lg border-2 border-logoGreen/30 shadow-sm">
@@ -1000,7 +1006,7 @@ const MenuSemanal = () => {
 
       {menu.map((item, index) => (
         <div key={item.dia} className="mb-4 border-b pb-4">
-          <h3 className="text-lg font-semibold text-black">{item.dia}</h3>
+          <h3 className="text-xl sm:text-2xl font-extrabold text-logoGreen tracking-tight">{item.dia}</h3>
 
           <div className="mt-2 w-full max-w-md">
             <label className="block mb-1 text-sm text-black">Receta principal</label>
@@ -1181,6 +1187,8 @@ const MenuSemanal = () => {
                   
                   // Postres de leche
                   const postresLecheDisponibles = postresDeLeche.filter(p => !postresExcluidos.includes(p));
+                  const variantesVainillaDisponibles = postresLecheDisponibles.filter(p => variantesCremaVainilla.includes(p));
+                  const postresLecheSinVariantes = postresLecheDisponibles.filter(p => !variantesCremaVainilla.includes(p));
                   // Para Pollo colorido, siempre postres de leche (recomendados)
                   // Para Pan de Carne y Pasta sorpresa, pueden ser leche o fruta (mostrar ambos como recomendados)
                   let postresLecheRecomendados: string[] = [];
@@ -1188,16 +1196,16 @@ const MenuSemanal = () => {
                   
                   if (item.principal === 'Pollo colorido') {
                     // Pollo colorido: solo postres de leche (recomendados)
-                    postresLecheRecomendados = postresLecheDisponibles;
+                    postresLecheRecomendados = postresLecheSinVariantes;
                     postresLecheOtros = [];
                   } else if (item.principal === 'Pan de Carne / Hamburguesa' || item.principal === 'Pasta sorpresa') {
                     // Pan de Carne y Pasta sorpresa: mostrar postres de leche como recomendados junto con frutas
-                    postresLecheRecomendados = postresLecheDisponibles;
+                    postresLecheRecomendados = postresLecheSinVariantes;
                     postresLecheOtros = [];
                   } else {
                     // Lógica normal
-                    postresLecheRecomendados = mostrarRecomendados === 'leche' ? postresLecheDisponibles : [];
-                    postresLecheOtros = mostrarRecomendados === 'leche' ? [] : postresLecheDisponibles;
+                    postresLecheRecomendados = mostrarRecomendados === 'leche' ? postresLecheSinVariantes : [];
+                    postresLecheOtros = mostrarRecomendados === 'leche' ? [] : postresLecheSinVariantes;
                   }
                   
                   // Budines
@@ -1269,6 +1277,15 @@ const MenuSemanal = () => {
                       {item.principal !== 'Pan de Carne / Hamburguesa' && item.principal !== 'Pasta sorpresa' && postresLecheRecomendados.length > 0 && (
                         <optgroup label="⭐ Recomendados - Postres de leche">
                           {postresLecheRecomendados
+                            .filter(p => p !== postreEspecifico)
+                            .map((nombre) => (
+                              <option key={nombre} value={nombre}>{nombre}</option>
+                            ))}
+                        </optgroup>
+                      )}
+                      {variantesVainillaDisponibles.length > 0 && (
+                        <optgroup label="Variantes de crema de vainilla">
+                          {variantesVainillaDisponibles
                             .filter(p => p !== postreEspecifico)
                             .map((nombre) => (
                               <option key={nombre} value={nombre}>{nombre}</option>
@@ -1373,6 +1390,11 @@ const MenuSemanal = () => {
                   {pesosPostres[item.postre]?.tipo === 'fruta_fresca' && (
                     <span className="block mt-1 text-xs text-blue-600 italic">
                       {pesosPostres[item.postre].unidad === 'g' && '(con cáscara)'}
+                    </span>
+                  )}
+                  {item.postre.startsWith('Crema de vainilla -') && (
+                    <span className="block mt-2 text-[11px] text-gray-600 italic">
+                      Consulta el recetario para ver las cantidades de ingredientes de esta variante.
                     </span>
                   )}
                 </div>
