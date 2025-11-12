@@ -40,7 +40,7 @@ const RecetaCopaLecheGrid = ( { receta, opcion }: Props ) => {
                 else {
                     if( ['ml', 'l', 'g', 'kg'].includes( unit ) ) {
                         
-                        if( unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS || unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) {
+                        if( ( unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS ) || ( unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) ) {
                             
                             q = Number( ( ( Number( quantity ) * 1 ) / 1000 ).toFixed(3) );
                         }
@@ -71,8 +71,8 @@ const RecetaCopaLecheGrid = ( { receta, opcion }: Props ) => {
         }
   
         dispatch( setRecetaCopaLechePorciones( newReceta ) );
-      },
-      [ dispatch, receta ]
+    },
+      [ dispatch, receta, unidadMasa, unidadVolumen ]
   );
 
   return (

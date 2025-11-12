@@ -1,48 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { recetasAlmuerzo } from '@/utils/recetas-almuerzo';
-
-// Pesos/porciones de postres
-interface PesoPostre {
-  peso: string;
-  unidad: string;
-  tipo: 'leche' | 'fruta' | 'fruta_fresca';
-}
-
-const pesosPostres: Record<string, PesoPostre> = {
-  // Postres de leche (cremas/flanes/arroz con leche)
-  'Arroz con leche': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de naranja': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de vainilla': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  
-  // Budines
-  'Budín de harina de maíz': { peso: '150', unidad: 'g', tipo: 'fruta' },
-  'Budín de zapallo y coco': { peso: '150', unidad: 'g', tipo: 'fruta' },
-  
-  // Frutas frescas
-  'Melón': { peso: '150', unidad: 'g', tipo: 'fruta_fresca' },
-  'Sandía': { peso: '250', unidad: 'g', tipo: 'fruta_fresca' },
-  'Uva': { peso: '1 racimo pequeño', unidad: '', tipo: 'fruta_fresca' },
-  'Ciruela': { peso: '2', unidad: 'unidades', tipo: 'fruta_fresca' },
-  'Naranja': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' },
-  'Banana': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' },
-  'Durazno': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' },
-  'Manzana': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' },
-  'Kiwi': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' },
-  'Frutilla': { peso: '5', unidad: 'unidades', tipo: 'fruta_fresca' },
-  'Mandarina': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' }
-};
-
-// Función para obtener el peso de un postre
-function obtenerPesoPostre(nombrePostre: string): string {
-  const postre = pesosPostres[nombrePostre];
-  if (!postre) return '';
-  
-  if (postre.unidad) {
-    return `${postre.peso} ${postre.unidad}`;
-  }
-  return postre.peso;
-}
+import { obtenerPesoPostre, pesosPostres } from '@/utils/pesos-postres';
 
 // Orden específico de ingredientes para el PDF
 const ORDEN_INGREDIENTES = [
@@ -265,6 +224,13 @@ interface DiaMenu {
 export function exportMenuToPDF(menu: DiaMenu[]) {
   const doc = new jsPDF();
 
+  const ajustarNumero = (valor: number, precision = 6) => Number(valor.toFixed(precision));
+  const aplicarCeilConEpsilon = (valor: number, precision = 6) => {
+    const ajustado = ajustarNumero(valor, precision);
+    const epsilon = 1 / Math.pow(10, precision + 2);
+    return Math.ceil(ajustado - epsilon);
+  };
+
   // Página 1: Título y tabla resumen
   doc.setFontSize(16);
   doc.text('Menú Semanal', 14, 20);
@@ -295,11 +261,12 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
     const nombreConIdentificador = `${nombreFruta} (para postre)`;
     // Usar un separador diferente para evitar problemas con nombres que contengan guiones
     const clave = `${nombreConIdentificador}::${unidad}`;
+    const cantidadAjustada = ajustarNumero(cantidad);
     
     if (!acumuladorIngredientes[clave]) {
       acumuladorIngredientes[clave] = { cantidad: 0, unidad: unidad };
     }
-    acumuladorIngredientes[clave].cantidad += cantidad;
+    acumuladorIngredientes[clave].cantidad = ajustarNumero(acumuladorIngredientes[clave].cantidad + cantidadAjustada);
   };
 
   const calcularIngredientes = (titulo: string, totalPersonas: number) => {
@@ -417,7 +384,7 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
 
     doc.setFontSize(10);
     doc.text(`Porciones - Chicas: ${porciones.chica}, Medianas: ${porciones.mediana}, Grandes: ${porciones.grande}`, 14, yOffset + 10);
-    const totalPersonas = porciones.chica * 0.67 + porciones.mediana + porciones.grande * 1.33;
+    const totalPersonas = ajustarNumero(porciones.chica * 0.67 + porciones.mediana + porciones.grande * 1.33, 4);
 
       // Layout vertical organizado por categorías
     const sectionStartY = yOffset + 20;
@@ -465,7 +432,7 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
       const pesoNumero = parseFloat(postreData.peso);
       if (!isNaN(pesoNumero) && postreData.unidad === 'g') {
         // Para frutas con peso en gramos (Melón, Sandía)
-        const cantidadTotal = pesoNumero * totalPersonas;
+        const cantidadTotal = ajustarNumero(pesoNumero * totalPersonas, 4);
         doc.text(`Cantidad total necesaria: ${cantidadTotal.toFixed(2)} ${postreData.unidad} (con cáscara)`, 14, currentY);
         currentY += 10;
         // Agregar al acumulador
@@ -473,7 +440,7 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
       } else if (postreData.peso.includes('racimo')) {
         // Para Uva: "1 racimo pequeño"
         doc.text(`Cantidad por persona: ${postreData.peso}`, 14, currentY);
-        const totalRacimos = Math.ceil(totalPersonas);
+        const totalRacimos = aplicarCeilConEpsilon(totalPersonas, 4);
         doc.text(`Total para ${totalPersonas.toFixed(0)} personas: ${totalRacimos} racimos pequeños`, 14, currentY + 5);
         currentY += 12;
         // Agregar al acumulador (usar unidades como "racimos pequeños")
@@ -486,7 +453,8 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
         const esPlural = cantidadBase > 1 || unidadDisplay === 'unidades';
         
         doc.text(`Cantidad por persona: ${postreData.peso} ${unidadDisplay}${esPlural ? '' : ''}`, 14, currentY);
-        const totalUnidades = Math.ceil(cantidadBase * totalPersonas);
+        const totalUnidadesExacto = ajustarNumero(cantidadBase * totalPersonas, 6);
+        const totalUnidades = aplicarCeilConEpsilon(totalUnidadesExacto, 6);
         const unidadFinal = unidadDisplay === 'unidad' ? 'unidades' : unidadDisplay;
         doc.text(`Total para ${totalPersonas.toFixed(0)} personas: ${totalUnidades} ${unidadFinal}`, 14, currentY + 5);
         currentY += 12;

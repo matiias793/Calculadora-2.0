@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/store';
 import { decrement, increment, setPorciones, setRecetaPorciones, setPorcionesTipo } from '@/store/receta/recetaSlice';
 import { UnidadMasa } from '@/utils/enums/unidad-masa';
 import { UnidadVolumen } from '@/utils/enums/unidad-volumen';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface Props {
   isAlmuerzo?: boolean;
@@ -44,34 +44,6 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
     return Math.round(total * 100) / 100; // Redondear a 2 decimales para mayor precisión
   };
 
-  useEffect(() => {
-    if (!recetaOriginal) return;
-    
-    if (isDesayunoMerienda) {
-      // Para desayunos y meriendas, usar directamente las porciones medianas
-      // Las cantidades base son para 10 porciones, por eso dividimos por 10 y multiplicamos por counterMediana
-      const validatedPorciones = validateAndLimit(counterMediana);
-      dispatch(setPorciones(validatedPorciones));
-      dispatch(setPorcionesTipo({ chica: 0, mediana: validatedPorciones, grande: 0 }));
-      recalculate(validatedPorciones / PORCIONES_BASE_DESAYUNO);
-    } else {
-      // Para almuerzos, usar la fórmula original con validación
-      const validatedChica = validateAndLimit(counterChica);
-      const validatedMediana = validateAndLimit(counterMediana);
-      const validatedGrande = validateAndLimit(counterGrande);
-      
-      const total = calculateTotalPorciones(validatedChica, validatedMediana, validatedGrande);
-      
-      dispatch(setPorciones(total));
-      dispatch(setPorcionesTipo({ 
-        chica: validatedChica, 
-        mediana: validatedMediana, 
-        grande: validatedGrande 
-      }));
-      recalculate(total);
-    }
-  }, [counterChica, counterMediana, counterGrande, unidadVolumen, unidadMasa, recetaOriginal, isDesayunoMerienda]);
-
   const handleChange = (setter: React.Dispatch<React.SetStateAction<number>>) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = parseInt(e.target.value.replace(/^0+/, ''));
@@ -93,29 +65,27 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
 
   const isHuevo = (name: string) => name.trim().toLowerCase().includes('huevo');
 
-  const processItem = (name: string, quantity: string | number, unit: string, factor: number) => {
+  const processItem = useCallback((name: string, quantity: string | number, unit: string, factor: number) => {
     let q: string | number = '';
     let u = unit;
     
     if (isNaN(Number(quantity))) {
       q = quantity;
     } else if (isHuevo(name)) {
-      // Si el huevo está en gramos, dividir por 60 para obtener unidades
       if (unit === 'g') {
         const unidades = parseFloat(((Number(quantity) * factor) / 60).toFixed(2));
         q = unidades;
         u = unidades === 1 ? 'unidad' : 'unidades';
       } else {
-        // Si ya está en unidades, multiplicar directamente
         const unidades = Math.round(Number(quantity) * factor);
         q = unidades;
         u = unidades === 1 ? 'unidad' : 'unidades';
       }
-    } else if (["ml", "ml", "l", "g", "kg"].includes(unit)) {
-      if ((["ml", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS)) {
+    } else if (['ml', 'l', 'g', 'kg'].includes(unit)) {
+      if (unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS) {
         q = parseFloat(((Number(quantity) * factor) / 1000).toFixed(2));
         u = 'l';
-      } else if (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS) {
+      } else if (unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS) {
         q = parseFloat(((Number(quantity) * factor) / 1000).toFixed(2));
         u = 'kg';
       } else {
@@ -125,12 +95,11 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
       q = parseFloat((Number(quantity) * factor).toFixed(2));
     }
     return { name, quantity: q, unit: u };
-  };
+  }, [unidadMasa, unidadVolumen]);
 
-  const recalculate = (factor: number, changeUnit: boolean = false) => {
+  const recalculate = useCallback((factor: number) => {
     if (!recetaOriginal) return;
 
-    // Validar que el factor sea un número válido
     if (isNaN(factor) || factor < 0) {
       console.warn('Factor de cálculo inválido:', factor);
       return;
@@ -151,7 +120,42 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
 
     if (variants) newReceta.variants = variants;
     dispatch(setRecetaPorciones(newReceta));
-  };
+  }, [dispatch, processItem, recetaOriginal]);
+
+  useEffect(() => {
+    if (!recetaOriginal) return;
+    
+    if (isDesayunoMerienda) {
+      const validatedPorciones = validateAndLimit(counterMediana);
+      dispatch(setPorciones(validatedPorciones));
+      dispatch(setPorcionesTipo({ chica: 0, mediana: validatedPorciones, grande: 0 }));
+      recalculate(validatedPorciones / PORCIONES_BASE_DESAYUNO);
+    } else {
+      const validatedChica = validateAndLimit(counterChica);
+      const validatedMediana = validateAndLimit(counterMediana);
+      const validatedGrande = validateAndLimit(counterGrande);
+      
+      const total = calculateTotalPorciones(validatedChica, validatedMediana, validatedGrande);
+      
+      dispatch(setPorciones(total));
+      dispatch(setPorcionesTipo({ 
+        chica: validatedChica, 
+        mediana: validatedMediana, 
+        grande: validatedGrande 
+      }));
+      recalculate(total);
+    }
+  }, [
+    counterChica,
+    counterMediana,
+    counterGrande,
+    unidadVolumen,
+    unidadMasa,
+    recetaOriginal,
+    isDesayunoMerienda,
+    dispatch,
+    recalculate
+  ]);
 
   return (
     <div className="flex-col w-full flex gap-5">

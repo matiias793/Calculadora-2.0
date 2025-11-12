@@ -289,9 +289,7 @@ export const recetas = {
             { name: 'Leche', quantity: 1500, unit: 'ml' },
             { name: 'Almidón de maíz', quantity: 90, unit: 'g' },
             { name: 'Azúcar', quantity: 150, unit: 'g' },
-            { name: 'Vainilla', quantity: 5, unit: 'g' },
-            { name: 'Cocoa', quantity: 50, unit: 'g' },
-            { name: 'Coco', quantity: 120, unit: 'g' }
+            { name: 'Vainilla', quantity: 5, unit: 'g' }
         ]
     },
     23: {

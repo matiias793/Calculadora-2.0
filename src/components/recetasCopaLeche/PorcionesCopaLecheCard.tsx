@@ -7,7 +7,7 @@ import { UnidadMasa } from '@/utils/enums/unidad-masa';
 import { UnidadVolumen } from '@/utils/enums/unidad-volumen';
 import { recetasLecheFluida } from '@/utils/recetas-leche-fluida';
 import { recetasLecheEnPolvo } from '@/utils/recetas-leche-polvo';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 const PorcionesCopaLecheCard = (
     {
@@ -28,10 +28,69 @@ const PorcionesCopaLecheCard = (
     const [ counter, setCounter ] = useState( porciones );
     const [ saborizante, setSaborizante ] = useState( '1' );
 
+    const recalculate = useCallback((factor: number, recetaParam?: Receta | null) => {
+      const baseReceta = recetaParam ?? recetaOriginal;
+      if (!baseReceta) return;
+      if (isNaN(factor) || factor < 0) {
+        console.warn('Factor de cálculo inválido:', factor);
+        return;
+      }
+
+      const ingredients = baseReceta.ingredients.map(({ name, quantity, unit }) => {
+        let cantidad: string | number = "";
+        let unidad = unit;
+
+        if (isNaN(Number(quantity))) {
+          cantidad = quantity;
+        } else {
+          const valor = Number(quantity);
+
+          if (name.toLowerCase().includes('huevo') && unit === 'g') {
+            cantidad = Number(((valor * factor) / 60).toFixed(3));
+            unidad = 'unidad';
+          } else if (name.toLowerCase().includes('yema') && unit === 'g') {
+            cantidad = Number(((valor * factor) / 15).toFixed(3));
+            unidad = 'unidad';
+          } else if (['ml', 'l', 'g', 'kg'].includes(unit)) {
+            if (unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS) {
+              cantidad = Number(((valor * factor) / 1000).toFixed(3));
+              unidad = 'l';
+            } else if (unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS) {
+              cantidad = Number(((valor * factor) / 1000).toFixed(3));
+              unidad = 'kg';
+            } else {
+              cantidad = Number((valor * factor).toFixed(3));
+            }
+          } else {
+            cantidad = Number((valor * factor).toFixed(3));
+          }
+        }
+
+        if (unidad === 'unidad' && Number(cantidad) !== 1) {
+          unidad = 'unid.';
+        }
+
+        return {
+          name,
+          quantity: cantidad,
+          unit: unidad
+        };
+      });
+
+      dispatch(setRecetaCopaLechePorciones({
+        title: baseReceta.title,
+        ingredients
+      }));
+    }, [dispatch, recetaOriginal, unidadMasa, unidadVolumen]);
+
     useEffect(() => {
-      if (!unidadVolumen || !unidadMasa || !recetaOriginal || !recetaOriginal.ingredients) return;
-      recalculate(counter, recetaOriginal, true);
-    }, [unidadVolumen, unidadMasa]);
+      if (!unidadVolumen || !unidadMasa || !recetaOriginal?.ingredients) return;
+      recalculate(counter, recetaOriginal);
+    }, [unidadVolumen, unidadMasa, recetaOriginal, counter, recalculate]);
+
+    useEffect(() => {
+      setCounter(porciones);
+    }, [porciones]);
   
     const handlePorcionesChange = ( e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
@@ -80,63 +139,11 @@ const PorcionesCopaLecheCard = (
         
         const recetas = opcion === '1' ? recetasLecheEnPolvo : recetasLecheFluida;
 
-        const receta: Receta = recetas[ Number( e.target.value ) as keyof typeof recetas ] as Receta;
+        const recetaSeleccionada: Receta = recetas[ Number( e.target.value ) as keyof typeof recetas ] as Receta;
         
         
-        dispatch( setRecetaCopaLecheOriginal( receta ) );
-        recalculate( counter, receta );
-    }
-  
-    const recalculate = ( factor: number, receta: Receta, changeUnit: boolean = false ) => {   
-        
-        const ingredients = receta.ingredients.map(
-            ( { name, quantity, unit } ) => {
-                let q: string | number = "";
-                if( isNaN(Number(quantity)) ) {
-                    q = quantity;
-                }
-                else {
-                    // Conversión especial para huevos y yemas
-                    if( name.toLowerCase().includes('huevo') && unit === 'g' ) {
-                        q = Number( ( ( Number( quantity ) * factor ) / 60 ).toFixed(3) );
-                        unit = 'unidad';
-                    } else if( name.toLowerCase().includes('yema') && unit === 'g' ) {
-                        q = Number( ( ( Number( quantity ) * factor ) / 15 ).toFixed(3) );
-                        unit = 'unidad';
-                    } else if( ['ml', 'l', 'g', 'kg'].includes( unit ) ) {
-                        
-                        if( ( unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS ) || ( unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) ) {
-                                                        
-                            q = Number( ( ( Number( quantity ) * factor ) / 1000 ).toFixed(3) );
-                        }
-                        else {                        
-                            q = Number( quantity ) * factor;
-                        }
-                            
-                    }
-                    else {
-                        q = Number( quantity ) * factor;
-                    }            
-                }
-                let u = unit;
-                if( unit === 'unidad' && ( q != 1 ) ) u = 'unid.';
-                if( unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS ) u = 'l';
-                if( unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS ) u = 'kg';
-                return {
-                    name,
-                    quantity:  q,
-                    unit: u  
-                };
-            }
-                
-        )
-        const newReceta: Receta = {
-            title: receta.title,
-            ingredients
-        }
-  
-        dispatch( setRecetaCopaLechePorciones( newReceta ) );
-      
+        dispatch( setRecetaCopaLecheOriginal( recetaSeleccionada ) );
+        recalculate( counter, recetaSeleccionada );
     }
   
     return (

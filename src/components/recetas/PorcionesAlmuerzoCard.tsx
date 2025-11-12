@@ -5,7 +5,7 @@ import { decrement, increment, setPorciones, setRecetaPorciones } from '@/store/
 import { TamanioEnum } from '@/utils/enums/tamanio';
 import { UnidadMasa } from '@/utils/enums/unidad-masa';
 import { UnidadVolumen } from '@/utils/enums/unidad-volumen';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 const PorcionesAlmuerzoCard = () => {
     const porciones = useAppSelector( ( state ) => state.receta.porciones );
@@ -48,10 +48,83 @@ const PorcionesAlmuerzoCard = () => {
       }
     };
   
+    const processIngredient = useCallback((
+      name: string,
+      quantity: string | number,
+      unit: string,
+      factor: number
+    ) => {
+      let q: string | number = "";
+      let u = unit;
+
+      if (isNaN(Number(quantity))) {
+        q = quantity;
+      } else {
+        const numQuantity = Number(quantity);
+
+        if (name.toLowerCase().includes('huevo') && unit === 'g') {
+          q = parseFloat(((numQuantity * factor) / 60).toFixed(3));
+          u = 'unidad';
+        } else if (name.toLowerCase().includes('yema') && unit === 'g') {
+          q = parseFloat(((numQuantity * factor) / 15).toFixed(3));
+          u = 'unidad';
+        } else if (['ml', 'l', 'g', 'kg'].includes(unit)) {
+          if ((unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS) ||
+              (unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS)) {
+            q = parseFloat(((numQuantity * factor) / 1000).toFixed(3));
+          } else {
+            q = parseFloat((numQuantity * factor).toFixed(3));
+          }
+        } else {
+          q = parseFloat((numQuantity * factor).toFixed(3));
+        }
+
+        const tamanioFactor = getTamanioFactor(tamanio);
+        if (!isNaN(Number(q))) {
+          q = parseFloat((Number(q) * tamanioFactor).toFixed(3));
+        }
+      }
+
+      if (unit === 'unidad' && Number(q) !== 1) u = 'unid.';
+      if (unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS) u = 'l';
+      if (unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS) u = 'kg';
+
+      return { name, quantity: q, unit: u };
+    }, [tamanio, unidadMasa, unidadVolumen]);
+
+    const recalculate = useCallback((factor: number) => {
+      if (!recetaOriginal || !recetaOriginal.ingredients) {
+        console.warn('Receta original no disponible para recalcular');
+        return;
+      }
+
+      if (isNaN(factor) || factor < 0) {
+        console.warn('Factor de cálculo inválido:', factor);
+        return;
+      }
+
+      const ingredients = recetaOriginal.ingredients.map(
+        ({ name, quantity, unit }) => processIngredient(name, quantity, unit, factor)
+      );
+
+      const variants = recetaOriginal?.variants?.map(
+        ({ name, quantity, unit }) => processIngredient(name, quantity, unit, factor)
+      );
+
+      const newReceta: Receta = {
+        title: recetaOriginal.title,
+        ingredients
+      };
+
+      if (variants) newReceta.variants = variants;
+
+      dispatch(setRecetaPorciones(newReceta));
+    }, [dispatch, processIngredient, recetaOriginal]);
+
     useEffect(() => {
-      if (!unidadVolumen || !unidadMasa || !recetaOriginal || !recetaOriginal.ingredients) return;
+      if (!unidadVolumen || !unidadMasa || !recetaOriginal?.ingredients) return;
       recalculate(counter);
-    }, [tamanio]);
+    }, [tamanio, unidadVolumen, unidadMasa, recetaOriginal, counter, recalculate]);
 
     useEffect(() => {
       setCounter( porciones )
@@ -72,11 +145,6 @@ const PorcionesAlmuerzoCard = () => {
       }
     }
   
-    useEffect(() => {
-      if (!unidadVolumen || !unidadMasa || !recetaOriginal || !recetaOriginal.ingredients) return;
-      recalculate(counter, true);
-    }, [unidadVolumen, unidadMasa]);
-  
     const handleDecrement = () => {
       const newValue = validateAndLimit(counter - 1);
       setCounter( newValue );
@@ -89,79 +157,6 @@ const PorcionesAlmuerzoCard = () => {
       setCounter( newValue );
       dispatch( increment( 1 ) );
       recalculate( newValue );
-    }
-
-    // Función para procesar ingredientes con validación
-    const processIngredient = (name: string, quantity: string | number, unit: string, factor: number) => {
-      let q: string | number = "";
-      let u = unit;
-
-      if (isNaN(Number(quantity))) {
-        q = quantity;
-      } else {
-        const numQuantity = Number(quantity);
-        
-        // Conversión especial para huevos y yemas
-        if (name.toLowerCase().includes('huevo') && unit === 'g') {
-          q = parseFloat(((numQuantity * factor) / 60).toFixed(3));
-          u = 'unidad';
-        } else if (name.toLowerCase().includes('yema') && unit === 'g') {
-          q = parseFloat(((numQuantity * factor) / 15).toFixed(3));
-          u = 'unidad';
-        } else if (['ml', 'ml', 'l', 'g', 'kg'].includes(unit)) {
-          if ((['ml', 'ml'].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) || 
-              (unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS)) {
-            q = parseFloat(((numQuantity * factor) / 1000).toFixed(3));
-          } else {
-            q = parseFloat((numQuantity * factor).toFixed(3));
-          }
-        } else {
-          q = parseFloat((numQuantity * factor).toFixed(3));
-        }
-
-        // Aplicar factor de tamaño
-        const tamanioFactor = getTamanioFactor(tamanio);
-        if (!isNaN(Number(q))) {
-          q = parseFloat((Number(q) * tamanioFactor).toFixed(3));
-        }
-      }
-
-      // Ajustar unidad según conversiones
-      if (unit === 'unidad' && Number(q) !== 1) u = 'unid.';
-      if (['ml', 'ml'].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) u = 'l';
-      if (unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS) u = 'kg';
-
-      return { name, quantity: q, unit: u };
-    };
-  
-    const recalculate = ( factor: number, changeUnit: boolean = false ) => {  
-      if (!recetaOriginal || !recetaOriginal.ingredients) {
-        console.warn('Receta original no disponible para recalcular');
-        return;
-      }
-
-      // Validar que el factor sea un número válido
-      if (isNaN(factor) || factor < 0) {
-        console.warn('Factor de cálculo inválido:', factor);
-        return;
-      }
-              
-      const ingredients = recetaOriginal.ingredients.map(
-        ({ name, quantity, unit }) => processIngredient(name, quantity, unit, factor)
-      );
-  
-      const variants = recetaOriginal?.variants?.map(
-        ({ name, quantity, unit }) => processIngredient(name, quantity, unit, factor)
-      );
-      
-      const newReceta: Receta = {
-        title: recetaOriginal.title,
-        ingredients
-      }
-  
-      if (variants) newReceta.variants = variants;
-  
-      dispatch( setRecetaPorciones( newReceta ) );
     }
   
     const handleTamanioChange = ( e: React.ChangeEvent<HTMLSelectElement>) => {

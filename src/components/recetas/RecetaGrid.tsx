@@ -38,8 +38,8 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
             if (isNaN(Number(quantity))) {
                 q = quantity;
             } else {
-                if (["ml", "ml", "l", "g", "kg"].includes(unit)) {
-                    if ((["ml", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) || (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS)) {
+        if (['ml', 'l', 'g', 'kg'].includes(unit)) {
+            if ((unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS) || (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS)) {
                         q = Number(((Number(quantity) * 1) / 1000).toFixed(3));
                     } else {
                         q = Number(quantity) * 1;
@@ -60,8 +60,8 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
             if (isNaN(Number(quantity))) {
                 q = quantity;
             } else {
-                if (["ml", "ml", "l", "g", "kg"].includes(unit)) {
-                    if ((["ml", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) || (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS)) {
+        if (['ml', 'l', 'g', 'kg'].includes(unit)) {
+            if ((unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS) || (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS)) {
                         q = Number(((Number(quantity) * 1) / 1000).toFixed(3));
                     } else {
                         q = Number(quantity) * 1;
@@ -84,7 +84,7 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
 
         variants && (newReceta.variants = variants);
         dispatch(setRecetaPorciones(newReceta));
-    }, [ isAlmuerzo, dispatch, receta ]);
+    }, [ isAlmuerzo, dispatch, receta, procedimiento, unidadMasa, unidadVolumen ]);
 
     const handleTabClick = (tabIndex: number) => {
         setTab(tabIndex);

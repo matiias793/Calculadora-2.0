@@ -12,30 +12,23 @@ const UnidadesCard = () => {
 
     const dispatch = useAppDispatch();
 
-    useEffect(
-        () => {
-            if (typeof window === "undefined") return;
+    useEffect(() => {
+        if (typeof window === "undefined") return;
 
-            let unidadVolumen = UnidadVolumen.CENTIMETROS_CUBICOS;
-            if( localStorage.getItem( "volumen" ) ) {
-              if( localStorage.getItem( "volumen" ) === 'l' ) {
-                  unidadVolumen = UnidadVolumen.LITROS
-                  setVolumen( unidadVolumen );
-              }
-            }
-        
-              let unidadMasa = UnidadMasa.GRAMOS;
-              if( localStorage.getItem( "masa" ) ) {
-                if( localStorage.getItem( "masa" ) === 'kg' ) {
-                  unidadMasa = UnidadMasa.KILOGRAMOS
-                  setMasa( unidadMasa );
-                }
-              }
-              dispatch( setUnidadVolumen( unidadVolumen ) );
-              dispatch( setUnidadMasa( unidadMasa ) );
-        },
-        []
-    )
+        let unidadVolumen = UnidadVolumen.CENTIMETROS_CUBICOS;
+        if (localStorage.getItem("volumen") === 'l') {
+          unidadVolumen = UnidadVolumen.LITROS;
+          setVolumen(unidadVolumen);
+        }
+    
+        let unidadMasa = UnidadMasa.GRAMOS;
+        if (localStorage.getItem("masa") === 'kg') {
+          unidadMasa = UnidadMasa.KILOGRAMOS;
+          setMasa(unidadMasa);
+        }
+        dispatch(setUnidadVolumen(unidadVolumen));
+        dispatch(setUnidadMasa(unidadMasa));
+    }, [dispatch]);
 
     const handleChangeUnidadVolumen = ( unidad: UnidadVolumen ) => {
         setVolumen( unidad );

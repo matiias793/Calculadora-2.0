@@ -8,6 +8,7 @@ import { nombresRecetasAlmuerzo, nombresAcompanamientos, nombresRecetasBase, nom
 import NavigationButtons from '@/components/shared/NavigationButtons';
 import { FaMagic } from 'react-icons/fa';
 import { getFrutasDeEstacion, obtenerMesActual } from '@/utils/frutas-estacion';
+import { obtenerPesoPostre, pesosPostres } from '@/utils/pesos-postres';
 
 type TipoComensal = 'chica' | 'mediana' | 'grande';
 
@@ -281,52 +282,6 @@ const frutasCitricas = [
   'Mandarina',
   'Kiwi'
 ];
-
-// Pesos/porciones de postres por tipo
-interface PesoPostre {
-  peso: string;
-  unidad: string;
-  tipo: 'leche' | 'fruta' | 'fruta_fresca';
-}
-
-const pesosPostres: Record<string, PesoPostre> = {
-  // Postres de leche (cremas/flanes/arroz con leche)
-  'Arroz con leche': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de naranja': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de vainilla': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de chocolate': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de coco': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema con cáscara de naranja': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  'Crema de caramelo': { peso: '130-150', unidad: 'g', tipo: 'leche' },
-  
-  // Budines
-  'Budín de harina de maíz': { peso: '150', unidad: 'g', tipo: 'fruta' },
-  'Budín de zapallo y coco': { peso: '150', unidad: 'g', tipo: 'fruta' },
-  
-  // Frutas frescas
-  'Melón': { peso: '150', unidad: 'g', tipo: 'fruta_fresca' },
-  'Sandía': { peso: '250', unidad: 'g', tipo: 'fruta_fresca' },
-  'Uva': { peso: '1 racimo pequeño', unidad: '', tipo: 'fruta_fresca' },
-  'Ciruela': { peso: '2', unidad: 'unidades', tipo: 'fruta_fresca' },
-  'Naranja': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' },
-  'Banana': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' },
-  'Durazno': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' },
-  'Manzana': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' },
-  'Kiwi': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' },
-  'Frutilla': { peso: '5', unidad: 'unidades', tipo: 'fruta_fresca' },
-  'Mandarina': { peso: '1', unidad: 'unidad', tipo: 'fruta_fresca' }
-};
-
-// Función para obtener el peso de un postre
-const obtenerPesoPostre = (nombrePostre: string): string => {
-  const postre = pesosPostres[nombrePostre];
-  if (!postre) return '';
-  
-  if (postre.unidad) {
-    return `${postre.peso} ${postre.unidad}`;
-  }
-  return postre.peso;
-};
 
 // Función para obtener un elemento aleatorio de un array
 const obtenerAleatorio = <T,>(array: T[]): T => {

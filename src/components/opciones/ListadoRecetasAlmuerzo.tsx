@@ -14,13 +14,10 @@ const ListadoRecetasAlmuerzo = () => {
     const [search, setSearch] = useState( busqueda ); 
     const [options, setOptions] = useState(opcionesAlmuerzosCenas);
   
-    useEffect(
-      () => {
-          dispatch( setPorciones(10) );
-          doFilter( busqueda );
-      },
-      [ dispatch ]
-    )
+    useEffect(() => {
+      dispatch(setPorciones(10));
+      doFilter(busqueda);
+    }, [dispatch, busqueda]);
     
   
     const handleChangeSearch = ( e: React.ChangeEvent<HTMLInputElement>) => { 

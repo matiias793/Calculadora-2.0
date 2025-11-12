@@ -805,7 +805,12 @@ export const procedimientosAlmuerzo = {
             {
                 title: "",
                 pasos: [
-                    // Procedimiento pendiente
+                    "Hervir la leche, cuando llegue a ebullición agregar el arroz y cocinar a fuego  lento, aproximadamente 10 minutos.",
+                    "Batir aparte la yema con el azúcar.",
+                    "Una vez cocido el arroz, agregar fuera del fuego la yema batida con el azúcar. Para esto añadir primero un poco de la mezcla de arroz con le leche caliente a la yema para que no se corte la preparación.",
+                    "Remover todo en el fuego por unos minutos más.",
+                    "Apagar el fuego, agregar la vainilla y mezclar bien.",
+                    "Colocar el arroz con leche en compoteras y refrigerar."
                 ]
             }
         ]
@@ -815,7 +820,12 @@ export const procedimientosAlmuerzo = {
             {
                 title: "",
                 pasos: [
-                    // Procedimiento pendiente
+                    "Batir ligeramente los huevos con el azúcar.",
+                    "Calentar la leche, añadir a la mezcla de huevos revolviendo siempre y llevar al fuego.",
+                    "Lavar las naranjas, obtener ralladura y jugo.",
+                    "Disolver bien el almidón de maíz y ralladura con el jugo de la naranja y añadir a la cacerola.",
+                    "Cocinar sin dejar de revolver hasta que se espese.",
+                    "Distribuir en compoteras individuales y enfriar."
                 ]
             }
         ]
@@ -825,11 +835,12 @@ export const procedimientosAlmuerzo = {
             {
                 title: "",
                 pasos: [
-                    "Disolver el almidón de maíz y el azúcar en 1/3 de la leche fría.",
-                    "Calentar los 2/3 de leche restantes.",
-                    "Incorporar la mezcla de almidón y azúcar a la leche caliente, revolviendo constantemente.",
-                    "Cocinar a fuego suave hasta que espese y rompa el hervor.",
-                    "Apagar el fuego, agregar la vainilla y mezclar."
+                    "Mezclar el azúcar con el almidón de maíz y disolver con 1/3 de la leche fría.",
+                    "Calentar los otros 2/3 de la leche restante, cuando esté a punto de hervor agregar la mezcla de almidón.",
+                    "Revolver suavemente en forma de 8 hasta que rompa el hervor.",
+                    "Apagar el fuego, agregar la vainilla y mezclar bien.",
+                    "Distribuir en compoteras individuales y enfriar.",
+                    "Si no se cuenta con capacidad de frío suficiente prepararla nunca antes de dos horas previas al servicio."
                 ]
             }
         ]
@@ -895,7 +906,12 @@ export const procedimientosAlmuerzo = {
             {
                 title: "",
                 pasos: [
-                    // Procedimiento pendiente
+                    "Cocinar el zapallo al vapor u horno hasta que quede bien tierno y hacer un puré liso.",
+                    "En un bol mezclar el puré tibio con la leche, el azúcar, el almidón y el coco rallado.",
+                    "Agregar los huevos ligeramente batidos y perfumar con la vainilla o canela.",
+                    "Volcar la preparación en una placa engrasada o con rocío vegetal.",
+                    "Cocinar en horno medio (180 °C) durante 30-35 minutos hasta que cuaje y dore.",
+                    "Dejar entibiar antes de porcionar."
                 ]
             }
         ]
@@ -905,7 +921,11 @@ export const procedimientosAlmuerzo = {
             {
                 title: "",
                 pasos: [
-                    // Procedimiento pendiente
+                    "Mezclar la harina de maíz con el azúcar y la leche fría hasta disolver los grumos.",
+                    "Agregar los huevos batidos, la vainilla y la ralladura de naranja.",
+                    "Verter la mezcla en una fuente previamente aceitada.",
+                    "Cocinar en horno medio (180 °C) durante 25-30 minutos hasta que cuaje.",
+                    "Dejar entibiar y desmoldar. Opcional: caramelizar la superficie antes de servir."
                 ]
             }
         ]
@@ -915,7 +935,11 @@ export const procedimientosAlmuerzo = {
             {
                 title: "",
                 pasos: [
-                    // Procedimiento pendiente
+                    "Colocar el azúcar en una cacerola de fondo grueso.",
+                    "Llevar a fuego medio sin revolver hasta que comience a fundirse en los bordes.",
+                    "Agregar el agua caliente en forma gradual, inclinando la cacerola para integrar.",
+                    "Cocinar hasta obtener un caramelo dorado uniforme.",
+                    "Retirar del fuego y utilizar inmediatamente."
                 ]
             }
         ]
@@ -925,7 +949,11 @@ export const procedimientosAlmuerzo = {
             {
                 title: "",
                 pasos: [
-                    // Procedimiento pendiente
+                    "Calentar el agua con la leche y la sal hasta el primer hervor.",
+                    "Agregar la harina de maíz en forma de lluvia mientras se bate con un batidor.",
+                    "Cocinar a fuego medio, revolviendo constantemente durante 5-7 minutos hasta que espese.",
+                    "Retirar del fuego, agregar el aceite y mezclar.",
+                    "Servir inmediatamente o extender en asadera para otras preparaciones."
                 ]
             }
         ]
@@ -935,7 +963,11 @@ export const procedimientosAlmuerzo = {
             {
                 title: "",
                 pasos: [
-                    // Procedimiento pendiente
+                    "Mezclar la harina, la sal y el polvo de hornear en un bol.",
+                    "Agregar el aceite y comenzar a integrar con las manos.",
+                    "Incorporar el agua de a poco hasta formar una masa tierna.",
+                    "Amasar suavemente hasta que quede lisa.",
+                    "Dejar descansar la masa 15 minutos tapada antes de estirar."
                 ]
             }
         ]
@@ -945,7 +977,12 @@ export const procedimientosAlmuerzo = {
             {
                 title: "",
                 pasos: [
-                    // Procedimiento pendiente
+                    "Mezclar la harina con la sal en un bol.",
+                    "Agregar el huevo y la mitad de la leche, batiendo hasta obtener una pasta sin grumos.",
+                    "Incorporar el resto de la leche y el aceite, mezclando hasta lograr una preparación líquida.",
+                    "Dejar reposar la mezcla 30 minutos en heladera.",
+                    "Calentar una sartén antiadherente ligeramente aceitada y volcar una porción pequeña.",
+                    "Cocinar 1-2 minutos por lado hasta dorar levemente."
                 ]
             }
         ]

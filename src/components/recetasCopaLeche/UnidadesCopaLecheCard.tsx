@@ -10,30 +10,23 @@ const UnidadesCopaLecheCard = () => {
   
       const dispatch = useAppDispatch();
   
-      useEffect(
-          () => {
-              if (typeof window === "undefined") return;
-          
-              let unidadVolumen = UnidadVolumen.CENTIMETROS_CUBICOS;
-              if( localStorage.getItem( "volumenCopaLeche" ) ) {
-                if( localStorage.getItem( "volumenCopaLeche" ) === 'l' ) {
-                    unidadVolumen = UnidadVolumen.LITROS
-                    setVolumen( unidadVolumen );
-                }
-              }
-          
-                let unidadMasa = UnidadMasa.GRAMOS;
-                if( localStorage.getItem( "masaCopaLeche" ) ) {
-                  if( localStorage.getItem( "masaCopaLeche" ) === 'kg' ) {
-                    unidadMasa = UnidadMasa.KILOGRAMOS
-                    setMasa( unidadMasa );
-                  }
-                }
-                dispatch( setUnidadVolumen( unidadVolumen ) );
-                dispatch( setUnidadMasa( unidadMasa ) );
-          },
-          []
-      )
+      useEffect(() => {
+          if (typeof window === "undefined") return;
+      
+          let unidadVolumen = UnidadVolumen.CENTIMETROS_CUBICOS;
+          if (localStorage.getItem("volumenCopaLeche") === 'l') {
+            unidadVolumen = UnidadVolumen.LITROS;
+            setVolumen(unidadVolumen);
+          }
+      
+          let unidadMasa = UnidadMasa.GRAMOS;
+          if (localStorage.getItem("masaCopaLeche") === 'kg') {
+            unidadMasa = UnidadMasa.KILOGRAMOS;
+            setMasa(unidadMasa);
+          }
+          dispatch(setUnidadVolumen(unidadVolumen));
+          dispatch(setUnidadMasa(unidadMasa));
+      }, [dispatch]);
   
       const handleChangeUnidadVolumen = ( unidad: UnidadVolumen ) => {
           setVolumen( unidad );
