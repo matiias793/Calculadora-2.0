@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/store';
 import { setBusqueda } from '@/store/busqueda/busquedaSlice';
 import { setPorciones } from '@/store/receta/recetaSlice';
 import { opcionesAlmuerzosCenas } from '@/utils/opciones-almuerzos-cenas';
+import { recetasAlmuerzo } from '@/utils/recetas-almuerzo';
 import React, { useEffect, useState } from 'react'
 import { FaSearch } from 'react-icons/fa';
 import OptionCard from '../main/OptionCard';
@@ -46,22 +47,46 @@ const ListadoRecetasAlmuerzo = () => {
               <div className="relative w-full">
                   <input 
                       type="text" 
-                      className="w-full backdrop-blur-sm bg-white text-black py-2 pl-10 pr-4 rounded-lg focus:outline-none border-2 border-logoGreen/20 focus:border-logoGreen transition-colors duration-300" 
+                      className="w-full backdrop-blur-sm bg-neutral-card text-neutral-text py-2 pl-10 pr-4 rounded-lg focus:outline-none border-2 border-primary/20 focus:border-primary transition-colors duration-300" 
                       placeholder="Nombre de la receta"
                       value = { search }
                       onChange={ handleChangeSearch }
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaSearch className="text-logoGreen text-md"/>
+                  <FaSearch className="text-primary text-md"/>
                   </div>
               </div>
           </div>
           <div className="flex flex-row flex-wrap justify-center gap-10 mt-10 w-full px-4">
               {
                   options.map(
-                      option => (
-                          <OptionCard key = { option.title } {...option}></OptionCard>
-                      )
+                      option => {
+                          // Buscar la estación de la receta
+                          const receta = Object.values(recetasAlmuerzo).find(r => r.title === option.title);
+                          const estacion = receta?.estacion;
+                          
+                          // Formatear la estación de manera más corta y legible
+                          let estacionFormateada: string | undefined;
+                          if (estacion) {
+                              if (estacion === 'TODO EL AÑO') {
+                                  estacionFormateada = 'Todo el año';
+                              } else if (estacion === 'OTOÑO-INVIERNO') {
+                                  estacionFormateada = 'Otoño-Invierno';
+                              } else if (estacion === 'PRIMAVERA-VERANO') {
+                                  estacionFormateada = 'Primavera-Verano';
+                              } else {
+                                  estacionFormateada = estacion;
+                              }
+                          }
+                          
+                          return (
+                              <OptionCard 
+                                  key = { option.title } 
+                                  {...option}
+                                  subtitle={estacionFormateada}
+                              ></OptionCard>
+                          );
+                      }
                   )
               }
               {

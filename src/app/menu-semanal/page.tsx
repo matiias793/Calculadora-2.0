@@ -4,10 +4,10 @@ import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { exportMenuToPDF } from '@/utils/exportMenuPDF';
 import { FaFilePdf } from 'react-icons/fa';
-import { nombresRecetasAlmuerzo, nombresAcompanamientos, nombresRecetasBase, nombresPostres } from '@/utils/recetas-almuerzo';
+import { nombresRecetasAlmuerzo, nombresAcompanamientos, nombresRecetasBase, nombresPostres, recetasAlmuerzo } from '@/utils/recetas-almuerzo';
 import NavigationButtons from '@/components/shared/NavigationButtons';
 import { FaMagic } from 'react-icons/fa';
-import { getFrutasDeEstacion, obtenerMesActual } from '@/utils/frutas-estacion';
+import { getFrutasDeEstacion, obtenerMesActual, obtenerEstacionActual, esRecetaAdecuadaParaEstacion } from '@/utils/frutas-estacion';
 import { obtenerPesoPostre, pesosPostres } from '@/utils/pesos-postres';
 
 type TipoComensal = 'chica' | 'mediana' | 'grande';
@@ -302,11 +302,40 @@ const mezclarArray = <T,>(array: T[]): T[] => {
 const generarMenuInteligente = () => {
   // Frutas de estación según mes actual (sugerencia interna)
   const frutasEstacionLocal = getFrutasDeEstacion(obtenerMesActual(), frutasFrescas).filter(f => frutasFrescas.includes(f));
-  // Filtrar recetas que existen en nombresRecetasAlmuerzo
-  const recetasPollo = recetasPorTipoCarne.pollo.filter(r => nombresRecetasAlmuerzo.includes(r));
-  const recetasVacuna = recetasPorTipoCarne.vacuna.filter(r => nombresRecetasAlmuerzo.includes(r));
-  const recetasPescado = recetasPorTipoCarne.pescado.filter(r => nombresRecetasAlmuerzo.includes(r));
-  const recetasCerdo = recetasPorTipoCarne.cerdo.filter(r => nombresRecetasAlmuerzo.includes(r));
+  // Obtener estación actual
+  const estacionActual = obtenerEstacionActual();
+  
+  // Función auxiliar para filtrar recetas por estación
+  const filtrarRecetasPorEstacion = (recetas: string[]): string[] => {
+    return recetas.filter(recetaNombre => {
+      // Buscar la receta en recetasAlmuerzo
+      const receta = Object.values(recetasAlmuerzo).find(r => r.title === recetaNombre);
+      if (!receta) {
+        // Si no se encuentra la receta, incluirla (por compatibilidad)
+        return true;
+      }
+      // Verificar si tiene estacion definida usando 'in' operator para type narrowing
+      if (!('estacion' in receta) || !receta.estacion) {
+        // Si no tiene estación definida, incluirla (por compatibilidad)
+        return true;
+      }
+      return esRecetaAdecuadaParaEstacion(receta.estacion, estacionActual);
+    });
+  };
+  
+  // Filtrar recetas que existen en nombresRecetasAlmuerzo y son adecuadas para la estación
+  const recetasPollo = filtrarRecetasPorEstacion(
+    recetasPorTipoCarne.pollo.filter(r => nombresRecetasAlmuerzo.includes(r))
+  );
+  const recetasVacuna = filtrarRecetasPorEstacion(
+    recetasPorTipoCarne.vacuna.filter(r => nombresRecetasAlmuerzo.includes(r))
+  );
+  const recetasPescado = filtrarRecetasPorEstacion(
+    recetasPorTipoCarne.pescado.filter(r => nombresRecetasAlmuerzo.includes(r))
+  );
+  const recetasCerdo = filtrarRecetasPorEstacion(
+    recetasPorTipoCarne.cerdo.filter(r => nombresRecetasAlmuerzo.includes(r))
+  );
 
   // Seleccionar recetas según las reglas
   const recetasSeleccionadas: string[] = [];
@@ -346,25 +375,61 @@ const generarMenuInteligente = () => {
     recetasYaUsadas.add(receta);
   }
 
-  // Si faltan días (por ejemplo, si no hay suficientes recetas), completar con opciones aleatorias
+  // Si faltan días, completar con opciones aleatorias SIN REPETIR
+  // Filtrar también por estación
   while (recetasSeleccionadas.length < diasSemana.length) {
-    const recetasDisponibles = nombresRecetasAlmuerzo.filter(r => !recetasYaUsadas.has(r));
+    // Primero intentar con recetas de la estación que no estén usadas
+    const recetasDisponibles = filtrarRecetasPorEstacion(
+      nombresRecetasAlmuerzo.filter(r => !recetasYaUsadas.has(r))
+    );
     if (recetasDisponibles.length > 0) {
       const receta = obtenerAleatorio(recetasDisponibles);
       recetasSeleccionadas.push(receta);
       recetasYaUsadas.add(receta);
     } else {
-      // Si no hay más recetas disponibles, permitir duplicados de pollo
-      if (recetasPollo.length > 0) {
-        recetasSeleccionadas.push(obtenerAleatorio(recetasPollo));
+      // Si no hay más recetas disponibles para la estación, intentar sin filtro de estación
+      const todasRecetasDisponibles = nombresRecetasAlmuerzo.filter(r => !recetasYaUsadas.has(r));
+      if (todasRecetasDisponibles.length > 0) {
+        const receta = obtenerAleatorio(todasRecetasDisponibles);
+        recetasSeleccionadas.push(receta);
+        recetasYaUsadas.add(receta);
       } else {
-        break;
+        // Si realmente no hay más opciones únicas, usar recetas ya seleccionadas pero mezcladas
+        // Esto solo debería pasar si hay muy pocas recetas disponibles
+        const recetasYaSeleccionadas = [...recetasSeleccionadas];
+        if (recetasYaSeleccionadas.length > 0) {
+          recetasSeleccionadas.push(obtenerAleatorio(recetasYaSeleccionadas));
+        } else {
+          break;
+        }
       }
     }
   }
 
+  // Asegurar que no haya duplicados en las recetas seleccionadas
+  const recetasUnicas: string[] = [];
+  const recetasVistas = new Set<string>();
+  for (const receta of recetasSeleccionadas) {
+    if (!recetasVistas.has(receta)) {
+      recetasUnicas.push(receta);
+      recetasVistas.add(receta);
+    }
+  }
+  
+  // Si faltan recetas únicas, completar con recetas no usadas
+  while (recetasUnicas.length < diasSemana.length) {
+    const disponibles = nombresRecetasAlmuerzo.filter(r => !recetasVistas.has(r));
+    if (disponibles.length > 0) {
+      const receta = obtenerAleatorio(disponibles);
+      recetasUnicas.push(receta);
+      recetasVistas.add(receta);
+    } else {
+      break;
+    }
+  }
+
   // Mezclar las recetas para distribución aleatoria en la semana
-  const recetasMezcladas = mezclarArray(recetasSeleccionadas.slice(0, diasSemana.length));
+  const recetasMezcladas = mezclarArray(recetasUnicas.slice(0, diasSemana.length));
 
   // Seleccionar postres: 2-3 de leche y 2-3 de fruta (total 4-5, pero tenemos 5 días)
   // Combinar postres de fruta con frutas frescas disponibles
@@ -372,8 +437,24 @@ const generarMenuInteligente = () => {
   const postresLecheDisponibles = postresDeLeche.filter(p => todosPostresDisponiblesList.includes(p));
   const postresFrutaDisponibles = [...postresDeFruta.filter(p => todosPostresDisponiblesList.includes(p)), ...frutasFrescas];
   
+  // Verificar si hay recetas que requieren fruta cítrica (lentejas)
+  const recetasConLentejas = recetasMezcladas.filter(r => {
+    const particularidades = particularidadesRecetas[r];
+    return particularidades?.postreRecomendado === 'fruta_citrica';
+  });
+  
   const postresSeleccionados: string[] = [];
   const postresYaUsados = new Set<string>();
+  
+  // Si hay recetas con lentejas, asegurar que haya al menos una fruta cítrica disponible
+  if (recetasConLentejas.length > 0) {
+    const frutasCitricasDisponibles = frutasCitricas.filter(f => frutasFrescas.includes(f));
+    if (frutasCitricasDisponibles.length > 0) {
+      const frutaCitrica = obtenerAleatorio(frutasCitricasDisponibles);
+      postresSeleccionados.push(frutaCitrica);
+      postresYaUsados.add(frutaCitrica);
+    }
+  }
   
   // Seleccionar 2-3 postres de leche (asegurar variedad)
   const cantidadPostresLeche = Math.floor(Math.random() * 2) + 2; // 2 o 3
@@ -389,7 +470,7 @@ const generarMenuInteligente = () => {
   }
   
   // Completar con postres de fruta y frutas frescas hasta tener 5 (asegurar variedad)
-  const postresFrutaCopia = [...postresFrutaDisponibles];
+  const postresFrutaCopia = [...postresFrutaDisponibles].filter(p => !postresYaUsados.has(p));
   while (postresSeleccionados.length < diasSemana.length && postresFrutaCopia.length > 0) {
     const postre = obtenerAleatorio(postresFrutaCopia);
     postresSeleccionados.push(postre);
@@ -423,8 +504,166 @@ const generarMenuInteligente = () => {
     }
   }
   
-  // Mezclar los postres para distribución aleatoria
-  const postresMezclados = mezclarArray(postresSeleccionados.slice(0, diasSemana.length));
+  // Función para distribuir postres evitando consecutivos del mismo tipo
+  const distribuirPostresSinConsecutivos = (postres: string[]): string[] => {
+    if (postres.length === 0) return [];
+    
+    // Clasificar postres por tipo
+    const postresLeche: string[] = [];
+    const postresFruta: string[] = [];
+    
+    postres.forEach(postre => {
+      if (postresDeLeche.includes(postre)) {
+        postresLeche.push(postre);
+      } else if (postresDeFruta.includes(postre) || frutasFrescas.includes(postre)) {
+        postresFruta.push(postre);
+      } else {
+        // Si no está en ninguna categoría, asignarlo a fruta por defecto
+        postresFruta.push(postre);
+      }
+    });
+    
+    const resultado: string[] = new Array(diasSemana.length).fill('');
+    const usados = new Set<string>();
+    
+    // Función auxiliar para verificar si un postre puede ir en una posición
+    const puedeIrEnPosicion = (postre: string, posicion: number): boolean => {
+      if (usados.has(postre)) return false;
+      
+      const esLeche = postresDeLeche.includes(postre);
+      const esFruta = postresDeFruta.includes(postre) || frutasFrescas.includes(postre);
+      
+      // Verificar que no haya consecutivos del mismo tipo
+      if (posicion > 0 && resultado[posicion - 1]) {
+        const anteriorEsLeche = postresDeLeche.includes(resultado[posicion - 1]);
+        const anteriorEsFruta = postresDeFruta.includes(resultado[posicion - 1]) || frutasFrescas.includes(resultado[posicion - 1]);
+        
+        if (esLeche && anteriorEsLeche) return false;
+        if (esFruta && anteriorEsFruta) return false;
+      }
+      
+      if (posicion < resultado.length - 1 && resultado[posicion + 1]) {
+        const siguienteEsLeche = postresDeLeche.includes(resultado[posicion + 1]);
+        const siguienteEsFruta = postresDeFruta.includes(resultado[posicion + 1]) || frutasFrescas.includes(resultado[posicion + 1]);
+        
+        if (esLeche && siguienteEsLeche) return false;
+        if (esFruta && siguienteEsFruta) return false;
+      }
+      
+      return true;
+    };
+    
+    // Distribuir alternando tipos cuando sea posible
+    let indiceLeche = 0;
+    let indiceFruta = 0;
+    let intentos = 0;
+    const maxIntentos = 100;
+    
+    // Intentar distribuir de manera balanceada
+    for (let i = 0; i < diasSemana.length && intentos < maxIntentos; i++) {
+      let asignado = false;
+      
+      // Intentar alternar tipos
+      if (i % 2 === 0 && indiceLeche < postresLeche.length) {
+        // Posición par: intentar postre de leche
+        for (let j = indiceLeche; j < postresLeche.length; j++) {
+          const postre = postresLeche[j];
+          if (puedeIrEnPosicion(postre, i)) {
+            resultado[i] = postre;
+            usados.add(postre);
+            indiceLeche = j + 1;
+            asignado = true;
+            break;
+          }
+        }
+      }
+      
+      if (!asignado && indiceFruta < postresFruta.length) {
+        // Intentar postre de fruta
+        for (let j = indiceFruta; j < postresFruta.length; j++) {
+          const postre = postresFruta[j];
+          if (puedeIrEnPosicion(postre, i)) {
+            resultado[i] = postre;
+            usados.add(postre);
+            indiceFruta = j + 1;
+            asignado = true;
+            break;
+          }
+        }
+      }
+      
+      // Si no se pudo asignar con el tipo preferido, intentar con el otro
+      if (!asignado) {
+        if (i % 2 === 0 && indiceFruta < postresFruta.length) {
+          for (let j = indiceFruta; j < postresFruta.length; j++) {
+            const postre = postresFruta[j];
+            if (puedeIrEnPosicion(postre, i)) {
+              resultado[i] = postre;
+              usados.add(postre);
+              indiceFruta = j + 1;
+              asignado = true;
+              break;
+            }
+          }
+        } else if (indiceLeche < postresLeche.length) {
+          for (let j = indiceLeche; j < postresLeche.length; j++) {
+            const postre = postresLeche[j];
+            if (puedeIrEnPosicion(postre, i)) {
+              resultado[i] = postre;
+              usados.add(postre);
+              indiceLeche = j + 1;
+              asignado = true;
+              break;
+            }
+          }
+        }
+      }
+      
+      // Si aún no se asignó, buscar cualquier postre disponible que no cree consecutivos
+      if (!asignado) {
+        const disponibles = postres.filter(p => !usados.has(p) && puedeIrEnPosicion(p, i));
+        if (disponibles.length > 0) {
+          resultado[i] = disponibles[0];
+          usados.add(disponibles[0]);
+          asignado = true;
+        } else {
+          // Si no hay disponible que no cree consecutivos, usar cualquier disponible
+          const cualquierDisponible = postres.filter(p => !usados.has(p));
+          if (cualquierDisponible.length > 0) {
+            resultado[i] = cualquierDisponible[0];
+            usados.add(cualquierDisponible[0]);
+          }
+        }
+      }
+      
+      intentos++;
+    }
+    
+    // Completar posiciones vacías con postres restantes, verificando que no creen consecutivos
+    const postresRestantes = postres.filter(p => !usados.has(p));
+    for (let i = 0; i < resultado.length; i++) {
+      if (!resultado[i] && postresRestantes.length > 0) {
+        // Buscar un postre que no cree consecutivos
+        const postreValido = postresRestantes.find(p => puedeIrEnPosicion(p, i));
+        if (postreValido) {
+          resultado[i] = postreValido;
+          usados.add(postreValido);
+          const index = postresRestantes.indexOf(postreValido);
+          if (index > -1) {
+            postresRestantes.splice(index, 1);
+          }
+        } else if (postresRestantes.length > 0) {
+          // Si no hay válido, usar cualquier disponible
+          resultado[i] = postresRestantes.shift() || '';
+        }
+      }
+    }
+    
+    return resultado;
+  };
+  
+  // Distribuir postres evitando consecutivos del mismo tipo
+  const postresMezclados = distribuirPostresSinConsecutivos(postresSeleccionados.slice(0, diasSemana.length));
 
   // Función para obtener acompañamiento según las particularidades de la receta
   const obtenerAcompanamientoParaReceta = (receta: string): string => {
@@ -563,6 +802,11 @@ const generarMenuInteligente = () => {
       postresCandidatos = postresCandidatos.filter(p => p !== 'Arroz con leche');
     }
     
+    // Si el plato principal contiene "arroz" en su nombre, excluir arroz con leche
+    if (receta && receta.toLowerCase().includes('arroz')) {
+      postresCandidatos = postresCandidatos.filter(p => p !== 'Arroz con leche');
+    }
+    
     // Si hay candidatos disponibles, seleccionar uno
     if (postresCandidatos.length > 0) {
       return obtenerAleatorio(postresCandidatos);
@@ -614,53 +858,186 @@ const generarMenuInteligente = () => {
     };
   });
   
-  // Asignar postres según recomendaciones, considerando acompañamientos
+  // Función auxiliar para verificar si un postre puede ir en una posición sin crear consecutivos
+  const puedeAsignarPostre = (postre: string, posicion: number, postresAsignados: string[]): boolean => {
+    const esLeche = postresDeLeche.includes(postre);
+    const esFruta = postresDeFruta.includes(postre) || frutasFrescas.includes(postre);
+    
+    // Verificar día anterior
+    if (posicion > 0 && postresAsignados[posicion - 1]) {
+      const anteriorEsLeche = postresDeLeche.includes(postresAsignados[posicion - 1]);
+      const anteriorEsFruta = postresDeFruta.includes(postresAsignados[posicion - 1]) || frutasFrescas.includes(postresAsignados[posicion - 1]);
+      
+      if (esLeche && anteriorEsLeche) return false;
+      if (esFruta && anteriorEsFruta) return false;
+    }
+    
+    // Verificar día siguiente
+    if (posicion < postresAsignados.length - 1 && postresAsignados[posicion + 1]) {
+      const siguienteEsLeche = postresDeLeche.includes(postresAsignados[posicion + 1]);
+      const siguienteEsFruta = postresDeFruta.includes(postresAsignados[posicion + 1]) || frutasFrescas.includes(postresAsignados[posicion + 1]);
+      
+      if (esLeche && siguienteEsLeche) return false;
+      if (esFruta && siguienteEsFruta) return false;
+    }
+    
+    return true;
+  };
+  
+  // Asignar postres según recomendaciones, pero respetando la distribución sin consecutivos
   const postresAsignados: string[] = new Array(diasSemana.length).fill('');
   const postresUsados = new Set<string>();
   
-  // Primera pasada: asignar postres recomendados considerando restricciones
+  // Usar los postres distribuidos sin consecutivos como base
+  const postresBase = [...postresMezclados];
+  
+  // Primera pasada: intentar asignar postres recomendados respetando distribución sin consecutivos
   nuevoMenuTemporal.forEach((item, index) => {
     const { principal, acompanamiento } = item;
     const particularidades = particularidadesRecetas[principal];
     
-    if (!particularidades) return;
+    if (!particularidades) {
+      // Si no hay particularidades, usar el postre de la distribución base si está disponible
+      if (postresBase[index] && !postresUsados.has(postresBase[index]) && 
+          puedeAsignarPostre(postresBase[index], index, postresAsignados)) {
+        postresAsignados[index] = postresBase[index];
+        postresUsados.add(postresBase[index]);
+      }
+      return;
+    }
     
     // Obtener postres candidatos según recomendaciones y restricciones
     const postresDisponibles = todosPostresDisponiblesList.filter(p => !postresUsados.has(p));
-    const postre = obtenerPostreParaReceta(principal, acompanamiento, postresDisponibles);
     
-    if (postre) {
-      postresAsignados[index] = postre;
-      postresUsados.add(postre);
+    // PRIORIDAD: Si la receta requiere fruta cítrica (lentejas), asegurar que se asigne
+    if (particularidades.postreRecomendado === 'fruta_citrica') {
+      const frutasCitricasDisponibles = frutasCitricas.filter(p => 
+        postresDisponibles.includes(p) && puedeAsignarPostre(p, index, postresAsignados)
+      );
+      if (frutasCitricasDisponibles.length > 0) {
+        const postreCitrico = obtenerAleatorio(frutasCitricasDisponibles);
+        postresAsignados[index] = postreCitrico;
+        postresUsados.add(postreCitrico);
+        return;
+      }
+    }
+    
+    const postreRecomendado = obtenerPostreParaReceta(principal, acompanamiento, postresDisponibles);
+    
+    // Verificar si el postre recomendado puede ir en esta posición sin crear consecutivos
+    if (postreRecomendado && puedeAsignarPostre(postreRecomendado, index, postresAsignados)) {
+      postresAsignados[index] = postreRecomendado;
+      postresUsados.add(postreRecomendado);
+    } else {
+      // Si el recomendado no puede ir, buscar una alternativa del mismo tipo que no cree consecutivos
+      let postreAlternativo = null;
+      
+      if (postreRecomendado) {
+        const esLecheRecomendado = postresDeLeche.includes(postreRecomendado);
+        const esFrutaRecomendado = postresDeFruta.includes(postreRecomendado) || frutasFrescas.includes(postreRecomendado);
+        
+        // Buscar alternativa del mismo tipo
+        if (esLecheRecomendado) {
+          postreAlternativo = postresDeLeche.find(p => 
+            postresDisponibles.includes(p) && 
+            puedeAsignarPostre(p, index, postresAsignados)
+          );
+        } else if (esFrutaRecomendado) {
+          postreAlternativo = [...postresDeFruta, ...frutasFrescas].find(p => 
+            postresDisponibles.includes(p) && 
+            puedeAsignarPostre(p, index, postresAsignados)
+          );
+        }
+      }
+      
+      if (postreAlternativo) {
+        postresAsignados[index] = postreAlternativo;
+        postresUsados.add(postreAlternativo);
+      } else if (postresBase[index] && !postresUsados.has(postresBase[index]) && 
+                 puedeAsignarPostre(postresBase[index], index, postresAsignados)) {
+        // Si no hay alternativa del mismo tipo, usar el de la distribución base
+        postresAsignados[index] = postresBase[index];
+        postresUsados.add(postresBase[index]);
+      }
     }
   });
   
-  // Segunda pasada: completar con postres restantes manteniendo distribución balanceada
-  const postresRestantes = todosPostresDisponiblesList.filter(p => !postresUsados.has(p));
-  const postresRestantesMezclados = mezclarArray(postresRestantes);
+  // Segunda pasada: completar posiciones vacías respetando distribución sin consecutivos
+  const postresRestantes = postresBase.filter(p => !postresUsados.has(p));
+  const todosPostresRestantes = todosPostresDisponiblesList.filter(p => !postresUsados.has(p));
   
-  let postresRestantesIndex = 0;
   for (let i = 0; i < diasSemana.length; i++) {
     if (!postresAsignados[i]) {
       const { principal, acompanamiento } = nuevoMenuTemporal[i];
       const particularidades = principal ? particularidadesRecetas[principal] : null;
       
-      // Intentar obtener postre considerando restricciones
-      const postresDisponibles = postresRestantes.length > 0 
-        ? postresRestantes 
-        : todosPostresDisponiblesList.filter(p => !postresUsados.has(p));
-      
       let postreFinal = '';
       
-      if (particularidades) {
-        postreFinal = obtenerPostreParaReceta(principal, acompanamiento, postresDisponibles);
-      } else if (postresRestantesIndex < postresRestantesMezclados.length) {
-        postreFinal = postresRestantesMezclados[postresRestantesIndex];
-        postresRestantesIndex++;
-      } else {
-        // Si se agotan los postres únicos, permitir duplicados
-        const todosPostres = [...postresDeLeche, ...postresDeFruta, ...frutasFrescas];
-        postreFinal = obtenerAleatorio(todosPostres);
+      // Primero intentar con postres de la distribución base
+      // Verificar si hay arroz en el acompañamiento o plato principal
+      const acompanamientosConArroz = ['Arroz', 'Arroz con vegetales salteados', 'Arroz amarillo', 'Arroz plato principal'];
+      const tieneArroz = (acompanamiento && acompanamientosConArroz.includes(acompanamiento)) || 
+                        (principal && principal.toLowerCase().includes('arroz'));
+      
+      if (postresRestantes.length > 0) {
+        for (const postre of postresRestantes) {
+          // Excluir arroz con leche si hay arroz
+          if (tieneArroz && postre === 'Arroz con leche') continue;
+          if (puedeAsignarPostre(postre, i, postresAsignados)) {
+            postreFinal = postre;
+            break;
+          }
+        }
+      }
+      
+      // Si no se encontró en la base, intentar con recomendaciones
+      if (!postreFinal && particularidades) {
+        // PRIORIDAD: Si la receta requiere fruta cítrica (lentejas), asegurar que se asigne
+        if (particularidades.postreRecomendado === 'fruta_citrica') {
+          const frutasCitricasDisponibles = frutasCitricas.filter(p => 
+            todosPostresRestantes.includes(p) && puedeAsignarPostre(p, i, postresAsignados)
+          );
+          if (frutasCitricasDisponibles.length > 0) {
+            postreFinal = obtenerAleatorio(frutasCitricasDisponibles);
+          }
+        }
+        
+        // Si aún no hay postre, intentar con otras recomendaciones
+        if (!postreFinal) {
+          const postresDisponibles = todosPostresRestantes.filter(p => 
+            puedeAsignarPostre(p, i, postresAsignados)
+          );
+          if (postresDisponibles.length > 0) {
+            postreFinal = obtenerPostreParaReceta(principal, acompanamiento, postresDisponibles);
+          }
+        }
+      }
+      
+      // Si aún no hay postre, usar cualquier disponible que no cree consecutivos
+      if (!postreFinal) {
+        // Verificar si hay arroz en el acompañamiento o plato principal
+        const acompanamientosConArroz = ['Arroz', 'Arroz con vegetales salteados', 'Arroz amarillo', 'Arroz plato principal'];
+        const tieneArroz = (acompanamiento && acompanamientosConArroz.includes(acompanamiento)) || 
+                          (principal && principal.toLowerCase().includes('arroz'));
+        
+        const postresCandidatos = todosPostresRestantes.filter(p => {
+          if (!puedeAsignarPostre(p, i, postresAsignados)) return false;
+          // Excluir arroz con leche si hay arroz
+          if (tieneArroz && p === 'Arroz con leche') return false;
+          return true;
+        });
+        
+        if (postresCandidatos.length > 0) {
+          postreFinal = obtenerAleatorio(postresCandidatos);
+        } else if (todosPostresRestantes.length > 0) {
+          // Si no hay opciones que eviten consecutivos, usar cualquier disponible (excepto arroz con leche si hay arroz)
+          const tieneArroz = (acompanamiento && acompanamientosConArroz.includes(acompanamiento)) || 
+                            (principal && principal.toLowerCase().includes('arroz'));
+          const postresFinales = tieneArroz 
+            ? todosPostresRestantes.filter(p => p !== 'Arroz con leche')
+            : todosPostresRestantes;
+          postreFinal = postresFinales.length > 0 ? postresFinales[0] : todosPostresRestantes[0];
+        }
       }
       
       if (postreFinal) {
@@ -669,6 +1046,10 @@ const generarMenuInteligente = () => {
         const indexRestante = postresRestantes.indexOf(postreFinal);
         if (indexRestante > -1) {
           postresRestantes.splice(indexRestante, 1);
+        }
+        const indexTodosRestantes = todosPostresRestantes.indexOf(postreFinal);
+        if (indexTodosRestantes > -1) {
+          todosPostresRestantes.splice(indexTodosRestantes, 1);
         }
       }
     }
@@ -866,12 +1247,12 @@ const MenuSemanal = () => {
   };
 
   return (
-    <div className="p-6 bg-white shadow rounded-xl">
+    <div className="p-6 bg-neutral-card shadow rounded-xl">
       <div className="mb-4">
         <NavigationButtons />
       </div>
 
-      <h2 className="text-2xl font-bold text-logoGreen mb-6">Planificación semanal</h2>
+      <h2 className="text-2xl font-bold text-primary mb-6">Planificación semanal</h2>
 
       <div className="mb-4 flex flex-wrap gap-4 items-center">
         <button
@@ -891,7 +1272,7 @@ const MenuSemanal = () => {
               setMostrarPostre(true);
             }
           }}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-white bg-gradient-to-r from-logoGreen to-green-600 hover:from-logoGreenHover hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-white bg-gradient-to-r from-primary to-primary-dark hover:from-primary-hover hover:to-primary-dark transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
           title="Genera un menú semanal automáticamente respetando las frecuencias de carnes y postres recomendadas"
         >
           <FaMagic className="text-lg" />
@@ -903,8 +1284,8 @@ const MenuSemanal = () => {
           onClick={() => setMostrarRecetaBase(!mostrarRecetaBase)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             mostrarRecetaBase 
-              ? 'bg-logoGreen text-white' 
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              ? 'bg-primary text-white' 
+              : 'bg-neutral-soft text-neutral-text hover:bg-neutral-soft/80'
           }`}
         >
           {mostrarRecetaBase ? 'Ocultar' : 'Mostrar'} Receta Base
@@ -913,8 +1294,8 @@ const MenuSemanal = () => {
           onClick={() => setMostrarPostre(!mostrarPostre)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             mostrarPostre 
-              ? 'bg-logoGreen text-white' 
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              ? 'bg-primary text-white' 
+              : 'bg-neutral-soft text-neutral-text hover:bg-neutral-soft/80'
           }`}
         >
           {mostrarPostre ? 'Ocultar' : 'Mostrar'} Postre
@@ -925,35 +1306,35 @@ const MenuSemanal = () => {
       {/* Texto introductorio removido según solicitud */}
 
       {/* Opción para mantener misma cantidad de comensales */}
-      <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-white rounded-lg border-2 border-logoGreen/30 shadow-sm">
+      <div className="mb-6 p-4 bg-gradient-to-r from-neutral-bg to-neutral-card rounded-lg border-2 border-primary/30 shadow-sm">
         <label className="inline-flex items-center cursor-pointer group">
           <input
             type="checkbox"
             checked={mismaCantidadTodos}
             onChange={(e) => manejarToggleMismaCantidad(e.target.checked)}
-            className="w-5 h-5 text-logoGreen border-gray-300 rounded focus:ring-logoGreen focus:ring-2 cursor-pointer"
+            className="w-5 h-5 text-primary border-neutral-soft rounded focus:ring-primary focus:ring-2 cursor-pointer"
           />
-          <span className="ml-3 text-base font-semibold text-gray-800 group-hover:text-logoGreen transition-colors">
+          <span className="ml-3 text-base font-semibold text-neutral-text group-hover:text-primary transition-colors">
             Mantener la misma cantidad de comensales en todos los días
           </span>
         </label>
 
         {mismaCantidadTodos && (
-          <div className="mt-4 p-4 bg-white rounded-lg border border-logoGreen/20 shadow-inner">
+          <div className="mt-4 p-4 bg-neutral-card rounded-lg border border-primary/20 shadow-inner">
             <p className="text-sm font-medium text-gray-700 mb-3">
               Ingrese la cantidad de porciones que se aplicará a todos los días:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {(['chica', 'mediana', 'grande'] as TipoComensal[]).map((tipo) => (
                 <div key={tipo}>
-                  <label className="block text-sm font-semibold text-logoGreen mb-2">
+                  <label className="block text-sm font-semibold text-primary mb-2">
                     Porciones {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
                   </label>
                   <input
                     type="number"
                     value={porcionesGlobales[tipo]}
                     onChange={(e) => manejarCambioPorcionesGlobales(tipo, e.target.value)}
-                    className="w-full p-3 border-2 border-logoGreen rounded-lg text-black text-lg font-medium focus:outline-none focus:ring-2 focus:ring-logoGreen focus:border-logoGreen transition-all"
+                    className="w-full p-3 border-2 border-primary rounded-lg text-neutral-text text-lg font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                     min={0}
                     placeholder="0"
                   />
@@ -966,7 +1347,7 @@ const MenuSemanal = () => {
 
       {menu.map((item, index) => (
         <div key={item.dia} className="mb-4 border-b pb-4">
-          <h3 className="text-xl sm:text-2xl font-extrabold text-logoGreen tracking-tight">{item.dia}</h3>
+          <h3 className="text-xl sm:text-2xl font-extrabold text-primary tracking-tight">{item.dia}</h3>
 
           <div className="mt-2 w-full max-w-md">
             <label className="block mb-1 text-sm text-black">Receta principal</label>
@@ -1382,8 +1763,8 @@ const MenuSemanal = () => {
           )}
           
           {mismaCantidadTodos && !item.sinMenu && (
-            <div className="mt-2 p-3 bg-logoGreen/10 rounded-lg border border-logoGreen/20">
-              <p className="text-xs font-semibold text-logoGreen mb-2">Porciones aplicadas (modo global):</p>
+            <div className="mt-2 p-3 bg-primary/10 rounded-lg border border-primary/20">
+              <p className="text-xs font-semibold text-primary mb-2">Porciones aplicadas (modo global):</p>
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <div>
                   <span className="font-medium text-gray-700">Chica:</span>
@@ -1463,7 +1844,7 @@ const MenuSemanal = () => {
             });
             exportMenuToPDF(menuConNumeros);
           }}
-          className="flex items-center gap-2 bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-2 px-4 rounded"
+          className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded"
         >
           <FaFilePdf className="text-white" />
           Exportar menú semanal

@@ -1,6 +1,7 @@
 export const recetasAlmuerzo =  {
     101: {
         title: 'Bocaditos de pollo',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Suprema', quantity: 80, unit: 'g' },
             { name: 'Avena', quantity: 20, unit: 'g' },
@@ -12,6 +13,7 @@ export const recetasAlmuerzo =  {
     },
     102: {
         title: 'Budín de pescado',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Pescado', quantity: 50, unit: 'g' },
             { name: 'Zanahoria', quantity: 30, unit: 'g' },
@@ -29,6 +31,7 @@ export const recetasAlmuerzo =  {
     },
     103: {
         title: 'Carbonada criolla',
+        estacion: 'OTOÑO-INVIERNO' as const,
         ingredients: [
             { name: 'Carne en cubos', quantity: 50, unit: 'g' },
             { name: 'Fideos', quantity: 40, unit: 'g' },
@@ -48,6 +51,7 @@ export const recetasAlmuerzo =  {
     },
     104: {
         title: 'Carne a la portuguesa',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Carne entera', quantity: 50, unit: 'g' },
             { name: 'Cebolla', quantity: 10, unit: 'g' },
@@ -64,6 +68,7 @@ export const recetasAlmuerzo =  {
     },
     105: {
         title: 'Cazuela de lentejas',
+        estacion: 'OTOÑO-INVIERNO' as const,
         ingredients: [
             { name: 'Carne picada o en cubos', quantity: 50, unit: 'g' },
             { name: 'Lentejas', quantity: 20, unit: 'g' },
@@ -85,6 +90,7 @@ export const recetasAlmuerzo =  {
     },
     106: {
         title: 'Chop suey de cerdo',
+        estacion: 'PRIMAVERA-VERANO' as const,
         ingredients: [
             { name: 'Carne de cerdo', quantity: 50, unit: 'g' },
             { name: 'Cebolla', quantity: 10, unit: 'g' },
@@ -101,6 +107,7 @@ export const recetasAlmuerzo =  {
     },
     107: {
         title: 'Chupín de pescado y verduras',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Pescado', quantity: 60, unit: 'g' },
             { name: 'Papa', quantity: 26, unit: 'g' },
@@ -118,6 +125,7 @@ export const recetasAlmuerzo =  {
     },
     108: {
         title: 'Croquetas de atún y papas',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Papa', quantity: 160, unit: 'g' },
             { name: 'Atún', quantity: 60, unit: 'g' },
@@ -132,6 +140,7 @@ export const recetasAlmuerzo =  {
     },
     109: {
         title: 'Ensalada completa de pollo',
+        estacion: 'PRIMAVERA-VERANO' as const,
         ingredients: [
             { name: 'Arroz', quantity: 40, unit: 'g' },
             { name: 'Lentejas', quantity: 20, unit: 'g' },
@@ -146,6 +155,7 @@ export const recetasAlmuerzo =  {
     },
     110: {
         title: 'Ensalada completa de atún',
+        estacion: 'PRIMAVERA-VERANO' as const,
         ingredients: [
             { name: 'Arroz', quantity: 40, unit: 'g' },
             { name: 'Lentejas', quantity: 20, unit: 'g' },
@@ -160,6 +170,7 @@ export const recetasAlmuerzo =  {
     },
     111: {
         title: 'Hamburguesa de pescado',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Pescado', quantity: 60, unit: 'g' },
             { name: 'Avena', quantity: 10, unit: 'g' },
@@ -175,6 +186,7 @@ export const recetasAlmuerzo =  {
     },
     112: {
         title: 'Lasaña',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Acelga', quantity: 100, unit: 'g' },
             { name: 'Carne picada', quantity: 40, unit: 'g' },
@@ -193,6 +205,7 @@ export const recetasAlmuerzo =  {
     },
     113: {
         title: 'Pan de Carne / Hamburguesa',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Carne picada', quantity: 60, unit: 'g' },
             { name: 'Avena', quantity: 10, unit: 'g' },
@@ -208,6 +221,7 @@ export const recetasAlmuerzo =  {
     },
     114: {
         title: 'Pasta sorpresa',
+        estacion: 'PRIMAVERA-VERANO' as const,
         ingredients: [
             { name: 'Suprema de pollo', quantity: 50, unit: 'g' },
             { name: 'Queso Danbo, Cuartirolo, Gouda o Port Salut', quantity: 15, unit: 'g' },
@@ -222,6 +236,7 @@ export const recetasAlmuerzo =  {
     },
     115: {
         title: 'Pasta con verdusalsa',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Carne picada o en cubos', quantity: 50, unit: 'g' },
             { name: 'Pulpa de tomate', quantity: 40, unit: 'g' },
@@ -239,6 +254,7 @@ export const recetasAlmuerzo =  {
     },
     116: {
         title: 'Pastel de carne y papa',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Carne picada', quantity: 50, unit: 'g' },
             { name: 'Papa', quantity: 160, unit: 'g' },
@@ -253,6 +269,7 @@ export const recetasAlmuerzo =  {
     },
     117: {
         title: 'Pollo colorido',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Suprema de pollo', quantity: 50, unit: 'g' },
             { name: 'Cebolla', quantity: 10, unit: 'g' },
@@ -272,6 +289,7 @@ export const recetasAlmuerzo =  {
     },
     118: {
         title: 'Pastel de carne y berenjenas',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Carne picada', quantity: 50, unit: 'g' },
             { name: 'Ricota', quantity: 50, unit: 'g' },
@@ -290,6 +308,7 @@ export const recetasAlmuerzo =  {
     },
     119: {
         title: 'Pollo con salsa blanca y verduras',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Suprema de pollo', quantity: 50, unit: 'g' },
             { name: 'Brócoli fresco', quantity: 60, unit: 'g' },
@@ -305,6 +324,7 @@ export const recetasAlmuerzo =  {
     },
     120: {
         title: 'Torta de carne y vegetales',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Carne picada', quantity: 60, unit: 'g' },
             { name: 'Cebolla', quantity: 10, unit: 'g' },
@@ -319,6 +339,7 @@ export const recetasAlmuerzo =  {
     },
     121: {
         title: 'Tortilla de papa, vegetales y pollo',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Papa', quantity: 160, unit: 'g' },
             { name: 'Zapallito', quantity: 50, unit: 'g' },
@@ -335,6 +356,7 @@ export const recetasAlmuerzo =  {
     },
     122: {
         title: 'Torta de atún',
+        estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Atún', quantity: 60, unit: 'g' },
             { name: 'Cebolla', quantity: 20, unit: 'g' },

@@ -48,13 +48,13 @@ const ListadoRecetas = () => {
             <div className="relative w-full">
                 <input 
                     type="text" 
-                    className="w-full backdrop-blur-sm bg-white text-black py-2 pl-10 pr-4 rounded-lg focus:outline-none border-2 border-logoGreen/20 focus:border-logoGreen transition-colors duration-300" 
+                    className="w-full backdrop-blur-sm bg-neutral-card text-neutral-text py-2 pl-10 pr-4 rounded-lg focus:outline-none border-2 border-primary/20 focus:border-primary transition-colors duration-300" 
                     placeholder="Nombre de la receta"
                     value = { search }
                     onChange={ handleChangeSearch }
                 />
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaSearch className="text-logoGreen text-md"/>
+                <FaSearch className="text-primary text-md"/>
                 </div>
             </div>
         </div>

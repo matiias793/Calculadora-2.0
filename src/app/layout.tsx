@@ -33,26 +33,26 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/images/LOGOAPPPNG.png", type: "image/png", sizes: "512x512" },
-      { url: "/images/LOGOAPPPNG.png", type: "image/png", sizes: "192x192" }
+      { url: "/logonuevoverde.png", sizes: "any" },
+      { url: "/logonuevoverde.png", type: "image/png", sizes: "512x512" },
+      { url: "/logonuevoverde.png", type: "image/png", sizes: "192x192" }
     ],
     apple: [
-      { url: "/images/LOGOAPPPNG.png", sizes: "180x180", type: "image/png" }
+      { url: "/logonuevoverde.png", sizes: "180x180", type: "image/png" }
     ],
-    shortcut: "/favicon.ico"
+    shortcut: "/logonuevoverde.png"
   },
   openGraph: {
     title: "Calculadora de Ingredientes",
     description: "Recetario para comedores escolares",
-    images: ["/images/LOGOAPPPNG.png"],
+    images: ["/logonuevoverde.png"],
     type: "website",
   },
   twitter: {
     card: "summary",
     title: "Calculadora de Ingredientes",
     description: "Recetario para comedores escolares",
-    images: ["/images/LOGOAPPPNG.png"],
+    images: ["/logonuevoverde.png"],
   },
   viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
 };

@@ -13,7 +13,7 @@ export default function EscuelasVerano2026() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] py-12 sm:py-16">
         <div className="flex flex-col items-center mb-8">
           <Image
-            src="/images/logo.png"
+            src="/logonuevoverde.png"
             width={200}
             height={200}
             alt="Logo"

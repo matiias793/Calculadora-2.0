@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import BackButton from '../shared/BackButton'
+import NavigationButtons from '../shared/NavigationButtons'
 import { RecetaCopaLeche } from '@/models/RecetaCopaLeche'
 import { useAppDispatch, useAppSelector } from '@/store'
 import { setPorciones, setRecetaCopaLecheOriginal, setRecetaCopaLechePorciones } from '@/store/recetaCopaLeche/recetaCopaLecheSlice'
@@ -79,7 +79,7 @@ const RecetaCopaLecheGrid = ( { receta, opcion }: Props ) => {
     <div className="mx-auto max-w-screen-xl w-full">
         <span className="font-bold text-3xl text-logoGreen text-center mt-5 w-full flex flex-col h-auto">
           <span className="flex flex-col items-start justify-start mb-4">
-            <BackButton/>
+            <NavigationButtons/>
           </span>
           <span className='text-center w-full'>
             {

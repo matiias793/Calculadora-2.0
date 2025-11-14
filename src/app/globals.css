@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F5FAF5;
+  --foreground: #5F6F5F;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,6 +17,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
+  background-color: #F5FAF5;
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -85,8 +86,8 @@ select:focus option:hover {
   
   /* Mejorar contraste de texto verde en móvil */
   .text-logoGreen {
-    color: #7CB342;
-    text-shadow: 0 1px 2px rgba(124, 179, 66, 0.1);
+    color: #8BCF85;
+    text-shadow: 0 1px 2px rgba(139, 207, 133, 0.1);
   }
 }
 
@@ -134,8 +135,8 @@ html {
   
   /* Indicador visual para filtros activos */
   select[style*="font-weight: 500"] {
-    border-color: #22C55E;
-    box-shadow: 0 0 0 1px #22C55E;
+    border-color: #8BCF85;
+    box-shadow: 0 0 0 1px #8BCF85;
   }
 }
 
@@ -147,8 +148,8 @@ select {
 
 select:focus {
   outline: none;
-  border-color: #22C55E;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  border-color: #8BCF85;
+  box-shadow: 0 0 0 3px rgba(139, 207, 133, 0.1);
 }
 
 /* Estilos para opciones de select */
@@ -159,4 +160,41 @@ select option {
 
 select option:hover {
   background-color: #f3f4f6;
+}
+
+/* Animaciones para la pantalla de bienvenida */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out;
+}
+
+.animate-slide-up-delay {
+  animation: slide-up 0.6s ease-out 0.2s both;
+}
+
+.animate-fade-in-delay {
+  animation: fade-in 0.6s ease-out 0.4s both;
 }
