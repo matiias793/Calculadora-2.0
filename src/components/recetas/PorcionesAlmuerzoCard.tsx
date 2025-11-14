@@ -170,7 +170,7 @@ const PorcionesAlmuerzoCard = () => {
               <h4 className="text-lg text-logoGreen font-bold">Cantidad de porciones</h4>
               <div className="flex flex-row gap-5 mt-7 mb-7">
                   <button 
-                    className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-2 px-4 rounded"
+                    className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]"
                     onClick={ handleDecrement }
                     disabled={ counter <= MIN_PORCIONES }>
                       -
@@ -185,7 +185,7 @@ const PorcionesAlmuerzoCard = () => {
                       max={MAX_PORCIONES}
                   />                
                   <button 
-                    className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-2 px-4 rounded"
+                    className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]"
                     onClick={ handleIncrement }
                     disabled={ counter >= MAX_PORCIONES }>
                       +

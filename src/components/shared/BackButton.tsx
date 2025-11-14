@@ -23,7 +23,7 @@ const BackButton = ({ href }: BackButtonProps) => {
         // Antes de navegar hacia atrás, establecer skipWelcome si vamos a "/"
         // Esto evita que se muestre la bienvenida al retroceder
         sessionStorage.setItem('skipWelcome', 'true');
-        window.history.back();
+    window.history.back();
       } else {
         // Si no hay historial, ir al menú principal sin bienvenida
         sessionStorage.setItem('skipWelcome', 'true');

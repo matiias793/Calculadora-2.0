@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Providers from "@/store/Providers";
+import ThemeColor from "@/components/shared/ThemeColor";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -55,6 +56,9 @@ export const metadata: Metadata = {
     images: ["/logonuevoverde.png"],
   },
   viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
+  other: {
+    "theme-color": "#8BCF85",
+  },
 };
 
 export default function RootLayout({
@@ -67,6 +71,7 @@ export default function RootLayout({
       <body
         className={`${ poppinsFont.className } ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ThemeColor />
         <div className="flex flex-row h-2">
           <div className="w-1/6 bg-green-400"></div>
           <div className="w-1/6 bg-orange-400"></div>

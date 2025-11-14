@@ -168,7 +168,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
               <label className="block font-semibold text-sm text-logoGreen mb-1">Porciones medianas</label>
               <div className="flex flex-row items-center gap-2">
                 <button 
-                  className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1 px-3 rounded" 
+                  className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]" 
                   onClick={() => handleDecrement(setCounterMediana, counterMediana)}
                   disabled={counterMediana <= 0}
                 >
@@ -185,7 +185,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
                   max={MAX_PORCIONES}
                 />
                 <button 
-                  className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1 px-3 rounded" 
+                  className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]" 
                   onClick={() => handleIncrement(setCounterMediana, counterMediana)}
                   disabled={counterMediana >= MAX_PORCIONES}
                 >
@@ -209,7 +209,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
                 <label className="block font-semibold text-sm text-logoGreen mb-1">{label}</label>
                 <div className="flex flex-row items-center gap-2">
                   <button 
-                    className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1 px-3 rounded" 
+                    className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]" 
                     onClick={() => handleDecrement(setter, value)}
                     disabled={value <= 0}
                   >
@@ -226,7 +226,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
                     max={MAX_PORCIONES}
                   />
                   <button 
-                    className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1 px-3 rounded" 
+                    className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]" 
                     onClick={() => handleIncrement(setter, value)}
                     disabled={value >= MAX_PORCIONES}
                   >

@@ -1080,7 +1080,7 @@ const MenuSemanal = () => {
 
   const [mostrarRecetaBase, setMostrarRecetaBase] = useState(false);
   const [mostrarPostre, setMostrarPostre] = useState(false);
-  const [mismaCantidadTodos, setMismaCantidadTodos] = useState(false);
+  const [mismaCantidadTodos, setMismaCantidadTodos] = useState(true); // Marcado por defecto
   const [porcionesGlobales, setPorcionesGlobales] = useState({ chica: '', mediana: '', grande: '' });
 
   const manejarCambio = (index: number, campo: 'principal' | 'acompanamiento' | 'recetaBase' | 'postre', valor: string) => {
