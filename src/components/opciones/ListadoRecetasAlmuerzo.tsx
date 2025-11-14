@@ -63,7 +63,7 @@ const ListadoRecetasAlmuerzo = () => {
                       option => {
                           // Buscar la estación de la receta
                           const receta = Object.values(recetasAlmuerzo).find(r => r.title === option.title);
-                          const estacion = receta?.estacion;
+                          const estacion = receta && 'estacion' in receta ? receta.estacion : undefined;
                           
                           // Formatear la estación de manera más corta y legible
                           let estacionFormateada: string | undefined;
