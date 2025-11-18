@@ -20,8 +20,8 @@ interface Props {
 const RecetaCopaLecheGrid = ( { receta, opcion }: Props ) => {
 
   const dispatch = useAppDispatch();
-  const unidadVolumen = useAppSelector( ( state ) => state.receta.unidadVolumen );
-  const unidadMasa = useAppSelector( ( state ) => state.receta.unidadMasa );
+  const unidadVolumen = useAppSelector( ( state ) => state.recetaCopaLeche.unidadVolumen );
+  const unidadMasa = useAppSelector( ( state ) => state.recetaCopaLeche.unidadMasa );
 
   const recetaOriginal = useAppSelector( ( state ) => state.recetaCopaLeche.recetaOriginal );
 

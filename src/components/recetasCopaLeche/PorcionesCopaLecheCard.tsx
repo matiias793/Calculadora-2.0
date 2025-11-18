@@ -2,7 +2,7 @@ import { Receta } from '@/models/Receta';
 import { RecetaCopaLeche } from '@/models/RecetaCopaLeche';
 import { Saborizante } from '@/models/Saborizante';
 import { useAppDispatch, useAppSelector } from '@/store';
-import { decrement, increment, setPorciones, setRecetaCopaLecheOriginal, setRecetaCopaLechePorciones } from '@/store/recetaCopaLeche/recetaCopaLecheSlice';
+import { setPorciones, setRecetaCopaLecheOriginal, setRecetaCopaLechePorciones } from '@/store/recetaCopaLeche/recetaCopaLecheSlice';
 import { UnidadMasa } from '@/utils/enums/unidad-masa';
 import { UnidadVolumen } from '@/utils/enums/unidad-volumen';
 import { recetasLecheFluida } from '@/utils/recetas-leche-fluida';
@@ -28,10 +28,19 @@ const PorcionesCopaLecheCard = (
     const [ counter, setCounter ] = useState( porciones );
     const [ saborizante, setSaborizante ] = useState( '1' );
 
+    const MIN_PORCIONES = 1;
+    const MAX_PORCIONES = 1000;
+
+    const validateAndLimit = (value: number): number => {
+      if (isNaN(value) || value < MIN_PORCIONES) return MIN_PORCIONES;
+      if (value > MAX_PORCIONES) return MAX_PORCIONES;
+      return Math.round(value);
+    };
+
     const recalculate = useCallback((factor: number, recetaParam?: Receta | null) => {
       const baseReceta = recetaParam ?? recetaOriginal;
       if (!baseReceta) return;
-      if (isNaN(factor) || factor < 0) {
+      if (isNaN(factor) || factor < MIN_PORCIONES) {
         console.warn('Factor de cálculo inválido:', factor);
         return;
       }
@@ -93,31 +102,30 @@ const PorcionesCopaLecheCard = (
     }, [porciones]);
   
     const handlePorcionesChange = ( e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      
-      const parsedValue = value.length == 0 ? 0: Number( value );
-      if ( isNaN( parsedValue ) ) {
-          return;
+      const rawValue = e.target.value.replace(/^0+/, '');
+      const parsedValue = rawValue === '' ? MIN_PORCIONES : Number(rawValue);
+      if (isNaN(parsedValue)) {
+        return;
       }
-      else {
-          setCounter( Number( parsedValue ) );
-          dispatch( setPorciones( parsedValue ) );
-          recalculate( parsedValue, recetaOriginal! );
-      }
-  
-    }
+      const validatedValue = validateAndLimit(parsedValue);
+      setCounter(validatedValue);
+      dispatch(setPorciones(validatedValue));
+      recalculate(validatedValue, recetaOriginal ?? receta);
+    };
   
     const handleDecrement = () => {
-      setCounter( counter - 1 );
-      dispatch( decrement() );
-      recalculate( ( counter - 1 ), recetaOriginal! );
-    }
+      const newValue = validateAndLimit(counter - 1);
+      setCounter(newValue);
+      dispatch(setPorciones(newValue));
+      recalculate(newValue, recetaOriginal ?? receta);
+    };
   
     const handleIncrement = () => {
-      setCounter( counter + 1 );
-      dispatch( increment() );
-      recalculate( ( counter + 1 ), recetaOriginal! );
-    }
+      const newValue = validateAndLimit(counter + 1);
+      setCounter(newValue);
+      dispatch(setPorciones(newValue));
+      recalculate(newValue, recetaOriginal ?? receta);
+    };
 
     const opciones: Saborizante[] = [
         {
@@ -176,10 +184,10 @@ const PorcionesCopaLecheCard = (
         <div className="flex flex-row overflow-hidden rounded-xl bg-white bg-clip-border text-gray-700 shadow-md h-auto">
             <div className="p-6">
                 <h4 className="text-lg text-logoGreen font-bold">Cantidad de porciones</h4>
-                <div className="flex flex-row gap-5 mt-7 mb-7">
+        <div className="flex flex-row gap-5 mt-7 mb-7">
                     <button className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-2 px-4 rounded"
                         onClick={ handleDecrement }
-                        disabled={ porciones <= 1 }>
+                        disabled={ counter <= MIN_PORCIONES }>
                         -
                     </button>
                     <input
@@ -188,13 +196,19 @@ const PorcionesCopaLecheCard = (
                         value = { counter }
                         onChange={ handlePorcionesChange }
                         className="py-1 text-xl text-center w-full px-0 mt-0 bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 focus:border-logoGreen border-gray-200"
+                        min={MIN_PORCIONES}
+                        max={MAX_PORCIONES}
                     />                
-                    <button className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-2 px-4 rounded"
-                        onClick={ handleIncrement }>
+                    <button className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-2 px-4 rounded"
+                        onClick={ handleIncrement }
+                        disabled={ counter >= MAX_PORCIONES }>
                         +
                     </button>
             
                 </div>
+                <p className="text-xs text-gray-500 text-center">
+                  Mínimo: {MIN_PORCIONES}, Máximo: {MAX_PORCIONES}
+                </p>
             </div>
         </div>
     </div> )

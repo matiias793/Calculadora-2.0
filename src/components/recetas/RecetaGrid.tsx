@@ -15,6 +15,7 @@ import VideosContainer from './VideosContainer'
 import UnidadesCard from './UnidadesCard'
 import { UnidadMasa } from '@/utils/enums/unidad-masa'
 import { UnidadVolumen } from '@/utils/enums/unidad-volumen'
+import RecipeAudioButton from './RecipeAudioButton'
 
 interface Props {
     receta: Receta,
@@ -90,6 +91,8 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
         setTab(tabIndex);
     };
 
+    const showAudioButton = receta.title.trim().toLowerCase() === 'bocaditos de pollo';
+
     return (
         <div className="mx-auto max-w-screen-xl w-full px-2 sm:px-4">
             <span className="font-bold text-2xl sm:text-3xl text-primary text-center mt-4 sm:mt-5 w-full flex flex-col h-auto">
@@ -103,6 +106,9 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
                     <span className="text-sm sm:text-base font-normal text-neutral-text mt-2 text-center w-full">
                         Estación recomendada: <span className="font-semibold text-primary">{receta.estacion}</span>
                     </span>
+                )}
+                {showAudioButton && (
+                    <RecipeAudioButton receta={receta} procedimiento={procedimiento} />
                 )}
             </span>
             <div className="tabs flex flex-col w-full mt-7">
