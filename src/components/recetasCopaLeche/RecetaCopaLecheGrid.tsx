@@ -8,6 +8,7 @@ import { setPorciones, setRecetaCopaLecheOriginal, setRecetaCopaLechePorciones }
 import PorcionesCopaLecheCard from './PorcionesCopaLecheCard'
 import IngredientesCopaLecheCard from './IngredientesCopaLecheCard'
 import UnidadesCopaLecheCard from './UnidadesCopaLecheCard'
+import CopaAudioButton from './CopaAudioButton'
 import { UnidadVolumen } from '@/utils/enums/unidad-volumen'
 import { UnidadMasa } from '@/utils/enums/unidad-masa'
 import { Receta } from '@/models/Receta'
@@ -88,6 +89,7 @@ const RecetaCopaLecheGrid = ( { receta, opcion }: Props ) => {
                   receta.title
             }
           </span>
+          <CopaAudioButton opcion={opcion} />
         </span>
         <div className="flex flex-col md:flex-row my-10 gap-5 items-start mt-10">
           <div className="flex flex-col md:w-1/3 w-full gap-5">

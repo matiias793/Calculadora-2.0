@@ -1,27 +1,20 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Receta } from '@/models/Receta';
-import { Procedimiento } from '@/models/Procedimiento';
-import { FaVolumeUp, FaStop } from 'react-icons/fa';
+import { FaStop, FaVolumeUp } from 'react-icons/fa';
 import { useAppSelector } from '@/store';
+import { saborizantesCopaLeche } from '@/utils/saborizantes';
 
-interface RecipeAudioButtonProps {
-  receta: Receta;
-  procedimiento: Procedimiento;
+interface CopaAudioButtonProps {
+  opcion: string;
 }
 
-const RecipeAudioButton = ({ receta, procedimiento }: RecipeAudioButtonProps) => {
+const CopaAudioButton = ({ opcion }: CopaAudioButtonProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [canSpeak, setCanSpeak] = useState(false);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const segmentsRef = useRef<string[]>([]);
-  const porcionesTipo = useAppSelector((state) => state.receta.porcionesTipo);
-  const recetaEscalada = useAppSelector((state) => state.receta.recetaPorciones);
-  const totalComensales = Math.max(
-    0,
-    porcionesTipo.chica + porcionesTipo.mediana + porcionesTipo.grande
-  );
+  const recetaPorciones = useAppSelector((state) => state.recetaCopaLeche.recetaPorciones);
+  const porciones = useAppSelector((state) => state.recetaCopaLeche.porciones);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -36,66 +29,39 @@ const RecipeAudioButton = ({ receta, procedimiento }: RecipeAudioButtonProps) =>
   }, []);
 
   const narrationSegments = useMemo<string[]>(() => {
-    const recetaBase = recetaEscalada ?? receta;
-    if (!recetaBase || !procedimiento) return [];
+    if (!recetaPorciones) return [];
 
-    const cantidadTexto =
-      totalComensales > 0
-        ? `Esta receta está calculada para ${totalComensales} ${totalComensales === 1 ? 'persona' : 'personas'}.`
-        : 'Aún no se configuró la cantidad de comensales.';
-
+    const totalPersonas = Math.max(1, porciones ?? 1);
     const segments: string[] = [];
-    segments.push(`Receta: ${recetaBase.title}. ${cantidadTexto}`);
+    segments.push(`Receta: ${recetaPorciones.title}. Está calculada para ${totalPersonas} ${totalPersonas === 1 ? 'persona' : 'personas'}.`);
 
-    recetaBase.ingredients.forEach(({ name, quantity, unit }, index) => {
+    recetaPorciones.ingredients.forEach(({ name, quantity, unit }, index) => {
       const cantidad = typeof quantity === 'number' ? Number(quantity).toLocaleString('es-AR') : quantity;
       const unidad = unit ? ` ${unit}` : '';
       segments.push(`Ingrediente ${index + 1}: ${name}, ${cantidad}${unidad}.`);
     });
 
-    if (recetaBase.variants && recetaBase.variants.length > 0) {
+    if (recetaPorciones.variants && recetaPorciones.variants.length > 0) {
       segments.push('Variantes de ingredientes.');
-      recetaBase.variants.forEach(({ name, quantity, unit }, index) => {
+      recetaPorciones.variants.forEach(({ name, quantity, unit }, index) => {
         const cantidad = typeof quantity === 'number' ? Number(quantity).toLocaleString('es-AR') : quantity;
         const unidad = unit ? ` ${unit}` : '';
         segments.push(`Variante ${index + 1}: ${name}, ${cantidad}${unidad}.`);
       });
     }
 
-    if (procedimiento?.opciones && procedimiento.opciones.length > 0) {
-      segments.push('Procedimiento.');
-      procedimiento.opciones.forEach((opcion, index) => {
-        const titulo = opcion.title ? `${opcion.title}.` : `Sección ${index + 1}.`;
-        segments.push(`${titulo}`);
-        opcion.pasos.forEach((paso, pasoIndex) => {
-          segments.push(`Paso ${index + 1}.${pasoIndex + 1}: ${paso}.`);
-        });
-      });
-    }
-
-    if (procedimiento?.tips && procedimiento.tips.length > 0) {
-      segments.push('Tips.');
-      procedimiento.tips.forEach((tip, index) => {
-        segments.push(`Tip ${index + 1}: ${tip}.`);
-      });
-    }
-
-    if (procedimiento?.variantes && procedimiento.variantes.length > 0) {
-      segments.push('Variantes.');
-      procedimiento.variantes.forEach((variante, index) => {
-        segments.push(`Variante ${index + 1}: ${variante}.`);
+    if (saborizantesCopaLeche.length > 0) {
+      segments.push('Saborizantes disponibles.');
+      saborizantesCopaLeche.forEach((saborizante, index) => {
+        segments.push(`Opción ${index + 1}: ${saborizante.nombre}.`);
       });
     }
 
     return segments;
-  }, [receta, recetaEscalada, procedimiento, totalComensales]);
+  }, [opcion, porciones, recetaPorciones]);
 
   useEffect(() => {
-    if (Array.isArray(narrationSegments)) {
-      segmentsRef.current = narrationSegments;
-    } else {
-      segmentsRef.current = [];
-    }
+    segmentsRef.current = narrationSegments;
   }, [narrationSegments]);
 
   const playSegment = useCallback((index: number) => {
@@ -115,7 +81,6 @@ const RecipeAudioButton = ({ receta, procedimiento }: RecipeAudioButtonProps) =>
     utterance.onend = () => playSegment(index + 1);
     utterance.onerror = () => setIsPlaying(false);
 
-    utteranceRef.current = utterance;
     synthesis.speak(utterance);
   }, [canSpeak]);
 
@@ -123,7 +88,6 @@ const RecipeAudioButton = ({ receta, procedimiento }: RecipeAudioButtonProps) =>
     if (typeof window === 'undefined' || !canSpeak || segmentsRef.current.length === 0) return;
 
     const synthesis = window.speechSynthesis;
-
     if (isPlaying) {
       synthesis.cancel();
       setIsPlaying(false);
@@ -148,17 +112,17 @@ const RecipeAudioButton = ({ receta, procedimiento }: RecipeAudioButtonProps) =>
       <button
         onClick={handleToggleAudio}
         className="flex items-center gap-2 px-5 py-2 rounded-full bg-primary text-white font-semibold shadow hover:bg-primary-hover transition-colors"
-        aria-label={isPlaying ? 'Detener narración de la receta' : 'Escuchar la receta narrada'}
+        aria-label={isPlaying ? 'Detener narración de la receta de copa de leche' : 'Escuchar la receta de copa de leche'}
       >
         {isPlaying ? <FaStop /> : <FaVolumeUp />}
         {isPlaying ? 'Detener audio' : 'Escuchar receta'}
       </button>
       <p className="text-xs text-neutral-text/80">
-        Incluye nombre, ingredientes, tips, variantes y procedimiento.
+        Incluye nombre, ingredientes y saborizantes disponibles.
       </p>
     </div>
   );
 };
 
-export default RecipeAudioButton;
+export default CopaAudioButton;
 

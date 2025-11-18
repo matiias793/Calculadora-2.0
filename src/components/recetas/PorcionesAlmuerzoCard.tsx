@@ -16,6 +16,8 @@ const PorcionesAlmuerzoCard = () => {
   
     const [ counter, setCounter ] = useState( porciones );
     const [ tamanio, setTamanio ] = useState( TamanioEnum.MEDIANA );
+
+    const buttonClasses = "bg-primary hover:bg-primary-hover text-white font-bold w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-transform duration-150 shadow-sm active:scale-95 disabled:bg-primary/40 disabled:cursor-not-allowed";
   
     // Constantes para cálculos precisos
     const MAX_PORCIONES = 1000;
@@ -170,7 +172,7 @@ const PorcionesAlmuerzoCard = () => {
               <h4 className="text-lg text-logoGreen font-bold">Cantidad de porciones</h4>
               <div className="flex flex-row gap-5 mt-7 mb-7">
                   <button 
-                    className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]"
+                    className={buttonClasses}
                     onClick={ handleDecrement }
                     disabled={ counter <= MIN_PORCIONES }>
                       -
@@ -185,7 +187,7 @@ const PorcionesAlmuerzoCard = () => {
                       max={MAX_PORCIONES}
                   />                
                   <button 
-                    className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]"
+                    className={buttonClasses}
                     onClick={ handleIncrement }
                     disabled={ counter >= MAX_PORCIONES }>
                       +

@@ -11,7 +11,7 @@ const ProcedimientoCard = () => {
     <div className="md:w-1/2 w-full flex flex-col overflow-hidden rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
 
         <div className="p-6">
-            <h4 className="text-lg text-logoGreen font-bold mb-5">Instrucciones</h4>
+            <h4 className="text-lg text-logoGreen font-bold mb-5">Procedimiento</h4>
             {
               procedimiento?.opciones.map(
                 ( opcion, index ) => (

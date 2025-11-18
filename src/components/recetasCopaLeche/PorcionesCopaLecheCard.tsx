@@ -7,6 +7,7 @@ import { UnidadMasa } from '@/utils/enums/unidad-masa';
 import { UnidadVolumen } from '@/utils/enums/unidad-volumen';
 import { recetasLecheFluida } from '@/utils/recetas-leche-fluida';
 import { recetasLecheEnPolvo } from '@/utils/recetas-leche-polvo';
+import { saborizantesCopaLeche } from '@/utils/saborizantes';
 import React, { useCallback, useEffect, useState } from 'react'
 
 const PorcionesCopaLecheCard = (
@@ -27,6 +28,8 @@ const PorcionesCopaLecheCard = (
   
     const [ counter, setCounter ] = useState( porciones );
     const [ saborizante, setSaborizante ] = useState( '1' );
+
+    const buttonClasses = "bg-primary hover:bg-primary-hover text-white font-bold w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-transform duration-150 shadow-sm active:scale-95 disabled:bg-primary/40 disabled:cursor-not-allowed";
 
     const MIN_PORCIONES = 1;
     const MAX_PORCIONES = 1000;
@@ -127,21 +130,6 @@ const PorcionesCopaLecheCard = (
       recalculate(newValue, recetaOriginal ?? receta);
     };
 
-    const opciones: Saborizante[] = [
-        {
-            id: '1',
-            nombre: 'Cocoa'
-        },
-        {
-            id: '2',
-            nombre: 'Cebada instantánea'
-        },
-        {
-            id: '3',
-            nombre: 'Vainilla'
-        },
-    ]
-
     const handleSaborizanteChange = ( e: React.ChangeEvent<HTMLSelectElement>) => {
         setSaborizante( e.target.value );
         
@@ -166,7 +154,7 @@ const PorcionesCopaLecheCard = (
                         onChange={handleSaborizanteChange}
                     >
                         {
-                            opciones.map(
+                            saborizantesCopaLeche.map(
                                 ( { id, nombre } ) => 
                                     <option 
                                         key = { id } 
@@ -185,7 +173,7 @@ const PorcionesCopaLecheCard = (
             <div className="p-6">
                 <h4 className="text-lg text-logoGreen font-bold">Cantidad de porciones</h4>
         <div className="flex flex-row gap-5 mt-7 mb-7">
-                    <button className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-2 px-4 rounded"
+                    <button className={buttonClasses}
                         onClick={ handleDecrement }
                         disabled={ counter <= MIN_PORCIONES }>
                         -
@@ -199,7 +187,7 @@ const PorcionesCopaLecheCard = (
                         min={MIN_PORCIONES}
                         max={MAX_PORCIONES}
                     />                
-                    <button className="bg-logoGreen hover:bg-logoGreenHover disabled:bg-logoGreenDisabled text-white font-bold py-2 px-4 rounded"
+                    <button className={buttonClasses}
                         onClick={ handleIncrement }
                         disabled={ counter >= MAX_PORCIONES }>
                         +

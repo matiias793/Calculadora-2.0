@@ -91,8 +91,6 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
         setTab(tabIndex);
     };
 
-    const showAudioButton = receta.title.trim().toLowerCase() === 'bocaditos de pollo';
-
     return (
         <div className="mx-auto max-w-screen-xl w-full px-2 sm:px-4">
             <span className="font-bold text-2xl sm:text-3xl text-primary text-center mt-4 sm:mt-5 w-full flex flex-col h-auto">
@@ -107,9 +105,7 @@ const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
                         Estación recomendada: <span className="font-semibold text-primary">{receta.estacion}</span>
                     </span>
                 )}
-                {showAudioButton && (
-                    <RecipeAudioButton receta={receta} procedimiento={procedimiento} />
-                )}
+                <RecipeAudioButton receta={receta} procedimiento={procedimiento} />
             </span>
             <div className="tabs flex flex-col w-full mt-7">
                 <div className="relative flex flex-row items-center">

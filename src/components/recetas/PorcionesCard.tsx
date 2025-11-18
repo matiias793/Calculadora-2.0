@@ -157,6 +157,8 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
     recalculate
   ]);
 
+  const buttonClasses = "bg-primary hover:bg-primary-hover text-white font-bold w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-transform duration-150 shadow-sm active:scale-95 disabled:bg-primary/40 disabled:cursor-not-allowed";
+
   return (
     <div className="flex-col w-full flex gap-5">
       <div className="p-6 overflow-hidden rounded-xl bg-white bg-clip-border text-gray-700 shadow-md h-auto">
@@ -166,9 +168,9 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
             // Solo mostrar porción mediana para desayunos y meriendas
             <div>
               <label className="block font-semibold text-sm text-logoGreen mb-1">Porciones medianas</label>
-              <div className="flex flex-row items-center gap-2">
+              <div className="flex flex-row items-center gap-3">
                 <button 
-                  className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]" 
+                  className={buttonClasses}
                   onClick={() => handleDecrement(setCounterMediana, counterMediana)}
                   disabled={counterMediana <= 0}
                 >
@@ -185,7 +187,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
                   max={MAX_PORCIONES}
                 />
                 <button 
-                  className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]" 
+                  className={buttonClasses}
                   onClick={() => handleIncrement(setCounterMediana, counterMediana)}
                   disabled={counterMediana >= MAX_PORCIONES}
                 >
@@ -207,9 +209,9 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
             }].map(({ label, value, setter }, index) => (
               <div key={index}>
                 <label className="block font-semibold text-sm text-logoGreen mb-1">{label}</label>
-                <div className="flex flex-row items-center gap-2">
+                <div className="flex flex-row items-center gap-3">
                   <button 
-                    className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]" 
+                    className={buttonClasses}
                     onClick={() => handleDecrement(setter, value)}
                     disabled={value <= 0}
                   >
@@ -226,7 +228,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
                     max={MAX_PORCIONES}
                   />
                   <button 
-                    className="bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-1.5 px-4 rounded-lg flex items-center justify-center min-w-[44px] h-[44px]" 
+                    className={buttonClasses}
                     onClick={() => handleIncrement(setter, value)}
                     disabled={value >= MAX_PORCIONES}
                   >
