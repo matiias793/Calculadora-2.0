@@ -42,10 +42,10 @@ export const recetasAlmuerzo =  {
             { name: 'Arvejas', quantity: 15, unit: 'g' },
             { name: 'Cebolla', quantity: 10, unit: 'g' },
             { name: 'Morrón', quantity: 15, unit: 'g' },
-            { name: 'Pulpa de tomate', quantity: 30, unit: 'g' },
+            { name: 'Pulpa de tomate', quantity: 30, unit: 'ml' },
             { name: 'Ajo', quantity: 1, unit: 'g' },
             { name: 'Sal', quantity: 1, unit: 'g' },
-            { name: 'Aceite', quantity: 10, unit: 'g' },
+            { name: 'Aceite', quantity: 10, unit: 'ml' },
             { name: 'Perejil', quantity: 2, unit: 'g' }
         ]
     },
@@ -58,7 +58,7 @@ export const recetasAlmuerzo =  {
             { name: 'Morrón', quantity: 15, unit: 'g' },
             { name: 'Zanahoria', quantity: 40, unit: 'g' },
             { name: 'Arvejas', quantity: 25, unit: 'g' },
-            { name: 'Pulpa de tomate', quantity: 40, unit: 'g' },
+            { name: 'Pulpa de tomate', quantity: 40, unit: 'ml' },
             { name: 'Ajo', quantity: 1, unit: 'g' },
             { name: 'Sal', quantity: 0.5, unit: 'g' },
             { name: 'Aceite', quantity: 5, unit: 'ml' },
@@ -114,7 +114,7 @@ export const recetasAlmuerzo =  {
             { name: 'Cebolla', quantity: 10, unit: 'g' },
             { name: 'Zanahoria', quantity: 50, unit: 'g' },
             { name: 'Morrón', quantity: 15, unit: 'g' },
-            { name: 'Pulpa de tomate', quantity: 20, unit: 'g' },
+            { name: 'Pulpa de tomate', quantity: 20, unit: 'ml' },
             { name: 'Arvejas', quantity: 30, unit: 'g' },
             { name: 'Ajo', quantity: 1, unit: 'g' },
             { name: 'Sal', quantity: 0.5, unit: 'g' },
@@ -135,7 +135,7 @@ export const recetasAlmuerzo =  {
             { name: 'Mix de verdes (perejil, ciboulette)', quantity: 1, unit: 'g' },
             { name: 'Ajo', quantity: 1, unit: 'g' },
             { name: 'Polenta', quantity: 20, unit: 'g' },
-            { name: 'Aceite (asadera)', quantity: 7.5, unit: 'g' }
+            { name: 'Aceite (asadera)', quantity: 7.5, unit: 'ml' }
         ]
     },
     109: {
@@ -197,7 +197,7 @@ export const recetasAlmuerzo =  {
             { name: 'Avena', quantity: 10, unit: 'g' },
             { name: 'Pimentón', quantity: 0.05, unit: 'g' },
             { name: 'Sal', quantity: 0.5, unit: 'g' },
-            { name: 'Aceite (asadera)', quantity: 5, unit: 'g' },
+            { name: 'Aceite (asadera)', quantity: 5, unit: 'ml' },
             { name: 'Salsa blanca', quantity: '1 porción', unit: '' },
             { name: 'Pulpa de tomate (opcional)', quantity: 10, unit: 'ml' },
             { name: 'Queso rallado', quantity: 5, unit: 'g' }
@@ -216,7 +216,7 @@ export const recetasAlmuerzo =  {
             { name: 'Sal', quantity: 0.5, unit: 'g' },
             { name: 'Perejil fresco', quantity: 1, unit: 'g' },
             { name: 'Ajo', quantity: 1, unit: 'g' },
-            { name: 'Aceite (asadera)', quantity: 5, unit: 'g' }
+            { name: 'Aceite (asadera)', quantity: 5, unit: 'ml' }
         ]
     },
     114: {
@@ -239,7 +239,7 @@ export const recetasAlmuerzo =  {
         estacion: 'TODO EL AÑO' as const,
         ingredients: [
             { name: 'Carne picada o en cubos', quantity: 50, unit: 'g' },
-            { name: 'Pulpa de tomate', quantity: 40, unit: 'g' },
+            { name: 'Pulpa de tomate', quantity: 40, unit: 'ml' },
             { name: 'Cebolla', quantity: 10, unit: 'g' },
             { name: 'Zanahoria', quantity: 30, unit: 'g' },
             { name: 'Morrón', quantity: 10, unit: 'g' },
@@ -282,7 +282,7 @@ export const recetasAlmuerzo =  {
             { name: 'Pulpa de tomate', quantity: 20, unit: 'ml' },
             { name: 'Apio', quantity: 0.5, unit: 'g' },
             { name: 'Sal', quantity: 0.5, unit: 'g' },
-            { name: 'Aceite', quantity: 5, unit: 'g' },
+            { name: 'Aceite', quantity: 5, unit: 'ml' },
             { name: 'Perejil', quantity: 1, unit: 'g' },
             { name: 'Agua', quantity: 10, unit: 'ml' }
         ]
@@ -297,7 +297,7 @@ export const recetasAlmuerzo =  {
             { name: 'Tomate', quantity: 30, unit: 'g' },
             { name: 'Morrón', quantity: 15, unit: 'g' },
             { name: 'Ajo', quantity: 1, unit: 'g' },
-            { name: 'Pulpa de tomate', quantity: 30, unit: 'g' },
+            { name: 'Pulpa de tomate', quantity: 30, unit: 'ml' },
             { name: 'Berenjenas', quantity: 70, unit: 'g' },
             { name: 'Aceite', quantity: 5, unit: 'ml' },
             { name: 'Sal', quantity: 0.75, unit: 'g' },
@@ -330,7 +330,7 @@ export const recetasAlmuerzo =  {
             { name: 'Cebolla', quantity: 10, unit: 'g' },
             { name: 'Morrón', quantity: 15, unit: 'g' },
             { name: 'Verdura de estación', quantity: 35, unit: 'g' },
-            { name: 'Aceite', quantity: 3, unit: 'g' },
+            { name: 'Aceite', quantity: 3, unit: 'ml' },
             { name: 'Huevo', quantity: 15, unit: 'g' },
             { name: 'Almidón de maíz', quantity: 2, unit: 'g' },
             { name: 'Sal', quantity: 0.5, unit: 'g' },
@@ -477,7 +477,7 @@ export const recetasAlmuerzo =  {
             { name: 'Zanahoria', quantity: 60, unit: 'g' },
             { name: 'Leche', quantity: 50, unit: 'ml' },
             { name: 'Aceite', quantity: 5, unit: 'ml' },
-            { name: 'Sal', quantity: 0.25, unit: 'ml' },
+            { name: 'Sal', quantity: 0.25, unit: 'g' },
             { name: 'Nuez moscada', quantity: 0.1, unit: 'g' }
         ]
     },
@@ -488,7 +488,7 @@ export const recetasAlmuerzo =  {
             { name: 'Agua', quantity: 120, unit: 'ml' },
             { name: 'Leche fluida', quantity: 50, unit: 'ml' },
             { name: 'Aceite', quantity: 2.5, unit: 'ml' },
-            { name: 'Sal', quantity: 0.5, unit: 'ml' },
+            { name: 'Sal', quantity: 0.5, unit: 'g' },
             { name: 'Nuez moscada', quantity: 0.1, unit: 'g' }
         ]
     },
@@ -537,7 +537,7 @@ export const recetasAlmuerzo =  {
             { name: 'Arroz', quantity: 15, unit: 'g' },
             { name: 'Azúcar', quantity: 15, unit: 'g' },
             { name: 'Yemas', quantity: 7.5, unit: 'g' },
-            { name: 'Vainilla', quantity: 0.5, unit: 'g' },
+            { name: 'Vainilla', quantity: 0.5, unit: 'ml' },
             { name: 'Canela', quantity: 0.25, unit: 'g' }
         ]
     },
@@ -557,7 +557,7 @@ export const recetasAlmuerzo =  {
             { name: 'Leche', quantity: 150, unit: 'ml' },
             { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
             { name: 'Azúcar', quantity: 15, unit: 'g' },
-            { name: 'Vainilla', quantity: 0.5, unit: 'g' }
+            { name: 'Vainilla', quantity: 0.5, unit: 'ml' }
         ]
     },
     148: {
@@ -584,7 +584,7 @@ export const recetasAlmuerzo =  {
             { name: 'Leche', quantity: 150, unit: 'ml' },
             { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
             { name: 'Azúcar', quantity: 15, unit: 'g' },
-            { name: 'Vainilla', quantity: 0.5, unit: 'g' }
+            { name: 'Vainilla', quantity: 0.5, unit: 'ml' }
         ]
     },
     151: {
@@ -593,7 +593,7 @@ export const recetasAlmuerzo =  {
             { name: 'Leche', quantity: 150, unit: 'ml' },
             { name: 'Almidón de maíz', quantity: 9, unit: 'g' },
             { name: 'Azúcar', quantity: 15, unit: 'g' },
-            { name: 'Vainilla', quantity: 0.5, unit: 'g' }
+            { name: 'Vainilla', quantity: 0.5, unit: 'ml' }
         ]
     },
     142: {
@@ -611,11 +611,11 @@ export const recetasAlmuerzo =  {
     143: {
         title: 'Budín de harina de maíz',
         ingredients: [
-            { name: 'Leche', quantity: 125, unit: 'g' },
+            { name: 'Leche', quantity: 125, unit: 'ml' },
             { name: 'Harina de maíz', quantity: 10, unit: 'g' },
             { name: 'Azúcar', quantity: 10, unit: 'g' },
             { name: 'Huevo', quantity: 11, unit: 'g' },
-            { name: 'Vainilla', quantity: 0.5, unit: 'g' },
+            { name: 'Vainilla', quantity: 0.5, unit: 'ml' },
             { name: 'Cáscara de naranja', quantity: 'c/n', unit: '' }
         ]
     },
@@ -650,8 +650,8 @@ export const recetasAlmuerzo =  {
         ingredients: [
             { name: 'Leche', quantity: 100, unit: 'ml' },
             { name: 'Harina de trigo', quantity: 50, unit: 'g' },
-            { name: 'Huevo', quantity: 1, unit: 'unidad' },
-            { name: 'Aceite', quantity: 5, unit: 'cc' },
+            { name: 'Huevo', quantity: 22.5, unit: 'g' },
+            { name: 'Aceite', quantity: 5, unit: 'ml' },
             { name: 'Sal', quantity: 0.25, unit: 'g' }
         ]
     }
