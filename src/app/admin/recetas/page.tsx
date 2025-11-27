@@ -65,13 +65,13 @@ const AdminRecetas = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch recetas
       const { data: recetasData, error: recetasError } = await supabase
         .from('recetas')
         .select('*')
         .order('titulo');
-      
+
       if (recetasError) throw recetasError;
       setRecetas(recetasData || []);
 
@@ -80,7 +80,7 @@ const AdminRecetas = () => {
         .from('ingredientes')
         .select('*')
         .order('nombre');
-      
+
       if (ingredientesError) throw ingredientesError;
       setIngredientes(ingredientesData || []);
 
@@ -92,7 +92,7 @@ const AdminRecetas = () => {
           ingrediente:ingredientes(*)
         `)
         .order('orden');
-      
+
       if (recetaIngredientesError) throw recetaIngredientesError;
       setRecetaIngredientes(recetaIngredientesData || []);
 
@@ -101,7 +101,7 @@ const AdminRecetas = () => {
         .from('procedimientos')
         .select('*')
         .order('orden');
-      
+
       if (procedimientosError) throw procedimientosError;
       setProcedimientos(procedimientosData || []);
 
@@ -123,14 +123,14 @@ const AdminRecetas = () => {
     if (categoria === 'almuerzos') categoriaDB = 'almuerzo';
     if (categoria === 'desayunos') categoriaDB = 'desayuno';
     if (categoria === 'copa_leche') categoriaDB = 'copa_leche';
-    
+
     const recetasCategoria = getRecetasByCategory(categoriaDB);
-    
+
     if (categoria === 'almuerzos') {
       switch (subCategoria) {
         case 'principales':
-          return recetasCategoria.filter(r => 
-            !r.titulo.toLowerCase().includes('arroz') && 
+          return recetasCategoria.filter(r =>
+            !r.titulo.toLowerCase().includes('arroz') &&
             !r.titulo.toLowerCase().includes('fideos') &&
             !r.titulo.toLowerCase().includes('ensalada') &&
             !r.titulo.toLowerCase().includes('puré') &&
@@ -139,8 +139,8 @@ const AdminRecetas = () => {
             !r.titulo.toLowerCase().includes('papas')
           );
         case 'acompañamientos':
-          return recetasCategoria.filter(r => 
-            r.titulo.toLowerCase().includes('arroz') || 
+          return recetasCategoria.filter(r =>
+            r.titulo.toLowerCase().includes('arroz') ||
             r.titulo.toLowerCase().includes('fideos') ||
             r.titulo.toLowerCase().includes('ensalada') ||
             r.titulo.toLowerCase().includes('puré') ||
@@ -156,35 +156,35 @@ const AdminRecetas = () => {
           return recetasCategoria;
       }
     }
-    
+
     return recetasCategoria;
   };
 
   const handleViewReceta = (receta: Receta) => {
     setEditingReceta(receta);
-    
+
     // Cargar ingredientes de la receta
     const ingredientesReceta = recetaIngredientes.filter(ri => ri.receta_id === receta.id);
     setEditingIngredientes(ingredientesReceta);
-    
+
     // Cargar procedimientos de la receta
     const procedimientosReceta = procedimientos.filter(p => p.receta_id === receta.id);
     setEditingProcedimientos(procedimientosReceta);
-    
+
     setShowViewModal(true);
   };
 
   const handleEditReceta = (receta: Receta) => {
     setEditingReceta(receta);
-    
+
     // Cargar ingredientes de la receta
     const ingredientesReceta = recetaIngredientes.filter(ri => ri.receta_id === receta.id);
     setEditingIngredientes(ingredientesReceta);
-    
+
     // Cargar procedimientos de la receta
     const procedimientosReceta = procedimientos.filter(p => p.receta_id === receta.id);
     setEditingProcedimientos(procedimientosReceta);
-    
+
     setShowEditModal(true);
   };
 
@@ -238,7 +238,7 @@ const AdminRecetas = () => {
       setShowEditModal(false);
       setEditingReceta(null);
       fetchData();
-      
+
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       console.error('Error updating receta:', error);
@@ -253,18 +253,18 @@ const AdminRecetas = () => {
     try {
       // Eliminar procedimientos
       await supabase.from('procedimientos').delete().eq('receta_id', id);
-      
+
       // Eliminar ingredientes
       await supabase.from('receta_ingredientes').delete().eq('receta_id', id);
-      
+
       // Eliminar receta
       const { error } = await supabase.from('recetas').delete().eq('id', id);
-      
+
       if (error) throw error;
 
       setSuccess('Receta eliminada correctamente');
       fetchData();
-      
+
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       console.error('Error deleting receta:', error);
@@ -275,7 +275,7 @@ const AdminRecetas = () => {
 
   const addIngrediente = () => {
     if (!editingReceta) return;
-    
+
     const newIngrediente: RecetaIngrediente = {
       id: Date.now(), // Temporal ID
       receta_id: editingReceta.id,
@@ -285,7 +285,7 @@ const AdminRecetas = () => {
       orden: editingIngredientes.length + 1,
       ingrediente: ingredientes[0] || { id: 0, nombre: '', unidad_base: '', categoria: '' }
     };
-    
+
     setEditingIngredientes([...editingIngredientes, newIngrediente]);
   };
 
@@ -295,7 +295,7 @@ const AdminRecetas = () => {
 
   const addProcedimiento = () => {
     if (!editingReceta) return;
-    
+
     const newProcedimiento: Procedimiento = {
       id: Date.now(), // Temporal ID
       receta_id: editingReceta.id,
@@ -303,7 +303,7 @@ const AdminRecetas = () => {
       pasos: [''],
       orden: editingProcedimientos.length + 1
     };
-    
+
     setEditingProcedimientos([...editingProcedimientos, newProcedimiento]);
   };
 
@@ -332,16 +332,6 @@ const AdminRecetas = () => {
   const filteredRecetas = getRecetasBySubCategory(activeTab, activeSubTab).filter(receta =>
     receta.titulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  // Debug logs
-  console.log('Total recetas:', recetas.length);
-  console.log('Active tab:', activeTab);
-  console.log('Active sub tab:', activeSubTab);
-  console.log('Filtered recetas:', filteredRecetas.length);
-  console.log('Recetas por categoría:', recetas.reduce((acc, r) => {
-    acc[r.categoria] = (acc[r.categoria] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>));
 
   if (loading) {
     return (
@@ -385,9 +375,9 @@ const AdminRecetas = () => {
             </div>
           )}
           {success && (
-                    <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-md">
-          {success}
-        </div>
+            <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-md">
+              {success}
+            </div>
           )}
 
           {/* Search */}
@@ -420,33 +410,30 @@ const AdminRecetas = () => {
             <nav className="-mb-px flex space-x-8">
               <button
                 onClick={() => setActiveTab('almuerzos')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${
-                  activeTab === 'almuerzos'
+                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'almuerzos'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                  }`}
               >
                 <Utensils className="mr-2 h-4 w-4" />
                 Almuerzos ({getRecetasByCategory('almuerzo').length})
               </button>
               <button
                 onClick={() => setActiveTab('desayunos')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${
-                  activeTab === 'desayunos'
+                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'desayunos'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                  }`}
               >
                 <Coffee className="mr-2 h-4 w-4" />
                 Desayunos ({getRecetasByCategory('desayuno').length})
               </button>
               <button
                 onClick={() => setActiveTab('copa_leche')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${
-                  activeTab === 'copa_leche'
+                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'copa_leche'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                  }`}
               >
                 <Milk className="mr-2 h-4 w-4" />
                 Copa de Leche ({getRecetasByCategory('copa_leche').length})
@@ -458,163 +445,159 @@ const AdminRecetas = () => {
           {activeTab === 'almuerzos' && (
             <div className="border-b border-gray-200 mb-6">
               <nav className="-mb-px flex space-x-8">
-                                 <button
-                   onClick={() => setActiveSubTab('principales')}
-                   className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                     activeSubTab === 'principales'
-                       ? 'border-blue-400 text-blue-500'
-                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                   }`}
-                 >
-                   Principales ({getRecetasBySubCategory('almuerzos', 'principales').length})
-                 </button>
-                                 <button
-                   onClick={() => setActiveSubTab('acompañamientos')}
-                   className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                     activeSubTab === 'acompañamientos'
-                       ? 'border-blue-400 text-blue-500'
-                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                   }`}
-                 >
-                   Acompañamientos ({getRecetasBySubCategory('almuerzos', 'acompañamientos').length})
-                 </button>
-                                 <button
-                   onClick={() => setActiveSubTab('postres')}
-                   className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                     activeSubTab === 'postres'
-                       ? 'border-blue-400 text-blue-500'
-                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                   }`}
-                 >
-                   Postres ({getRecetasByCategory('postre').length})
-                 </button>
-                                 <button
-                   onClick={() => setActiveSubTab('receta_base')}
-                   className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                     activeSubTab === 'receta_base'
-                       ? 'border-blue-400 text-blue-500'
-                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                   }`}
-                 >
-                   Recetas Base ({getRecetasByCategory('receta_base').length})
-                 </button>
+                <button
+                  onClick={() => setActiveSubTab('principales')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${activeSubTab === 'principales'
+                      ? 'border-blue-400 text-blue-500'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                >
+                  Principales ({getRecetasBySubCategory('almuerzos', 'principales').length})
+                </button>
+                <button
+                  onClick={() => setActiveSubTab('acompañamientos')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${activeSubTab === 'acompañamientos'
+                      ? 'border-blue-400 text-blue-500'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                >
+                  Acompañamientos ({getRecetasBySubCategory('almuerzos', 'acompañamientos').length})
+                </button>
+                <button
+                  onClick={() => setActiveSubTab('postres')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${activeSubTab === 'postres'
+                      ? 'border-blue-400 text-blue-500'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                >
+                  Postres ({getRecetasByCategory('postre').length})
+                </button>
+                <button
+                  onClick={() => setActiveSubTab('receta_base')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${activeSubTab === 'receta_base'
+                      ? 'border-blue-400 text-blue-500'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                >
+                  Recetas Base ({getRecetasByCategory('receta_base').length})
+                </button>
               </nav>
             </div>
           )}
 
-                     {/* Debug Info */}
-           <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-             <h3 className="text-sm font-medium text-blue-900 mb-2">Información de Debug:</h3>
-             <div className="text-sm text-blue-700 space-y-1">
-               <p>Total de recetas cargadas: {recetas.length}</p>
-               <p>Pestaña activa: {activeTab}</p>
-               <p>Sub-pestaña activa: {activeSubTab}</p>
-               <p>Recetas filtradas: {filteredRecetas.length}</p>
-               <div className="mt-2">
-                 <p className="font-medium">Recetas por categoría:</p>
-                 <ul className="list-disc list-inside ml-2">
-                   {Object.entries(recetas.reduce((acc, r) => {
-                     acc[r.categoria] = (acc[r.categoria] || 0) + 1;
-                     return acc;
-                   }, {} as Record<string, number>)).map(([cat, count]) => (
-                     <li key={cat}>{cat}: {count}</li>
-                   ))}
-                 </ul>
-               </div>
-               <div className="mt-2">
-                 <p className="font-medium">Problemas detectados:</p>
-                 <ul className="list-disc list-inside ml-2">
-                   {(() => {
-                     const recetasSinIngredientes = recetas.filter(r => 
-                       !recetaIngredientes.some(ri => ri.receta_id === r.id)
-                     );
-                     const recetasSinProcedimientos = recetas.filter(r => 
-                       !procedimientos.some(p => p.receta_id === r.id)
-                     );
-                     const recetasDuplicadas = recetas.reduce((acc, r) => {
-                       acc[r.titulo] = (acc[r.titulo] || 0) + 1;
-                       return acc;
-                     }, {} as Record<string, number>);
-                     const duplicadas = Object.entries(recetasDuplicadas).filter(([_, count]) => count > 1);
-                     
-                     return [
-                       duplicadas.length > 0 && <li key="duplicadas" className="text-red-600">Recetas duplicadas: {duplicadas.length}</li>,
-                       recetasSinIngredientes.length > 0 && <li key="sin-ingredientes" className="text-orange-600">Sin ingredientes: {recetasSinIngredientes.length}</li>,
-                       recetasSinProcedimientos.length > 0 && <li key="sin-procedimientos" className="text-orange-600">Sin procedimientos: {recetasSinProcedimientos.length}</li>
-                     ].filter(Boolean);
-                   })()}
-                 </ul>
-               </div>
-             </div>
-           </div>
+          {/* Debug Info */}
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+            <h3 className="text-sm font-medium text-blue-900 mb-2">Información de Debug:</h3>
+            <div className="text-sm text-blue-700 space-y-1">
+              <p>Total de recetas cargadas: {recetas.length}</p>
+              <p>Pestaña activa: {activeTab}</p>
+              <p>Sub-pestaña activa: {activeSubTab}</p>
+              <p>Recetas filtradas: {filteredRecetas.length}</p>
+              <div className="mt-2">
+                <p className="font-medium">Recetas por categoría:</p>
+                <ul className="list-disc list-inside ml-2">
+                  {Object.entries(recetas.reduce((acc, r) => {
+                    acc[r.categoria] = (acc[r.categoria] || 0) + 1;
+                    return acc;
+                  }, {} as Record<string, number>)).map(([cat, count]) => (
+                    <li key={cat}>{cat}: {count}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="mt-2">
+                <p className="font-medium">Problemas detectados:</p>
+                <ul className="list-disc list-inside ml-2">
+                  {(() => {
+                    const recetasSinIngredientes = recetas.filter(r =>
+                      !recetaIngredientes.some(ri => ri.receta_id === r.id)
+                    );
+                    const recetasSinProcedimientos = recetas.filter(r =>
+                      !procedimientos.some(p => p.receta_id === r.id)
+                    );
+                    const recetasDuplicadas = recetas.reduce((acc, r) => {
+                      acc[r.titulo] = (acc[r.titulo] || 0) + 1;
+                      return acc;
+                    }, {} as Record<string, number>);
+                    const duplicadas = Object.entries(recetasDuplicadas).filter(([_, count]) => count > 1);
+
+                    return [
+                      duplicadas.length > 0 && <li key="duplicadas" className="text-red-600">Recetas duplicadas: {duplicadas.length}</li>,
+                      recetasSinIngredientes.length > 0 && <li key="sin-ingredientes" className="text-orange-600">Sin ingredientes: {recetasSinIngredientes.length}</li>,
+                      recetasSinProcedimientos.length > 0 && <li key="sin-procedimientos" className="text-orange-600">Sin procedimientos: {recetasSinProcedimientos.length}</li>
+                    ].filter(Boolean);
+                  })()}
+                </ul>
+              </div>
+            </div>
+          </div>
 
           {/* Recipes Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRecetas.map((receta) => {
               const recetaIngredientesCount = recetaIngredientes.filter(ri => ri.receta_id === receta.id).length;
               const procedimientosCount = procedimientos.filter(p => p.receta_id === receta.id).length;
-              
+
               return (
                 <div key={receta.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
                   <div className="p-6">
-                                         <div className="flex justify-between items-start mb-4">
-                       <h3 className="text-lg font-semibold text-black">{receta.titulo}</h3>
-                       <div className="flex space-x-2">
-                         <button
-                           onClick={() => handleViewReceta(receta)}
-                           className="text-blue-400 hover:text-blue-600"
-                           title="Ver receta"
-                         >
-                           <Eye className="h-4 w-4" />
-                         </button>
-                         <button
-                           onClick={() => handleEditReceta(receta)}
-                           className="text-blue-600 hover:text-blue-900"
-                           title="Editar receta"
-                         >
-                           <Edit className="h-4 w-4" />
-                         </button>
-                         <button
-                           onClick={() => handleDeleteReceta(receta.id)}
-                           className="text-red-600 hover:text-red-900"
-                           title="Eliminar receta"
-                         >
-                           <Trash2 className="h-4 w-4" />
-                         </button>
-                       </div>
-                     </div>
-                    
-                                         <p className="text-black text-sm mb-4">{receta.descripcion}</p>
-                    
-                                         <div className="flex justify-between text-sm text-black">
-                       <span>{recetaIngredientesCount} ingredientes</span>
-                       <span>{procedimientosCount} procedimientos</span>
-                     </div>
-                    
-                                         <div className="mt-4 pt-4 border-t border-gray-200">
-                       <div className="flex flex-wrap gap-2">
-                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                           {receta.categoria}
-                         </span>
-                         {(() => {
-                           const tieneIngredientes = recetaIngredientes.some(ri => ri.receta_id === receta.id);
-                           const tieneProcedimientos = procedimientos.some(p => p.receta_id === receta.id);
-                           
-                           return [
-                             !tieneIngredientes && (
-                               <span key="sin-ingredientes" className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                 Sin ingredientes
-                               </span>
-                             ),
-                             !tieneProcedimientos && (
-                               <span key="sin-procedimientos" className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                                 Sin procedimientos
-                               </span>
-                             )
-                           ].filter(Boolean);
-                         })()}
-                       </div>
-                     </div>
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-lg font-semibold text-black">{receta.titulo}</h3>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleViewReceta(receta)}
+                          className="text-blue-400 hover:text-blue-600"
+                          title="Ver receta"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleEditReceta(receta)}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="Editar receta"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReceta(receta.id)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Eliminar receta"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="text-black text-sm mb-4">{receta.descripcion}</p>
+
+                    <div className="flex justify-between text-sm text-black">
+                      <span>{recetaIngredientesCount} ingredientes</span>
+                      <span>{procedimientosCount} procedimientos</span>
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="flex flex-wrap gap-2">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {receta.categoria}
+                        </span>
+                        {(() => {
+                          const tieneIngredientes = recetaIngredientes.some(ri => ri.receta_id === receta.id);
+                          const tieneProcedimientos = procedimientos.some(p => p.receta_id === receta.id);
+
+                          return [
+                            !tieneIngredientes && (
+                              <span key="sin-ingredientes" className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                Sin ingredientes
+                              </span>
+                            ),
+                            !tieneProcedimientos && (
+                              <span key="sin-procedimientos" className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                Sin procedimientos
+                              </span>
+                            )
+                          ].filter(Boolean);
+                        })()}
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
@@ -637,8 +620,8 @@ const AdminRecetas = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-gray-200">
-                                 <div className="flex justify-between items-center">
-                   <h3 className="text-lg font-medium text-black">Editar Receta: {editingReceta.titulo}</h3>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium text-black">Editar Receta: {editingReceta.titulo}</h3>
                   <button
                     onClick={() => setShowEditModal(false)}
                     className="text-gray-400 hover:text-gray-600"
@@ -650,24 +633,24 @@ const AdminRecetas = () => {
 
               <div className="p-6 space-y-6">
                 {/* Receta Info */}
-                                 <div>
-                   <h4 className="text-md font-medium text-black mb-4">Información de la Receta</h4>
+                <div>
+                  <h4 className="text-md font-medium text-black mb-4">Información de la Receta</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                                             <label className="block text-sm font-medium text-black mb-1">Título</label>
+                      <label className="block text-sm font-medium text-black mb-1">Título</label>
                       <input
                         type="text"
                         value={editingReceta.titulo}
-                        onChange={(e) => setEditingReceta({...editingReceta, titulo: e.target.value})}
+                        onChange={(e) => setEditingReceta({ ...editingReceta, titulo: e.target.value })}
                         className="w-full p-2 border border-gray-300 rounded-md"
                       />
                     </div>
                     <div>
-                                             <label className="block text-sm font-medium text-black mb-1">Descripción</label>
+                      <label className="block text-sm font-medium text-black mb-1">Descripción</label>
                       <input
                         type="text"
                         value={editingReceta.descripcion}
-                        onChange={(e) => setEditingReceta({...editingReceta, descripcion: e.target.value})}
+                        onChange={(e) => setEditingReceta({ ...editingReceta, descripcion: e.target.value })}
                         className="w-full p-2 border border-gray-300 rounded-md"
                       />
                     </div>
@@ -686,7 +669,7 @@ const AdminRecetas = () => {
                       Agregar
                     </button>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {editingIngredientes.map((ingrediente, index) => (
                       <div key={index} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-md">
@@ -750,15 +733,15 @@ const AdminRecetas = () => {
                 <div>
                   <div className="flex justify-between items-center mb-4">
                     <h4 className="text-md font-medium text-black">Procedimientos</h4>
-                                         <button
-                       onClick={addProcedimiento}
-                       className="flex items-center px-3 py-1 bg-blue-400 text-white rounded-md hover:bg-blue-500 text-sm"
-                     >
-                       <Plus className="mr-1 h-3 w-3" />
-                       Agregar
-                     </button>
+                    <button
+                      onClick={addProcedimiento}
+                      className="flex items-center px-3 py-1 bg-blue-400 text-white rounded-md hover:bg-blue-500 text-sm"
+                    >
+                      <Plus className="mr-1 h-3 w-3" />
+                      Agregar
+                    </button>
                   </div>
-                  
+
                   <div className="space-y-4">
                     {editingProcedimientos.map((procedimiento, procIndex) => (
                       <div key={procIndex} className="border border-gray-200 rounded-md p-4">
@@ -781,7 +764,7 @@ const AdminRecetas = () => {
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
-                        
+
                         <div className="space-y-2">
                           {procedimiento.pasos.map((paso, pasoIndex) => (
                             <div key={pasoIndex} className="flex items-center space-x-2">
@@ -832,101 +815,101 @@ const AdminRecetas = () => {
               </div>
             </div>
           </div>
-                 )}
+        )}
 
-         {/* View Modal */}
-         {showViewModal && editingReceta && (
-           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-             <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-               <div className="p-6 border-b border-gray-200">
-                 <div className="flex justify-between items-center">
-                   <h3 className="text-lg font-medium text-black">Ver Receta: {editingReceta.titulo}</h3>
-                   <button
-                     onClick={() => setShowViewModal(false)}
-                     className="text-gray-400 hover:text-gray-600"
-                   >
-                     <X className="h-6 w-6" />
-                   </button>
-                 </div>
-               </div>
+        {/* View Modal */}
+        {showViewModal && editingReceta && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium text-black">Ver Receta: {editingReceta.titulo}</h3>
+                  <button
+                    onClick={() => setShowViewModal(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+                </div>
+              </div>
 
-               <div className="p-6 space-y-6">
-                 {/* Receta Info */}
-                 <div>
-                   <h4 className="text-md font-medium text-black mb-4">Información de la Receta</h4>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <div>
-                       <label className="block text-sm font-medium text-black mb-1">Título</label>
-                       <p className="p-2 bg-gray-50 border border-gray-300 rounded-md text-black">{editingReceta.titulo}</p>
-                     </div>
-                     <div>
-                       <label className="block text-sm font-medium text-black mb-1">Descripción</label>
-                       <p className="p-2 bg-gray-50 border border-gray-300 rounded-md text-black">{editingReceta.descripcion || 'Sin descripción'}</p>
-                     </div>
-                   </div>
-                 </div>
+              <div className="p-6 space-y-6">
+                {/* Receta Info */}
+                <div>
+                  <h4 className="text-md font-medium text-black mb-4">Información de la Receta</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Título</label>
+                      <p className="p-2 bg-gray-50 border border-gray-300 rounded-md text-black">{editingReceta.titulo}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Descripción</label>
+                      <p className="p-2 bg-gray-50 border border-gray-300 rounded-md text-black">{editingReceta.descripcion || 'Sin descripción'}</p>
+                    </div>
+                  </div>
+                </div>
 
-                 {/* Ingredientes */}
-                 <div>
-                   <h4 className="text-md font-medium text-black mb-4">Ingredientes</h4>
-                   {editingIngredientes.length > 0 ? (
-                     <div className="space-y-3">
-                       {editingIngredientes.map((ingrediente, index) => (
-                         <div key={index} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-md bg-gray-50">
-                           <div className="flex-1">
-                             <p className="text-black font-medium">{ingrediente.ingrediente.nombre}</p>
-                           </div>
-                           <div className="text-black">
-                             <span className="font-medium">{ingrediente.cantidad}</span>
-                             <span className="ml-1">{ingrediente.unidad}</span>
-                           </div>
-                         </div>
-                       ))}
-                     </div>
-                   ) : (
-                     <p className="text-gray-500 text-center py-4">No hay ingredientes registrados</p>
-                   )}
-                 </div>
+                {/* Ingredientes */}
+                <div>
+                  <h4 className="text-md font-medium text-black mb-4">Ingredientes</h4>
+                  {editingIngredientes.length > 0 ? (
+                    <div className="space-y-3">
+                      {editingIngredientes.map((ingrediente, index) => (
+                        <div key={index} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-md bg-gray-50">
+                          <div className="flex-1">
+                            <p className="text-black font-medium">{ingrediente.ingrediente.nombre}</p>
+                          </div>
+                          <div className="text-black">
+                            <span className="font-medium">{ingrediente.cantidad}</span>
+                            <span className="ml-1">{ingrediente.unidad}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No hay ingredientes registrados</p>
+                  )}
+                </div>
 
-                 {/* Procedimientos */}
-                 <div>
-                   <h4 className="text-md font-medium text-black mb-4">Procedimientos</h4>
-                   {editingProcedimientos.length > 0 ? (
-                     <div className="space-y-4">
-                       {editingProcedimientos.map((procedimiento, procIndex) => (
-                         <div key={procIndex} className="border border-gray-200 rounded-md p-4 bg-gray-50">
-                           <h5 className="font-medium text-black mb-3">{procedimiento.titulo}</h5>
-                           <div className="space-y-2">
-                             {procedimiento.pasos.map((paso, pasoIndex) => (
-                               <div key={pasoIndex} className="flex items-start space-x-2">
-                                 <span className="text-sm text-gray-500 w-6 mt-1">{pasoIndex + 1}.</span>
-                                 <p className="flex-1 text-black">{paso}</p>
-                               </div>
-                             ))}
-                           </div>
-                         </div>
-                       ))}
-                     </div>
-                   ) : (
-                     <p className="text-gray-500 text-center py-4">No hay procedimientos registrados</p>
-                   )}
-                 </div>
-               </div>
+                {/* Procedimientos */}
+                <div>
+                  <h4 className="text-md font-medium text-black mb-4">Procedimientos</h4>
+                  {editingProcedimientos.length > 0 ? (
+                    <div className="space-y-4">
+                      {editingProcedimientos.map((procedimiento, procIndex) => (
+                        <div key={procIndex} className="border border-gray-200 rounded-md p-4 bg-gray-50">
+                          <h5 className="font-medium text-black mb-3">{procedimiento.titulo}</h5>
+                          <div className="space-y-2">
+                            {procedimiento.pasos.map((paso, pasoIndex) => (
+                              <div key={pasoIndex} className="flex items-start space-x-2">
+                                <span className="text-sm text-gray-500 w-6 mt-1">{pasoIndex + 1}.</span>
+                                <p className="flex-1 text-black">{paso}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No hay procedimientos registrados</p>
+                  )}
+                </div>
+              </div>
 
-               <div className="p-6 border-t border-gray-200 flex justify-end">
-                 <button
-                   onClick={() => setShowViewModal(false)}
-                   className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-                 >
-                   Cerrar
-                 </button>
-               </div>
-             </div>
-           </div>
-         )}
-       </div>
-     </AdminProtected>
-   );
- };
+              <div className="p-6 border-t border-gray-200 flex justify-end">
+                <button
+                  onClick={() => setShowViewModal(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </AdminProtected>
+  );
+};
 
 export default AdminRecetas;

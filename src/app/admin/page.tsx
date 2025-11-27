@@ -22,15 +22,8 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      // Debug: mostrar las credenciales ingresadas
-      console.log('Intentando login con:', {
-        username: credentials.username,
-        password: credentials.password
-      });
-      
       // Primero intentar con credenciales hardcodeadas (para desarrollo)
       if (credentials.username === 'admin' && credentials.password === 'admin') {
-        console.log('Login exitoso como admin (hardcoded)');
         localStorage.setItem('isAdmin', 'true');
         localStorage.setItem('adminUser', JSON.stringify({
           username: credentials.username,
@@ -39,7 +32,6 @@ const AdminLogin = () => {
         router.push('/admin/dashboard');
         return;
       } else if (credentials.username === 'superadmin' && credentials.password === 'superadmin123') {
-        console.log('Login exitoso como superadmin (hardcoded)');
         localStorage.setItem('isAdmin', 'true');
         localStorage.setItem('adminUser', JSON.stringify({
           username: credentials.username,
@@ -48,13 +40,12 @@ const AdminLogin = () => {
         router.push('/admin/dashboard');
         return;
       }
-      
+
       // Si no son credenciales hardcodeadas, consultar la base de datos
-      console.log('Consultando base de datos para:', credentials.username);
-      
+
       // Importar dinámicamente para evitar problemas de SSR
       const { supabase } = await import('@/lib/supabase');
-      
+
       const { data, error } = await supabase
         .from('administradores')
         .select('*')
@@ -64,13 +55,11 @@ const AdminLogin = () => {
         .single();
 
       if (error) {
-        console.log('Error en consulta BD:', error);
         setError('Credenciales incorrectas');
         return;
       }
 
       if (data) {
-        console.log('Login exitoso desde BD:', data);
         localStorage.setItem('isAdmin', 'true');
         localStorage.setItem('adminUser', JSON.stringify({
           username: data.username,
@@ -79,7 +68,6 @@ const AdminLogin = () => {
         }));
         router.push('/admin/dashboard');
       } else {
-        console.log('Credenciales incorrectas');
         setError('Credenciales incorrectas');
       }
     } catch (error) {
@@ -97,7 +85,7 @@ const AdminLogin = () => {
           <div className="mb-6">
             <NavigationButtons />
           </div>
-          
+
           <div className="text-center">
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
               Panel de Administrador
@@ -126,7 +114,7 @@ const AdminLogin = () => {
                 type="text"
                 required
                 value={credentials.username}
-                onChange={(e) => setCredentials({...credentials, username: e.target.value})}
+                onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-logoGreen focus:border-logoGreen"
                 placeholder="Ingresa tu usuario"
               />
@@ -143,7 +131,7 @@ const AdminLogin = () => {
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={credentials.password}
-                  onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                  onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                   className="block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-logoGreen focus:border-logoGreen"
                   placeholder="Ingresa tu contraseña"
                 />

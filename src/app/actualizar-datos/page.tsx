@@ -100,12 +100,12 @@ export default function ActualizarDatos() {
     e.preventDefault();
     try {
       const { data, error } = await authService.login(loginData.documento, loginData.password);
-      
+
       if (error) {
         alert('Error al iniciar sesión: Credenciales incorrectas');
         return;
       }
-      
+
       if (data) {
         setIsAuthenticated(true);
         setCurrentUser({
@@ -120,7 +120,7 @@ export default function ActualizarDatos() {
           tarea: data.tarea || 'cocina',
           password: ''
         });
-        
+
         // Cargar datos en el formulario de actualización
         setUpdateData({
           primer_nombre: data.primer_nombre,
@@ -137,9 +137,7 @@ export default function ActualizarDatos() {
 
         // Cargar opciones de escuelas para el departamento del usuario
         if (data.departamento) {
-          console.log('Cargando opciones de escuelas para departamento:', data.departamento);
           const opciones = generarOpcionesEscuelas(data.departamento);
-          console.log('Opciones de escuelas cargadas:', opciones.length, opciones.slice(0, 5));
           setOpcionesEscuelas(opciones);
         }
 
@@ -156,7 +154,7 @@ export default function ActualizarDatos() {
     setLoadingUniforme(true);
     try {
       const { data, error } = await uniformeService.getUniformeByDocument(documento);
-      
+
       if (error) {
         console.error('Error cargando datos de uniforme:', error);
       } else if (data) {
@@ -188,13 +186,6 @@ export default function ActualizarDatos() {
     setSavingUniforme(true);
 
     try {
-      console.log('Intentando guardar uniforme:', {
-        documento: currentUser.documento,
-        talle_tunica: uniformeData.talle_tunica,
-        talle_calzado: uniformeData.talle_calzado,
-        tipo_uniforme: uniformeData.tipo_uniforme
-      });
-
       const { data, error } = await uniformeService.updateUniforme({
         documento: currentUser.documento,
         talle_tunica: uniformeData.talle_tunica!,
@@ -203,21 +194,12 @@ export default function ActualizarDatos() {
       });
 
       if (error) {
-        console.error('Error de Supabase:', error);
-        console.error('Detalles del error:', {
-          message: (error as any).message,
-          details: (error as any).details,
-          hint: (error as any).hint,
-          code: (error as any).code
-        });
         setUniformeError(`Error al guardar los datos: ${(error as any).message || 'Error desconocido'}`);
       } else {
-        console.log('Uniforme guardado exitosamente:', data);
         setUniformeSuccess('Datos de uniforme actualizados correctamente');
         setTimeout(() => setUniformeSuccess(''), 3000);
       }
     } catch (error) {
-      console.error('Error general:', error);
       setUniformeError(`Error al guardar los datos: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     } finally {
       setSavingUniforme(false);
@@ -230,7 +212,7 @@ export default function ActualizarDatos() {
       alert('Las contraseñas no coinciden');
       return;
     }
-    
+
     try {
       const userData = {
         documento: registerData.documento,
@@ -244,14 +226,14 @@ export default function ActualizarDatos() {
         tarea: registerData.tarea,
         password: registerData.password
       };
-      
+
       const { data, error } = await authService.register(userData);
-      
+
       if (error) {
         alert('Error al registrar usuario: ' + (error as any).message);
         return;
       }
-      
+
       if (data) {
         alert('Usuario registrado exitosamente');
         setIsLogin(true);
@@ -281,9 +263,9 @@ export default function ActualizarDatos() {
       alert('Las contraseñas no coinciden');
       return;
     }
-    
+
     if (!currentUser) return;
-    
+
     try {
       const updateUserData: any = {
         primer_nombre: updateData.primer_nombre,
@@ -295,19 +277,19 @@ export default function ActualizarDatos() {
         celular: updateData.celular,
         tarea: updateData.tarea
       };
-      
+
       // Solo actualizar contraseña si se proporcionó una nueva
       if (updateData.password) {
         updateUserData.password = updateData.password;
       }
-      
+
       const { data, error } = await authService.updateUser(currentUser.documento, updateUserData);
-      
+
       if (error) {
         alert('Error al actualizar datos: ' + (error as any).message);
         return;
       }
-      
+
       if (data) {
         alert('Datos actualizados exitosamente');
         // Actualizar el usuario actual
@@ -338,15 +320,13 @@ export default function ActualizarDatos() {
 
   // Función para actualizar opciones de escuelas cuando cambia el departamento
   const handleDepartamentoChange = (departamento: string, isRegister: boolean = false) => {
-    console.log('Cambiando departamento a:', departamento);
     const opciones = generarOpcionesEscuelas(departamento);
-    console.log('Opciones de escuelas generadas:', opciones.length, opciones.slice(0, 5));
     setOpcionesEscuelas(opciones);
-    
+
     if (isRegister) {
-      setRegisterData({...registerData, departamento, escuela: ''});
+      setRegisterData({ ...registerData, departamento, escuela: '' });
     } else {
-      setUpdateData({...updateData, departamento, escuela: ''});
+      setUpdateData({ ...updateData, departamento, escuela: '' });
     }
   };
 
@@ -356,7 +336,7 @@ export default function ActualizarDatos() {
         <div className="mb-6">
           <NavigationButtons />
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-md p-6 mt-6">
           <h1 className="text-3xl font-bold text-center text-logoGreen mb-8">
             Actualizar Mis Datos
@@ -368,17 +348,15 @@ export default function ActualizarDatos() {
               <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setIsLogin(true)}
-                  className={`flex-1 py-2 px-4 rounded-md transition-colors ${
-                    isLogin ? 'bg-white shadow-sm text-logoGreen' : 'text-gray-600'
-                  }`}
+                  className={`flex-1 py-2 px-4 rounded-md transition-colors ${isLogin ? 'bg-white shadow-sm text-logoGreen' : 'text-gray-600'
+                    }`}
                 >
                   Iniciar Sesión
                 </button>
                 <button
                   onClick={() => setIsLogin(false)}
-                  className={`flex-1 py-2 px-4 rounded-md transition-colors ${
-                    !isLogin ? 'bg-white shadow-sm text-logoGreen' : 'text-gray-600'
-                  }`}
+                  className={`flex-1 py-2 px-4 rounded-md transition-colors ${!isLogin ? 'bg-white shadow-sm text-logoGreen' : 'text-gray-600'
+                    }`}
                 >
                   Crear Cuenta
                 </button>
@@ -395,7 +373,7 @@ export default function ActualizarDatos() {
                       type="text"
                       required
                       value={loginData.documento}
-                      onChange={(e) => setLoginData({...loginData, documento: e.target.value})}
+                      onChange={(e) => setLoginData({ ...loginData, documento: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                       placeholder="Ej: 12345678"
                     />
@@ -408,7 +386,7 @@ export default function ActualizarDatos() {
                       type="password"
                       required
                       value={loginData.password}
-                      onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                       placeholder="Ingresa tu contraseña"
                     />
@@ -432,7 +410,7 @@ export default function ActualizarDatos() {
                         type="text"
                         required
                         value={registerData.documento}
-                        onChange={(e) => setRegisterData({...registerData, documento: e.target.value})}
+                        onChange={(e) => setRegisterData({ ...registerData, documento: e.target.value })}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                         placeholder="Ej: 12345678"
                       />
@@ -445,7 +423,7 @@ export default function ActualizarDatos() {
                         type="text"
                         required
                         value={registerData.primer_nombre}
-                        onChange={(e) => setRegisterData({...registerData, primer_nombre: e.target.value})}
+                        onChange={(e) => setRegisterData({ ...registerData, primer_nombre: e.target.value })}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                         placeholder="Ej: Juan"
                       />
@@ -459,7 +437,7 @@ export default function ActualizarDatos() {
                       <input
                         type="text"
                         value={registerData.segundo_nombre}
-                        onChange={(e) => setRegisterData({...registerData, segundo_nombre: e.target.value})}
+                        onChange={(e) => setRegisterData({ ...registerData, segundo_nombre: e.target.value })}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                         placeholder="Ej: Carlos"
                       />
@@ -472,7 +450,7 @@ export default function ActualizarDatos() {
                         type="text"
                         required
                         value={registerData.primer_apellido}
-                        onChange={(e) => setRegisterData({...registerData, primer_apellido: e.target.value})}
+                        onChange={(e) => setRegisterData({ ...registerData, primer_apellido: e.target.value })}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                         placeholder="Ej: Pérez"
                       />
@@ -486,7 +464,7 @@ export default function ActualizarDatos() {
                       <input
                         type="text"
                         value={registerData.segundo_apellido}
-                        onChange={(e) => setRegisterData({...registerData, segundo_apellido: e.target.value})}
+                        onChange={(e) => setRegisterData({ ...registerData, segundo_apellido: e.target.value })}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                         placeholder="Ej: González"
                       />
@@ -518,7 +496,7 @@ export default function ActualizarDatos() {
                       <select
                         required
                         value={registerData.escuela}
-                        onChange={(e) => setRegisterData({...registerData, escuela: e.target.value})}
+                        onChange={(e) => setRegisterData({ ...registerData, escuela: e.target.value })}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                         disabled={!registerData.departamento}
                       >
@@ -538,7 +516,7 @@ export default function ActualizarDatos() {
                         type="tel"
                         required
                         value={registerData.celular}
-                        onChange={(e) => setRegisterData({...registerData, celular: e.target.value})}
+                        onChange={(e) => setRegisterData({ ...registerData, celular: e.target.value })}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                         placeholder="Ej: 099123456"
                       />
@@ -552,7 +530,7 @@ export default function ActualizarDatos() {
                       <select
                         required
                         value={registerData.tarea}
-                        onChange={(e) => setRegisterData({...registerData, tarea: e.target.value})}
+                        onChange={(e) => setRegisterData({ ...registerData, tarea: e.target.value })}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                       >
                         <option value="cocina">Cocina</option>
@@ -568,7 +546,7 @@ export default function ActualizarDatos() {
                         type="password"
                         required
                         value={registerData.password}
-                        onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
+                        onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                         placeholder="Mínimo 6 caracteres"
                       />
@@ -582,7 +560,7 @@ export default function ActualizarDatos() {
                       type="password"
                       required
                       value={registerData.confirmPassword}
-                      onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
+                      onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
                       placeholder="Repite tu contraseña"
                     />
@@ -613,22 +591,20 @@ export default function ActualizarDatos() {
                 <button
                   type="button"
                   onClick={() => setActiveSection('datos')}
-                  className={`px-6 py-3 rounded-md font-medium transition-colors ${
-                    activeSection === 'datos'
+                  className={`px-6 py-3 rounded-md font-medium transition-colors ${activeSection === 'datos'
                       ? 'bg-logoGreen text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                    }`}
                 >
                   📝 Datos Personales
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveSection('uniformes')}
-                  className={`px-6 py-3 rounded-md font-medium transition-colors ${
-                    activeSection === 'uniformes'
+                  className={`px-6 py-3 rounded-md font-medium transition-colors ${activeSection === 'uniformes'
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                    }`}
                 >
                   👔 Datos de Uniforme
                 </button>
@@ -640,177 +616,177 @@ export default function ActualizarDatos() {
                   <h3 className="text-xl font-semibold text-gray-800 mb-4">
                     Actualizar Información Personal
                   </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Primer Nombre *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={updateData.primer_nombre}
-                      onChange={(e) => setUpdateData({...updateData, primer_nombre: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                      placeholder="Ej: Juan"
-                    />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Primer Nombre *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={updateData.primer_nombre}
+                        onChange={(e) => setUpdateData({ ...updateData, primer_nombre: e.target.value })}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                        placeholder="Ej: Juan"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Segundo Nombre
+                      </label>
+                      <input
+                        type="text"
+                        value={updateData.segundo_nombre}
+                        onChange={(e) => setUpdateData({ ...updateData, segundo_nombre: e.target.value })}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                        placeholder="Ej: Carlos"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Primer Apellido *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={updateData.primer_apellido}
+                        onChange={(e) => setUpdateData({ ...updateData, primer_apellido: e.target.value })}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                        placeholder="Ej: Pérez"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Segundo Apellido
+                      </label>
+                      <input
+                        type="text"
+                        value={updateData.segundo_apellido}
+                        onChange={(e) => setUpdateData({ ...updateData, segundo_apellido: e.target.value })}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                        placeholder="Ej: González"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Departamento *
+                      </label>
+                      <select
+                        required
+                        value={updateData.departamento}
+                        onChange={(e) => handleDepartamentoChange(e.target.value, false)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                      >
+                        <option value="">Selecciona un departamento</option>
+                        {DEPARTAMENTOS_URUGUAY.map((departamento) => (
+                          <option key={departamento} value={departamento}>
+                            {departamento}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Escuela donde trabaja *
+                      </label>
+                      <select
+                        required
+                        value={updateData.escuela}
+                        onChange={(e) => setUpdateData({ ...updateData, escuela: e.target.value })}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                        disabled={!updateData.departamento}
+                      >
+                        <option value="">{updateData.departamento ? 'Selecciona una escuela' : 'Primero selecciona un departamento'}</option>
+                        {opcionesEscuelas.map((escuela) => (
+                          <option key={escuela} value={escuela}>
+                            {escuela}
+                          </option>
+                        ))}
+                        {/* Debug: mostrar cantidad de opciones */}
+                        {opcionesEscuelas.length > 0 && (
+                          <option disabled>Debug: {opcionesEscuelas.length} escuelas disponibles</option>
+                        )}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Celular de contacto *
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={updateData.celular}
+                        onChange={(e) => setUpdateData({ ...updateData, celular: e.target.value })}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                        placeholder="Ej: 099123456"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Tarea que desempeña *
+                      </label>
+                      <select
+                        required
+                        value={updateData.tarea}
+                        onChange={(e) => setUpdateData({ ...updateData, tarea: e.target.value })}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                      >
+                        <option value="cocina">Cocina</option>
+                        <option value="limpieza">Limpieza</option>
+                        <option value="cocina y limpieza">Cocina y Limpieza</option>
+                      </select>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Segundo Nombre
-                    </label>
-                    <input
-                      type="text"
-                      value={updateData.segundo_nombre}
-                      onChange={(e) => setUpdateData({...updateData, segundo_nombre: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                      placeholder="Ej: Carlos"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Primer Apellido *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={updateData.primer_apellido}
-                      onChange={(e) => setUpdateData({...updateData, primer_apellido: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                      placeholder="Ej: Pérez"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Segundo Apellido
-                    </label>
-                    <input
-                      type="text"
-                      value={updateData.segundo_apellido}
-                      onChange={(e) => setUpdateData({...updateData, segundo_apellido: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                      placeholder="Ej: González"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Departamento *
-                    </label>
-                    <select
-                      required
-                      value={updateData.departamento}
-                      onChange={(e) => handleDepartamentoChange(e.target.value, false)}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                    >
-                      <option value="">Selecciona un departamento</option>
-                      {DEPARTAMENTOS_URUGUAY.map((departamento) => (
-                        <option key={departamento} value={departamento}>
-                          {departamento}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Escuela donde trabaja *
-                    </label>
-                    <select
-                      required
-                      value={updateData.escuela}
-                      onChange={(e) => setUpdateData({...updateData, escuela: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                      disabled={!updateData.departamento}
-                    >
-                      <option value="">{updateData.departamento ? 'Selecciona una escuela' : 'Primero selecciona un departamento'}</option>
-                      {opcionesEscuelas.map((escuela) => (
-                        <option key={escuela} value={escuela}>
-                          {escuela}
-                        </option>
-                      ))}
-                      {/* Debug: mostrar cantidad de opciones */}
-                      {opcionesEscuelas.length > 0 && (
-                        <option disabled>Debug: {opcionesEscuelas.length} escuelas disponibles</option>
-                      )}
-                    </select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Celular de contacto *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={updateData.celular}
-                      onChange={(e) => setUpdateData({...updateData, celular: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                      placeholder="Ej: 099123456"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tarea que desempeña *
-                    </label>
-                    <select
-                      required
-                      value={updateData.tarea}
-                      onChange={(e) => setUpdateData({...updateData, tarea: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                    >
-                      <option value="cocina">Cocina</option>
-                      <option value="limpieza">Limpieza</option>
-                      <option value="cocina y limpieza">Cocina y Limpieza</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nueva Contraseña (opcional)
-                  </label>
-                  <input
-                    type="password"
-                    value={updateData.password}
-                    onChange={(e) => setUpdateData({...updateData, password: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                    placeholder="Deja vacío para mantener la actual"
-                  />
-                </div>
-                {updateData.password && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Confirmar Nueva Contraseña
+                      Nueva Contraseña (opcional)
                     </label>
                     <input
                       type="password"
-                      value={updateData.confirmPassword}
-                      onChange={(e) => setUpdateData({...updateData, confirmPassword: e.target.value})}
+                      value={updateData.password}
+                      onChange={(e) => setUpdateData({ ...updateData, password: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
-                      placeholder="Repite la nueva contraseña"
+                      placeholder="Deja vacío para mantener la actual"
                     />
                   </div>
-                )}
-                
-                <div className="flex gap-4">
-                  <button
-                    type="submit"
-                    className="flex-1 bg-logoGreen text-white py-3 px-4 rounded-md hover:bg-blue-600 transition-colors font-medium"
-                  >
-                    Actualizar Datos
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="flex-1 bg-gray-500 text-white py-3 px-4 rounded-md hover:bg-gray-600 transition-colors font-medium"
-                  >
-                    Cerrar Sesión
-                  </button>
-                </div>
-              </form>
+                  {updateData.password && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Confirmar Nueva Contraseña
+                      </label>
+                      <input
+                        type="password"
+                        value={updateData.confirmPassword}
+                        onChange={(e) => setUpdateData({ ...updateData, confirmPassword: e.target.value })}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-logoGreen focus:border-transparent"
+                        placeholder="Repite la nueva contraseña"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex gap-4">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-logoGreen text-white py-3 px-4 rounded-md hover:bg-blue-600 transition-colors font-medium"
+                    >
+                      Actualizar Datos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex-1 bg-gray-500 text-white py-3 px-4 rounded-md hover:bg-gray-600 transition-colors font-medium"
+                    >
+                      Cerrar Sesión
+                    </button>
+                  </div>
+                </form>
               )}
 
               {/* Sección de Datos de Uniforme */}
@@ -847,7 +823,7 @@ export default function ActualizarDatos() {
                           <select
                             id="talle_tunica"
                             value={uniformeData.talle_tunica}
-                            onChange={(e) => setUniformeData({...uniformeData, talle_tunica: e.target.value})}
+                            onChange={(e) => setUniformeData({ ...uniformeData, talle_tunica: e.target.value })}
                             className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             required
                           >
@@ -868,7 +844,7 @@ export default function ActualizarDatos() {
                           <select
                             id="talle_calzado"
                             value={uniformeData.talle_calzado}
-                            onChange={(e) => setUniformeData({...uniformeData, talle_calzado: e.target.value})}
+                            onChange={(e) => setUniformeData({ ...uniformeData, talle_calzado: e.target.value })}
                             className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             required
                           >
@@ -896,7 +872,7 @@ export default function ActualizarDatos() {
                         <select
                           id="tipo_uniforme"
                           value={uniformeData.tipo_uniforme}
-                          onChange={(e) => setUniformeData({...uniformeData, tipo_uniforme: e.target.value as any})}
+                          onChange={(e) => setUniformeData({ ...uniformeData, tipo_uniforme: e.target.value as any })}
                           className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           required
                         >

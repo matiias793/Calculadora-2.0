@@ -58,7 +58,7 @@ const options = [
   {
     image: (
       <Image
-        src="/logonuevoverde.png"
+        src="/images/verano2026.jpg"
         fill
         style={{ objectFit: "contain" }}
         alt="Escuelas de verano 2026"
@@ -112,12 +112,12 @@ export default function Home() {
 
       // Verificar si ya se mostró la bienvenida en esta sesión
       const welcomeShown = sessionStorage.getItem('welcomeShown');
-      
+
       // Solo mostrar bienvenida si:
       // 1. No se ha mostrado antes en esta sesión
       // 2. Y es la primera carga (historial tiene solo 1 entrada o viene de navegación directa)
       const isFirstLoad = !welcomeShown && window.history.length <= 1;
-      
+
       if (isFirstLoad) {
         setShowWelcome(true);
         sessionStorage.setItem('welcomeShown', 'true');

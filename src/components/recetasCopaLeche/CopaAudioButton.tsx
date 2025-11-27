@@ -58,7 +58,7 @@ const CopaAudioButton = ({ opcion }: CopaAudioButtonProps) => {
     }
 
     return segments;
-  }, [opcion, porciones, recetaPorciones]);
+  }, [porciones, recetaPorciones]);
 
   useEffect(() => {
     segmentsRef.current = narrationSegments;

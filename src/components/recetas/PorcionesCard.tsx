@@ -28,7 +28,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
   // Constantes para cálculos precisos
   const FACTOR_CHICA = 0.67;
   const FACTOR_GRANDE = 1.33;
-  const PORCIONES_BASE_DESAYUNO = 10;
+
   const MAX_PORCIONES = 1000; // Límite máximo para evitar cálculos excesivos
 
   // Función para validar y limitar valores
@@ -68,7 +68,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
   const processItem = useCallback((name: string, quantity: string | number, unit: string, factor: number) => {
     let q: string | number = '';
     let u = unit;
-    
+
     if (isNaN(Number(quantity))) {
       q = quantity;
     } else if (isHuevo(name)) {
@@ -124,24 +124,24 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
 
   useEffect(() => {
     if (!recetaOriginal) return;
-    
+
     if (isDesayunoMerienda) {
       const validatedPorciones = validateAndLimit(counterMediana);
       dispatch(setPorciones(validatedPorciones));
       dispatch(setPorcionesTipo({ chica: 0, mediana: validatedPorciones, grande: 0 }));
-      recalculate(validatedPorciones / PORCIONES_BASE_DESAYUNO);
+      recalculate(validatedPorciones);
     } else {
       const validatedChica = validateAndLimit(counterChica);
       const validatedMediana = validateAndLimit(counterMediana);
       const validatedGrande = validateAndLimit(counterGrande);
-      
+
       const total = calculateTotalPorciones(validatedChica, validatedMediana, validatedGrande);
-      
+
       dispatch(setPorciones(total));
-      dispatch(setPorcionesTipo({ 
-        chica: validatedChica, 
-        mediana: validatedMediana, 
-        grande: validatedGrande 
+      dispatch(setPorcionesTipo({
+        chica: validatedChica,
+        mediana: validatedMediana,
+        grande: validatedGrande
       }));
       recalculate(total);
     }
@@ -169,7 +169,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
             <div>
               <label className="block font-semibold text-sm text-logoGreen mb-1">Porciones medianas</label>
               <div className="flex flex-row items-center gap-3">
-                <button 
+                <button
                   className={buttonClasses}
                   onClick={() => handleDecrement(setCounterMediana, counterMediana)}
                   disabled={counterMediana <= 0}
@@ -186,7 +186,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
                   min="0"
                   max={MAX_PORCIONES}
                 />
-                <button 
+                <button
                   className={buttonClasses}
                   onClick={() => handleIncrement(setCounterMediana, counterMediana)}
                   disabled={counterMediana >= MAX_PORCIONES}
@@ -210,7 +210,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
               <div key={index}>
                 <label className="block font-semibold text-sm text-logoGreen mb-1">{label}</label>
                 <div className="flex flex-row items-center gap-3">
-                  <button 
+                  <button
                     className={buttonClasses}
                     onClick={() => handleDecrement(setter, value)}
                     disabled={value <= 0}
@@ -227,7 +227,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
                     min="0"
                     max={MAX_PORCIONES}
                   />
-                  <button 
+                  <button
                     className={buttonClasses}
                     onClick={() => handleIncrement(setter, value)}
                     disabled={value >= MAX_PORCIONES}
@@ -238,7 +238,7 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
               </div>
             ))
           )}
-          
+
           {/* Mostrar total calculado para almuerzos */}
           {!isDesayunoMerienda && (
             <div className="mt-4 p-3 bg-gray-50 rounded-lg">

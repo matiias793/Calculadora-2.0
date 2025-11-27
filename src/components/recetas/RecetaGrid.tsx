@@ -23,69 +23,16 @@ interface Props {
     isAlmuerzo: boolean
 }
 
-const RecetaGrid = ( { receta, procedimiento, isAlmuerzo }: Props ) => {
+const RecetaGrid = ({ receta, procedimiento, isAlmuerzo }: Props) => {
     const dispatch = useAppDispatch();
-    const unidadVolumen = useAppSelector( ( state ) => state.receta.unidadVolumen );
-    const unidadMasa = useAppSelector( ( state ) => state.receta.unidadMasa );
-    const [ tab, setTab ] = useState(1);
+    const unidadVolumen = useAppSelector((state) => state.receta.unidadVolumen);
+    const unidadMasa = useAppSelector((state) => state.receta.unidadMasa);
+    const [tab, setTab] = useState(1);
 
     useEffect(() => {
-        dispatch( setPorciones( isAlmuerzo ? 1 : 10 ) );
-        dispatch( setRecetaOriginal( receta ) );
-        dispatch( setProcedimiento( procedimiento ) );
-
-        const ingredients = receta!.ingredients.map(({ name, quantity, unit }) => {
-            let q: string | number = "";
-            if (isNaN(Number(quantity))) {
-                q = quantity;
-            } else {
-        if (['ml', 'l', 'g', 'kg'].includes(unit)) {
-            if ((unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS) || (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS)) {
-                        q = Number(((Number(quantity) * 1) / 1000).toFixed(3));
-                    } else {
-                        q = Number(quantity) * 1;
-                    }
-                } else {
-                    q = Number(quantity) * 1;
-                }
-            }
-            let u = unit;
-            if (unit === "unidad" && q != 1) u = "unid.";
-            if (["ml", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) u = "l";
-            if (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS) u = "kg";
-            return { name, quantity: q, unit: u };
-        });
-
-        const variants = receta?.variants?.map(({ name, quantity, unit }) => {
-            let q: string | number = "";
-            if (isNaN(Number(quantity))) {
-                q = quantity;
-            } else {
-        if (['ml', 'l', 'g', 'kg'].includes(unit)) {
-            if ((unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS) || (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS)) {
-                        q = Number(((Number(quantity) * 1) / 1000).toFixed(3));
-                    } else {
-                        q = Number(quantity) * 1;
-                    }
-                } else {
-                    q = Number(quantity) * 1;
-                }
-            }
-            let u = unit;
-            if (unit === "unidad" && q != 1) u = "unid.";
-            if (["ml", "ml"].includes(unit) && unidadVolumen === UnidadVolumen.LITROS) u = "l";
-            if (unit === "g" && unidadMasa === UnidadMasa.KILOGRAMOS) u = "kg";
-            return { name, quantity: q, unit: u };
-        });
-
-        const newReceta: Receta = {
-            title: receta!.title,
-            ingredients
-        };
-
-        variants && (newReceta.variants = variants);
-        dispatch(setRecetaPorciones(newReceta));
-    }, [ isAlmuerzo, dispatch, receta, procedimiento, unidadMasa, unidadVolumen ]);
+        dispatch(setRecetaOriginal(receta));
+        dispatch(setProcedimiento(procedimiento));
+    }, [dispatch, receta, procedimiento]);
 
     const handleTabClick = (tabIndex: number) => {
         setTab(tabIndex);
