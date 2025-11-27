@@ -126,11 +126,23 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
     if (!recetaOriginal) return;
 
     if (isDesayunoMerienda) {
-      const validatedPorciones = validateAndLimit(counterMediana);
-      dispatch(setPorciones(validatedPorciones));
-      dispatch(setPorcionesTipo({ chica: 0, mediana: validatedPorciones, grande: 0 }));
-      recalculate(validatedPorciones);
+      // Lógica para Desayunos/Meriendas: Lotes de 10
+      // Ignoramos los tipos de porción y usamos el total de niños
+      // Asumimos que el usuario ingresa el total en el campo "Mediana" (o sumamos todos si hubiera input)
+      const totalNinos = validateAndLimit(counterMediana);
+
+      // Fórmula: Factor = Math.ceil(CantidadTotalNiños / 10)
+      // Si hay 0 niños, factor 0. Si hay 1-10 niños, factor 1. Si hay 11-20, factor 2.
+      const factor = totalNinos > 0 ? Math.ceil(totalNinos / 10) : 0;
+
+      // Actualizamos el store con el total de niños para mostrar en UI "para X personas"
+      // Pero el recálculo de ingredientes se hace con el FACTOR de lotes
+      dispatch(setPorciones(totalNinos));
+      dispatch(setPorcionesTipo({ chica: 0, mediana: totalNinos, grande: 0 }));
+
+      recalculate(factor);
     } else {
+      // Lógica para Almuerzos: Lineal exacta
       const validatedChica = validateAndLimit(counterChica);
       const validatedMediana = validateAndLimit(counterMediana);
       const validatedGrande = validateAndLimit(counterGrande);
