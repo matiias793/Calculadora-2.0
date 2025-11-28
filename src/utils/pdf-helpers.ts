@@ -1,6 +1,7 @@
 import { ORDEN_INGREDIENTES, MAPEO_VARIACIONES } from '@/data/pdf-config';
 import { recetasAlmuerzo } from '@/utils/recetas-almuerzo';
 import { pesosPostres } from '@/utils/pesos-postres';
+import { convertirFluidaAPolvo } from '@/utils/conversion-leche';
 
 export interface DiaMenu {
     dia: string;
@@ -164,7 +165,8 @@ export const agregarFrutaAlAcumulador = (
 export const calcularIngredientesReceta = (
     titulo: string,
     totalPersonas: number,
-    acumulador: AcumuladorIngredientes
+    acumulador: AcumuladorIngredientes,
+    usarLechePolvo: boolean = false
 ): (string | number)[][] => {
     const receta = Object.values(recetasAlmuerzo).find(r => r.title === titulo);
     if (!receta) return [];
@@ -188,12 +190,34 @@ export const calcularIngredientesReceta = (
 
             // Usar nombre normalizado para agrupar ingredientes similares
             const nombreNormalizado = normalizarNombreIngrediente(name);
-            const clave = `${nombreNormalizado}::${unidadFinal}`;
 
-            if (!acumulador[clave]) {
-                acumulador[clave] = { cantidad: 0, unidad: unidadFinal };
+            // Lógica de conversión de Leche Fluida a Polvo
+            if (usarLechePolvo && (nombreNormalizado.toLowerCase() === 'leche' || nombreNormalizado.toLowerCase() === 'leche fluida')) {
+                const { gramosPolvo, mlAgua } = convertirFluidaAPolvo(parseFloat(cantidadFinal as string));
+
+                // Agregar Leche en Polvo
+                const clavePolvo = `Leche en Polvo::g`;
+                if (!acumulador[clavePolvo]) {
+                    acumulador[clavePolvo] = { cantidad: 0, unidad: 'g' };
+                }
+                acumulador[clavePolvo].cantidad += gramosPolvo;
+
+                // Agregar Agua
+                const claveAgua = `Agua (para leche en polvo)::ml`;
+                if (!acumulador[claveAgua]) {
+                    acumulador[claveAgua] = { cantidad: 0, unidad: 'ml' };
+                }
+                acumulador[claveAgua].cantidad += mlAgua;
+
+            } else {
+                // Comportamiento normal
+                const clave = `${nombreNormalizado}::${unidadFinal}`;
+
+                if (!acumulador[clave]) {
+                    acumulador[clave] = { cantidad: 0, unidad: unidadFinal };
+                }
+                acumulador[clave].cantidad += parseFloat(cantidadFinal as string);
             }
-            acumulador[clave].cantidad += parseFloat(cantidadFinal as string);
         }
 
         return [name, cantidadFinal, unidadFinal];

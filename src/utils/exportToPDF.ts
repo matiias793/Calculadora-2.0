@@ -1,11 +1,13 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { convertirFluidaAPolvo } from '@/utils/conversion-leche';
 
 export function exportRecetaToPDF(
   titulo: string,
   porciones: { chica: number, mediana: number, grande: number },
   ingredientes: { name: string, quantity: number | string, unit: string }[],
-  variantes?: { name: string, quantity: number | string, unit: string }[]
+  variantes?: { name: string, quantity: number | string, unit: string }[],
+  usarLechePolvo: boolean = false
 ) {
   const doc = new jsPDF();
 
@@ -20,13 +22,23 @@ export function exportRecetaToPDF(
   autoTable(doc, {
     startY: 50,
     head: [['Ingrediente', 'Cantidad', 'Unidad']],
-    body: ingredientes.map(i => [
-      i.name,
-      typeof i.quantity === 'number'
-        ? i.quantity.toLocaleString('es-ES', { maximumFractionDigits: 2 })
-        : i.quantity,
-      i.unit
-    ]),
+    body: ingredientes.flatMap(i => {
+      const nombreNorm = i.name.toLowerCase();
+      if (usarLechePolvo && (nombreNorm === 'leche' || nombreNorm === 'leche fluida') && typeof i.quantity === 'number') {
+        const { gramosPolvo, mlAgua } = convertirFluidaAPolvo(i.quantity);
+        return [
+          ['Leche en Polvo', gramosPolvo.toLocaleString('es-ES', { maximumFractionDigits: 2 }), 'g'],
+          ['Agua (para leche en polvo)', mlAgua.toLocaleString('es-ES', { maximumFractionDigits: 2 }), 'ml']
+        ];
+      }
+      return [[
+        i.name,
+        typeof i.quantity === 'number'
+          ? i.quantity.toLocaleString('es-ES', { maximumFractionDigits: 2 })
+          : i.quantity,
+        i.unit
+      ]];
+    }),
   });
 
   // Añadir variantes si existen

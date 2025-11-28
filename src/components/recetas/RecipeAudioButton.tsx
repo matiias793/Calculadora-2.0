@@ -144,18 +144,16 @@ const RecipeAudioButton = ({ receta, procedimiento }: RecipeAudioButtonProps) =>
   }
 
   return (
-    <div className="mt-4 flex flex-col items-center gap-2">
+    <div className="mt-2 flex justify-end">
       <button
         onClick={handleToggleAudio}
-        className="flex items-center gap-2 px-5 py-2 rounded-full bg-primary text-white font-semibold shadow hover:bg-primary-hover transition-colors"
-        aria-label={isPlaying ? 'Detener narración de la receta' : 'Escuchar la receta narrada'}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-primary transition-colors text-sm font-medium border border-gray-200"
+        aria-label={isPlaying ? 'Detener narración' : 'Escuchar receta'}
+        title={isPlaying ? 'Detener narración' : 'Escuchar receta'}
       >
-        {isPlaying ? <FaStop /> : <FaVolumeUp />}
-        {isPlaying ? 'Detener audio' : 'Escuchar receta'}
+        {isPlaying ? <FaStop size={14} /> : <FaVolumeUp size={16} />}
+        <span className="text-xs">{isPlaying ? 'Detener' : 'Escuchar'}</span>
       </button>
-      <p className="text-xs text-neutral-text/80">
-        Incluye nombre, ingredientes, tips, variantes y procedimiento.
-      </p>
     </div>
   );
 };

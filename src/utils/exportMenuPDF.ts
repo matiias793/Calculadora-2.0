@@ -12,6 +12,7 @@ import {
   procesarDatosPostre,
   normalizarNombreIngrediente
 } from '@/utils/pdf-helpers';
+import { convertirFluidaAPolvo } from '@/utils/conversion-leche';
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -19,7 +20,7 @@ declare module 'jspdf' {
   }
 }
 
-export function exportMenuToPDF(menu: DiaMenu[]) {
+export function exportMenuToPDF(menu: DiaMenu[], usarLechePolvo: boolean = false) {
   const doc = new jsPDF();
   const { colors, fonts, margins, tables } = PDF_CONFIG;
 
@@ -54,8 +55,83 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
 
   const renderIngredientes = (titulo: string, totalPersonas: number, xOffset: number, maxWidth: number, startY: number) => {
     // Calcula ingredientes y actualiza el acumulador global
-    const ingredientes = calcularIngredientesReceta(titulo, totalPersonas, acumuladorIngredientes);
+    const ingredientes = calcularIngredientesReceta(titulo, totalPersonas, acumuladorIngredientes, usarLechePolvo);
 
+    // Interceptar y convertir leche si es necesario
+    if (usarLechePolvo) {
+      // Iteramos sobre las claves del acumulador para encontrar leche recien agregada o existente
+      // NOTA: calcularIngredientesReceta ya sumó al acumulador. Necesitamos ajustar el acumulador.
+      // Sin embargo, calcularIngredientesReceta devuelve la lista de ingredientes de ESTA receta.
+      // Pero el acumulador es GLOBAL.
+      // La estrategia más segura es:
+      // 1. Dejar que calcularIngredientesReceta haga su trabajo.
+      // 2. Al final, antes de generar la tabla de totales, hacer la conversión.
+      // PERO, el usuario pidió: "Ignora la leche fluida (no la sumes a la lista final)."
+      // Si lo hacemos al final, es más fácil.
+      // Si lo hacemos aquí, afectamos a la tabla por día?
+      // El requerimiento dice: "Resultado Esperado: El usuario controla si quiere ver y comprar leche líquida o en polvo".
+      // Y "UI Reactiva... INSERTA visualmente dos filas".
+      // Para el PDF, "Recorre los ingredientes... Si usarLechePolvo es true... Ignora la leche fluida... Calcula... Suma".
+
+      // Si modificamos el acumulador aquí, afectamos los totales.
+      // Pero `ingredientes` (el array devuelto) se usa para la tabla del día.
+      // Deberíamos modificar AMBOS si queremos que el PDF refleje el cambio en la tabla del día TAMBIÉN?
+      // El usuario dijo: "Lógica del PDF... Intercepción de Datos... Recorre los ingredientes... Si usarLechePolvo es true... Ignora... Calcula... Suma a los acumuladores".
+      // Esto suena a que afecta a los TOTALES.
+      // ¿Afecta a las tablas individuales de cada día?
+      // "El usuario controla si quiere ver y comprar".
+      // Asumiré que quiere ver el cambio en TODAS partes (tablas diarias y totales).
+      // Asumiré que quiere ver el cambio en TODAS partes (tablas diarias y totales).
+
+      // Modificar la lista de ingredientes para el renderizado de la tabla diaria
+      const ingredientesConvertidos = ingredientes.flatMap(ing => {
+        const [nombre, cantidad, unidad] = ing;
+        const nombreNorm = normalizarNombreIngrediente(nombre as string).toLowerCase();
+
+        // Parsear cantidad si es string (ya que calcularIngredientesReceta devuelve strings formateados)
+        const cantidadNum = typeof cantidad === 'number' ? cantidad : parseFloat(cantidad as string);
+
+        if ((nombreNorm === 'leche' || nombreNorm === 'leche fluida') && !isNaN(cantidadNum)) {
+          const { gramosPolvo, mlAgua } = convertirFluidaAPolvo(cantidadNum);
+          return [
+            ['Leche en Polvo', gramosPolvo, 'g'],
+            ['Agua (para leche en polvo)', mlAgua, 'ml']
+          ];
+        }
+        return [ing];
+      });
+
+      // Usamos la lista convertida para la tabla
+      // NOTA: Esto NO afecta al acumulador global todavía, eso se hace al final en "PROCESAMIENTO FINAL DE TOTALES"
+      // O podemos hacerlo aquí si queremos que el acumulador se vaya llenando con lo convertido.
+      // Si lo hacemos aquí, debemos tener cuidado de no duplicar o dejar basura.
+      // El código actual hace la conversión de totales AL FINAL.
+      // Así que aquí solo necesitamos alterar la VISUALIZACIÓN de la tabla diaria.
+
+      const ingredientesOrdenados = ingredientesConvertidos.sort((a, b) => {
+        const ordenA = obtenerOrdenIngrediente(a[0] as string);
+        const ordenB = obtenerOrdenIngrediente(b[0] as string);
+        return ordenA - ordenB;
+      });
+
+      doc.setFontSize(fonts.sizes.normal);
+      doc.text(`${titulo}`, xOffset, startY);
+      const tableStartY = startY + 6;
+
+      autoTable(doc, {
+        startY: tableStartY,
+        head: tables.ingredientsHeader,
+        body: ingredientesOrdenados,
+        styles: { fontSize: fonts.sizes.tableBody, cellPadding: 1 },
+        headStyles: { fillColor: colors.primary, textColor: colors.text.white, fontSize: fonts.sizes.tableHeader },
+        margin: { left: xOffset },
+        tableWidth: maxWidth
+      });
+
+      return (doc as any).lastAutoTable?.finalY || startY + 20;
+    }
+
+    // Si no se usa leche en polvo, comportamiento normal
     const ingredientesOrdenados = ingredientes.sort((a, b) => {
       const ordenA = obtenerOrdenIngrediente(a[0] as string);
       const ordenB = obtenerOrdenIngrediente(b[0] as string);
@@ -198,6 +274,10 @@ export function exportMenuToPDF(menu: DiaMenu[]) {
   doc.addPage();
   doc.setFontSize(fonts.sizes.title);
   doc.text('INGREDIENTES TOTALES PARA TODA LA SEMANA', margins.left, margins.top);
+
+  // --- PROCESAMIENTO FINAL DE TOTALES (CONVERSIÓN DE LECHE) ---
+  // --- PROCESAMIENTO FINAL DE TOTALES ---
+  // La conversión de leche ya se realizó durante la acumulación en calcularIngredientesReceta
 
   const totalIngredientesArray = Object.entries(acumuladorIngredientes)
     .map(([clave, { cantidad, unidad }]) => {

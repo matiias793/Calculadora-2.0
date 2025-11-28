@@ -9,8 +9,7 @@ import DiaMenuRow from '@/components/menu/DiaMenuRow';
 import {
   diasSemana,
   particularidadesRecetas,
-  TipoComensal,
-  postresDeLeche
+  TipoComensal
 } from '@/data/menu-data';
 import { generarMenuInteligente } from '@/utils/menu-generator';
 
@@ -32,6 +31,7 @@ const MenuSemanal = () => {
   const [mostrarPostre, setMostrarPostre] = useState(false);
   const [mismaCantidadTodos, setMismaCantidadTodos] = useState(true); // Marcado por defecto
   const [porcionesGlobales, setPorcionesGlobales] = useState({ chica: '', mediana: '', grande: '' });
+  const [usarLechePolvoGlobal, setUsarLechePolvoGlobal] = useState(false);
 
   const manejarCambio = (index: number, campo: 'principal' | 'acompanamiento' | 'recetaBase' | 'postre', valor: string) => {
     const nuevoMenu = [...menu];
@@ -194,8 +194,8 @@ const MenuSemanal = () => {
           <button
             onClick={() => setMostrarRecetaBase(!mostrarRecetaBase)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${mostrarRecetaBase
-                ? 'bg-primary text-white'
-                : 'bg-neutral-soft text-neutral-text hover:bg-neutral-soft/80'
+              ? 'bg-primary text-white'
+              : 'bg-neutral-soft text-neutral-text hover:bg-neutral-soft/80'
               }`}
           >
             {mostrarRecetaBase ? 'Ocultar' : 'Mostrar'} Receta Base
@@ -203,13 +203,26 @@ const MenuSemanal = () => {
           <button
             onClick={() => setMostrarPostre(!mostrarPostre)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${mostrarPostre
-                ? 'bg-primary text-white'
-                : 'bg-neutral-soft text-neutral-text hover:bg-neutral-soft/80'
+              ? 'bg-primary text-white'
+              : 'bg-neutral-soft text-neutral-text hover:bg-neutral-soft/80'
               }`}
           >
             {mostrarPostre ? 'Ocultar' : 'Mostrar'} Postre
           </button>
         </div>
+      </div>
+
+      {/* Opción Global para Leche en Polvo */}
+      <div className="mb-4 flex items-center">
+        <label className="inline-flex items-center cursor-pointer p-3 bg-blue-50 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors">
+          <input
+            type="checkbox"
+            className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+            checked={usarLechePolvoGlobal}
+            onChange={(e) => setUsarLechePolvoGlobal(e.target.checked)}
+          />
+          <span className="ml-2 text-base font-medium text-gray-700">🏫 Usar leche en polvo para todas las recetas</span>
+        </label>
       </div>
 
       {/* Opción para mantener misma cantidad de comensales */}
@@ -266,7 +279,7 @@ const MenuSemanal = () => {
         />
       ))}
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-6 flex flex-col sm:flex-row justify-end items-center gap-4">
         <button
           onClick={() => {
             // Convertir las porciones a números antes de exportar y asegurar incluirPan
@@ -279,7 +292,7 @@ const MenuSemanal = () => {
                 incluirPan
               };
             });
-            exportMenuToPDF(menuConNumeros);
+            exportMenuToPDF(menuConNumeros, usarLechePolvoGlobal);
           }}
           className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded"
         >

@@ -1,105 +1,108 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { Home, Sun, Info } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Info } from 'lucide-react';
 import { SummerNavigation } from '@/components/verano/SummerNavigation';
-import { MenuCalendarGrid } from '@/components/verano/MenuCalendarGrid';
+import { WeeklyGroup } from '@/components/verano/WeeklyGroup';
 import { PLANIFICACION_VERANO } from '@/data/planificacion-verano';
 import { PLANIFICACION_MALDONADO } from '@/data/planificacion-maldonado';
+import { getSemanasVerano, WeekGroup } from '@/utils/verano-weeks';
+import NavigationButtons from '@/components/shared/NavigationButtons';
 
 export default function EscuelasVeranoPage() {
     const [activeTab, setActiveTab] = useState<'maldonado' | 'resto'>('resto');
+    const [weeks, setWeeks] = useState<WeekGroup[]>([]);
+
+    // Cargar y agrupar semanas al cambiar la pestaña
+    useEffect(() => {
+        const data = activeTab === 'maldonado' ? PLANIFICACION_MALDONADO : PLANIFICACION_VERANO;
+        const agrupadas = getSemanasVerano(data);
+        setWeeks(agrupadas);
+    }, [activeTab]);
+
+    // Manejar la apertura/cierre de acordeones
+    const handleToggleWeek = (id: number) => {
+        setWeeks(prevWeeks => prevWeeks.map(week =>
+            week.id === id ? { ...week, isOpen: !week.isOpen } : week
+        ));
+    };
+
+    const basePath = activeTab === 'maldonado' ? '/escuelas-verano/maldonado/dia' : '/escuelas-verano/dia';
+    const title = activeTab === 'maldonado' ? 'Calendario - Maldonado' : 'Calendario - Todo el País';
 
     return (
         <div className="min-h-screen bg-neutral-50 pb-12">
-            {/* Header Hero */}
-            <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-12 px-4 mb-8">
-                <div className="max-w-7xl mx-auto">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center text-green-100 hover:text-white mb-6 transition-colors"
-                    >
-                        <Home className="w-4 h-4 mr-2" />
-                        Volver al Inicio
-                    </Link>
 
-                    <div className="text-center">
-                        <div className="flex justify-center mb-4">
-                            <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm">
-                                <Sun className="w-8 h-8 text-yellow-300" />
-                            </div>
-                        </div>
-                        <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                            Escuelas de Verano 2026
-                        </h1>
-                        <p className="text-green-100 max-w-2xl mx-auto text-lg">
-                            Calculadora de insumos y planificación de menús.
-                        </p>
-                    </div>
+            {/* 1. NAVEGACIÓN ESTÁNDAR (Botones Volver/Home) */}
+            <div className="bg-white px-4 py-4 border-b border-neutral-200">
+                <div className="max-w-7xl mx-auto">
+                    <NavigationButtons />
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Navigation Tabs */}
-                <SummerNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+            {/* 2. HERO BANNER CON IMAGEN DE FONDO */}
+            <div className="relative bg-neutral-900 h-64 mb-8 overflow-hidden shadow-md">
+                {/* Imagen */}
+                <div
+                    className="absolute inset-0 bg-cover bg-center opacity-60"
+                    style={{ backgroundImage: "url('/images/veranoportada2026.jpg')" }}
+                ></div>
+                {/* Overlay Degradado para leer texto */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
 
-                {/* Content Area */}
+                {/* Textos del Banner */}
+                <div className="relative z-10 h-full flex flex-col justify-end pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h1 className="text-3xl md:text-5xl font-bold text-white shadow-sm mb-2">
+                        Escuelas de Verano 2026
+                    </h1>
+                    <p className="text-green-50 text-lg md:text-xl font-medium shadow-sm max-w-2xl">
+                        Planificación de menús y calculadora de insumos oficial.
+                    </p>
+                </div>
+            </div>
+
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                {/* 3. AVISO DE CONSTRUCCIÓN (Sutil) */}
+                <div className="mb-8 bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg shadow-sm flex items-start">
+                    <Info className="w-5 h-5 text-amber-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <div>
+                        <p className="font-semibold text-amber-800">⚠️ Sección en fase de Prototipo</p>
+                        <p className="text-sm text-amber-700">
+                            La planificación mostrada es preliminar. Los datos finales pueden variar.
+                        </p>
+                    </div>
+                </div>
+
+                {/* 4. TABS DE NAVEGACIÓN (Maldonado / Todo el País) */}
+                <div className="mb-8">
+                    <SummerNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+                </div>
+
+                {/* 5. LISTA DE SEMANAS (Acordeones) */}
                 <div className="transition-all duration-300 ease-in-out">
-                    {activeTab === 'maldonado' ? (
-                        <div>
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-bold text-neutral-800 flex items-center">
-                                    <span className="w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
-                                    Calendario de Menús - Maldonado
-                                </h2>
-                                <span className="text-sm text-neutral-500 bg-white px-3 py-1 rounded-full border border-neutral-200 shadow-sm">
-                                    8 Ene - 5 Feb
-                                </span>
-                            </div>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-xl font-bold text-neutral-800 flex items-center">
+                            {/* Indicador visual de color según la tab */}
+                            <span className={`w-2 h-8 rounded-full mr-3 ${activeTab === 'maldonado' ? 'bg-blue-500' : 'bg-green-500'}`}></span>
+                            {title}
+                        </h2>
+                    </div>
 
-                            {PLANIFICACION_MALDONADO && PLANIFICACION_MALDONADO.length > 0 ? (
-                                <MenuCalendarGrid
-                                    dias={PLANIFICACION_MALDONADO}
-                                    basePath="/escuelas-verano/maldonado/dia"
+                    {weeks.length > 0 ? (
+                        <div className="space-y-4">
+                            {weeks.map((week) => (
+                                <WeeklyGroup
+                                    key={week.id}
+                                    week={week}
+                                    basePath={basePath}
+                                    onToggle={() => handleToggleWeek(week.id)}
                                 />
-                            ) : (
-                                <div className="text-center py-12 bg-white rounded-xl border border-neutral-200 shadow-sm">
-                                    <p className="text-neutral-500 mb-2">No se encontraron datos de planificación para Maldonado.</p>
-                                    <p className="text-xs text-neutral-400">Verifique el archivo de datos o contacte a soporte.</p>
-                                </div>
-                            )}
-
-                            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start">
-                                <Info className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
-                                <p className="text-sm text-blue-800">
-                                    <strong>Nota:</strong> Incluye Desayuno, Almuerzo y Merienda. Seleccione un día para calcular los insumos.
-                                </p>
-                            </div>
+                            ))}
                         </div>
                     ) : (
-                        <div>
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-bold text-neutral-800 flex items-center">
-                                    <span className="w-2 h-8 bg-green-500 rounded-full mr-3"></span>
-                                    Calendario de Menús - Resto del País
-                                </h2>
-                                <span className="text-sm text-neutral-500 bg-white px-3 py-1 rounded-full border border-neutral-200 shadow-sm">
-                                    8 Ene - 5 Feb
-                                </span>
-                            </div>
-
-                            <MenuCalendarGrid
-                                dias={PLANIFICACION_VERANO}
-                                basePath="/escuelas-verano/dia"
-                            />
-
-                            <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start">
-                                <Info className="w-5 h-5 text-yellow-600 mr-3 mt-0.5 flex-shrink-0" />
-                                <p className="text-sm text-yellow-800">
-                                    <strong>Nota:</strong> Seleccione un día para calcular los insumos necesarios según la cantidad de comensales.
-                                </p>
-                            </div>
+                        <div className="text-center py-12 bg-white rounded-xl border border-neutral-200 border-dashed">
+                            <p className="text-neutral-400">Cargando planificación...</p>
                         </div>
                     )}
                 </div>

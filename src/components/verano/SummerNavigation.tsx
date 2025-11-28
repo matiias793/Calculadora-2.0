@@ -12,8 +12,8 @@ export const SummerNavigation: React.FC<SummerNavigationProps> = ({ activeTab, o
                 <button
                     onClick={() => onTabChange('maldonado')}
                     className={`px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${activeTab === 'maldonado'
-                            ? 'bg-green-600 text-white shadow-md'
-                            : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+                        ? 'bg-green-600 text-white shadow-md'
+                        : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
                         }`}
                 >
                     Maldonado
@@ -21,11 +21,11 @@ export const SummerNavigation: React.FC<SummerNavigationProps> = ({ activeTab, o
                 <button
                     onClick={() => onTabChange('resto')}
                     className={`px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${activeTab === 'resto'
-                            ? 'bg-green-600 text-white shadow-md'
-                            : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+                        ? 'bg-green-600 text-white shadow-md'
+                        : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
                         }`}
                 >
-                    Resto del País
+                    Todo el País
                 </button>
             </div>
         </div>

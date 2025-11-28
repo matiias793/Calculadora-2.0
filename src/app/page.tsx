@@ -65,7 +65,7 @@ const options = [
       />
     ),
     title: 'Escuelas de verano 2026',
-    url: '/escuelas-verano-2026'
+    url: '/escuelas-verano'
   }
 ];
 
