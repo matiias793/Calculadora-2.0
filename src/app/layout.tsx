@@ -15,7 +15,7 @@ const geistMono = localFont({
   weight: "100 900",
 });
 const poppinsFont = localFont({
-  src: [ 
+  src: [
     {
       path: "./fonts/Poppins/Poppins-Regular.ttf",
       weight: "400",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   },
   viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
   other: {
-    "theme-color": "#8BCF85",
+    "theme-color": "#f0fdf4",
   },
 };
 
@@ -69,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${ poppinsFont.className } ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${poppinsFont.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeColor />
         <div className="flex flex-row h-2">
@@ -82,7 +82,7 @@ export default function RootLayout({
         </div>
         <div className="bg-gradient-to-b from-green-50 to-white min-h-screen py-3 sm:py-4 md:py-8 px-2 sm:px-4">
           <Providers>
-            { children }
+            {children}
           </Providers>
         </div>
       </body>

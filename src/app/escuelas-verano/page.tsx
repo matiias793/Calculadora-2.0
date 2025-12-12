@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Info } from 'lucide-react';
+import { Coffee, Utensils } from 'lucide-react';
 import { SummerNavigation } from '@/components/verano/SummerNavigation';
 import { WeeklyGroup } from '@/components/verano/WeeklyGroup';
 import { PLANIFICACION_VERANO } from '@/data/planificacion-verano';
@@ -63,15 +63,31 @@ export default function EscuelasVeranoPage() {
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                {/* 3. AVISO DE CONSTRUCCIÓN (Sutil) */}
-                <div className="mb-8 bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg shadow-sm flex items-start">
-                    <Info className="w-5 h-5 text-amber-600 mr-3 mt-0.5 flex-shrink-0" />
-                    <div>
-                        <p className="font-semibold text-amber-800">⚠️ Sección en fase de Prototipo</p>
-                        <p className="text-sm text-amber-700">
-                            La planificación mostrada es preliminar. Los datos finales pueden variar.
-                        </p>
-                    </div>
+                {/* 3. BOTONES DE RECETARIOS (Reemplaza aviso de prototipo) */}
+                <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <a
+                        href="https://drive.google.com/file/d/1qiHPj8cujsd8VWLNt0oOZkM2ir-Z7lrH/view"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-3 p-4 bg-white border border-neutral-200 rounded-xl shadow-sm hover:shadow-md hover:border-amber-300 transition-all group"
+                    >
+                        <div className="p-2 bg-amber-100 text-amber-600 rounded-full group-hover:bg-amber-200 transition-colors">
+                            <Coffee className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-neutral-700 group-hover:text-amber-800">Recetario Copa de Leche</span>
+                    </a>
+
+                    <a
+                        href="https://drive.google.com/file/d/1bK9WCzHW7sVbctLb1Z1E1qAWRctcrZ8-/view"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-3 p-4 bg-white border border-neutral-200 rounded-xl shadow-sm hover:shadow-md hover:border-green-300 transition-all group"
+                    >
+                        <div className="p-2 bg-green-100 text-green-600 rounded-full group-hover:bg-green-200 transition-colors">
+                            <Utensils className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-neutral-700 group-hover:text-green-800">Recetario Almuerzos</span>
+                    </a>
                 </div>
 
                 {/* 4. TABS DE NAVEGACIÓN (Maldonado / Todo el País) */}
