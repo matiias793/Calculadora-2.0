@@ -58,7 +58,7 @@ const options = [
   {
     image: (
       <Image
-        src="/images/verano2026.jpg"
+        src="/images/logo-verano-2026.jpg"
         fill
         style={{ objectFit: "contain" }}
         alt="Escuelas de verano 2026"
