@@ -2,6 +2,8 @@ import { ORDEN_INGREDIENTES, MAPEO_VARIACIONES } from '@/data/pdf-config';
 import { recetasAlmuerzo } from '@/utils/recetas-almuerzo';
 import { pesosPostres } from '@/utils/pesos-postres';
 import { convertirFluidaAPolvo } from '@/utils/conversion-leche';
+import { UnidadMasa } from '@/utils/enums/unidad-masa';
+import { UnidadVolumen } from '@/utils/enums/unidad-volumen';
 
 export interface DiaMenu {
     dia: string;
@@ -144,21 +146,45 @@ export const calcularPanTotal = (menu: DiaMenu[]) => {
     return totalPan;
 };
 
+// Función para agregar al acumulador, manejando conversiones si es necesario
+const agregarAlAcumuladorHelper = (
+    acumulador: AcumuladorIngredientes,
+    nombre: string,
+    cantidad: number,
+    unidad: string,
+    unidadMasa: UnidadMasa,
+    unidadVolumen: UnidadVolumen
+) => {
+    let cantidadFinal = cantidad;
+    let unidadFinal = unidad;
+
+    // Convertir si es necesario para el acumulador
+    if (unidad === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS) {
+        cantidadFinal = cantidad / 1000;
+        unidadFinal = 'kg';
+    } else if (unidad === 'ml' && unidadVolumen === UnidadVolumen.LITROS) {
+        cantidadFinal = cantidad / 1000;
+        unidadFinal = 'l';
+    }
+
+    const clave = `${nombre}::${unidadFinal}`;
+    if (!acumulador[clave]) {
+        acumulador[clave] = { cantidad: 0, unidad: unidadFinal };
+    }
+    acumulador[clave].cantidad += cantidadFinal;
+};
+
 // Función para agregar fruta fresca al acumulador
 export const agregarFrutaAlAcumulador = (
     acumulador: AcumuladorIngredientes,
     nombreFruta: string,
     cantidad: number,
-    unidad: string
+    unidad: string,
+    unidadMasa: UnidadMasa = UnidadMasa.GRAMOS,
+    unidadVolumen: UnidadVolumen = UnidadVolumen.CENTIMETROS_CUBICOS
 ) => {
     const nombreConIdentificador = `${nombreFruta} (para postre)`;
-    const clave = `${nombreConIdentificador}::${unidad}`;
-    const cantidadAjustada = ajustarNumero(cantidad);
-
-    if (!acumulador[clave]) {
-        acumulador[clave] = { cantidad: 0, unidad: unidad };
-    }
-    acumulador[clave].cantidad = ajustarNumero(acumulador[clave].cantidad + cantidadAjustada);
+    agregarAlAcumuladorHelper(acumulador, nombreConIdentificador, cantidad, unidad, unidadMasa, unidadVolumen);
 };
 
 // Calcula ingredientes para una receta y actualiza el acumulador
@@ -166,12 +192,14 @@ export const calcularIngredientesReceta = (
     titulo: string,
     totalPersonas: number,
     acumulador: AcumuladorIngredientes,
-    usarLechePolvo: boolean = false
+    usarLechePolvo: boolean = false,
+    unidadMasa: UnidadMasa = UnidadMasa.GRAMOS,
+    unidadVolumen: UnidadVolumen = UnidadVolumen.CENTIMETROS_CUBICOS
 ): (string | number)[][] => {
     const receta = Object.values(recetasAlmuerzo).find(r => r.title === titulo);
     if (!receta) return [];
 
-    return receta.ingredients.map(({ name, quantity, unit }) => {
+    return receta.ingredients.flatMap(({ name, quantity, unit }) => {
         let cantidadFinal: number | string = quantity;
         let unidadFinal = unit;
 
@@ -184,50 +212,85 @@ export const calcularIngredientesReceta = (
             } else if (name.toLowerCase().includes('yema') && unit === 'g') {
                 cantidadFinal = (cantidadFinal / 15).toFixed(2);
                 unidadFinal = 'unidad/es';
-            } else {
-                cantidadFinal = cantidadFinal.toFixed(2);
             }
 
             // Usar nombre normalizado para agrupar ingredientes similares
             const nombreNormalizado = normalizarNombreIngrediente(name);
+            const nombreLower = nombreNormalizado.toLowerCase();
 
             // Lógica de conversión de Leche Fluida a Polvo
-            if (usarLechePolvo && (nombreNormalizado.toLowerCase() === 'leche' || nombreNormalizado.toLowerCase() === 'leche fluida')) {
-                const { gramosPolvo, mlAgua } = convertirFluidaAPolvo(parseFloat(cantidadFinal as string));
+            if (usarLechePolvo && (nombreLower === 'leche' || nombreLower === 'leche fluida')) {
+                const cantidadNumerica = parseFloat(cantidadFinal as string); // Esto está en ml o unidad original (asumimos ml si es leche fluida)
+
+                // Si la unidad original es litros, convertir a ml
+                let cantidadEnMl = cantidadNumerica;
+                if (['l', 'litro', 'litros'].includes(unit.toLowerCase())) {
+                    cantidadEnMl = cantidadEnMl * 1000;
+                }
+
+                const { gramosPolvo, mlAgua } = convertirFluidaAPolvo(cantidadEnMl);
 
                 // Agregar Leche en Polvo
-                const clavePolvo = `Leche en Polvo::g`;
-                if (!acumulador[clavePolvo]) {
-                    acumulador[clavePolvo] = { cantidad: 0, unidad: 'g' };
-                }
-                acumulador[clavePolvo].cantidad += gramosPolvo;
+                agregarAlAcumuladorHelper(acumulador, 'Leche en Polvo', gramosPolvo, 'g', unidadMasa, unidadVolumen);
 
                 // Agregar Agua
-                const claveAgua = `Agua (para leche en polvo)::ml`;
-                if (!acumulador[claveAgua]) {
-                    acumulador[claveAgua] = { cantidad: 0, unidad: 'ml' };
+                agregarAlAcumuladorHelper(acumulador, 'Agua (para leche en polvo)', mlAgua, 'ml', unidadMasa, unidadVolumen);
+
+                // Para el retorno (tabla diaria), devolvemos leche en polvo y agua convertidos según preferencias
+
+                // Conversión para visualización diaria
+                let polvoMostrar = gramosPolvo;
+                let unidadPolvo = 'g';
+                if (unidadMasa === UnidadMasa.KILOGRAMOS) {
+                    polvoMostrar = gramosPolvo / 1000;
+                    unidadPolvo = 'kg';
                 }
-                acumulador[claveAgua].cantidad += mlAgua;
+
+                let aguaMostrar = mlAgua;
+                let unidadAgua = 'ml';
+                if (unidadVolumen === UnidadVolumen.LITROS) {
+                    aguaMostrar = mlAgua / 1000;
+                    unidadAgua = 'l';
+                }
+
+                return [
+                    ['Leche en Polvo', parseFloat(polvoMostrar.toFixed(4)), unidadPolvo],
+                    ['Agua (para leche en polvo)', parseFloat(aguaMostrar.toFixed(4)), unidadAgua]
+                ];
 
             } else {
                 // Comportamiento normal
                 const clave = `${nombreNormalizado}::${unidadFinal}`;
+                agregarAlAcumuladorHelper(acumulador, nombreNormalizado, parseFloat(cantidadFinal as string), unidadFinal, unidadMasa, unidadVolumen);
 
-                if (!acumulador[clave]) {
-                    acumulador[clave] = { cantidad: 0, unidad: unidadFinal };
+                // Conversión para visualización diaria
+                let cantidadMostrar = parseFloat(cantidadFinal as string);
+
+                if (unidadFinal === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS) {
+                    cantidadMostrar = cantidadMostrar / 1000;
+                    unidadFinal = 'kg';
+                } else if (unidadFinal === 'ml' && unidadVolumen === UnidadVolumen.LITROS) {
+                    cantidadMostrar = cantidadMostrar / 1000;
+                    unidadFinal = 'l';
                 }
-                acumulador[clave].cantidad += parseFloat(cantidadFinal as string);
+
+                // Ajustar precisión según preferencia (4 decimales)
+                const cantidadFormatted = parseFloat(cantidadMostrar.toFixed(4));
+
+                return [[name, cantidadFormatted, unidadFinal]];
             }
         }
 
-        return [name, cantidadFinal, unidadFinal];
+        return [[name, cantidadFinal, unidadFinal]];
     });
 };
 
 export const procesarDatosPostre = (
     postre: string,
     totalPersonas: number,
-    acumulador: AcumuladorIngredientes
+    acumulador: AcumuladorIngredientes,
+    unidadMasa: UnidadMasa = UnidadMasa.GRAMOS,
+    unidadVolumen: UnidadVolumen = UnidadVolumen.CENTIMETROS_CUBICOS
 ) => {
     const postreData = pesosPostres[postre];
     if (!postreData) return null;
@@ -238,12 +301,22 @@ export const procesarDatosPostre = (
         if (!isNaN(pesoNumero) && postreData.unidad === 'g') {
             // Frutas por peso (g)
             const cantidadTotal = ajustarNumero(pesoNumero * totalPersonas, 4);
-            agregarFrutaAlAcumulador(acumulador, postre, cantidadTotal, postreData.unidad);
-            return { tipo: 'fruta_peso', cantidadTotal, unidad: postreData.unidad };
+            agregarFrutaAlAcumulador(acumulador, postre, cantidadTotal, postreData.unidad, unidadMasa, unidadVolumen);
+
+            // Return converted values for display if needed
+            let displayCantidad = cantidadTotal;
+            let displayUnidad = postreData.unidad;
+
+            if (displayUnidad === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS) {
+                displayCantidad = cantidadTotal / 1000;
+                displayUnidad = 'kg';
+            }
+
+            return { tipo: 'fruta_peso', cantidadTotal: displayCantidad, unidad: displayUnidad };
         } else if (postreData.peso.includes('racimo')) {
             // Uvas
             const totalRacimos = aplicarCeilConEpsilon(totalPersonas, 4);
-            agregarFrutaAlAcumulador(acumulador, postre, totalRacimos, 'racimos pequeños');
+            agregarFrutaAlAcumulador(acumulador, postre, totalRacimos, 'racimos pequeños', unidadMasa, unidadVolumen);
             return { tipo: 'fruta_racimo', total: totalRacimos, unidad: 'racimos pequeños' };
         } else {
             // Frutas por unidad
@@ -253,7 +326,7 @@ export const procesarDatosPostre = (
             const totalUnidades = aplicarCeilConEpsilon(totalUnidadesExacto, 6);
             const unidadFinal = unidadDisplay === 'unidad' ? 'unidades' : unidadDisplay;
 
-            agregarFrutaAlAcumulador(acumulador, postre, totalUnidades, unidadFinal);
+            agregarFrutaAlAcumulador(acumulador, postre, totalUnidades, unidadFinal, unidadMasa, unidadVolumen);
             return {
                 tipo: 'fruta_unidad',
                 total: totalUnidades,

@@ -77,79 +77,105 @@ export const generarMenuInteligente = () => {
         recetasPorTipoCarne.cerdo.filter(r => nombresRecetasAlmuerzo.includes(r))
     );
 
-    // Seleccionar recetas según las reglas
+    // --- SELECCIÓN BALANCEADA DE RECETAS ---
+    // Objetivo: Elegir 5 recetas cumpliendo las frecuencias de carne, pero intentando
+    // que sus preferencias de postre se acerquen a un split 3/2 para facilitar el trabajo posterior.
+
     const recetasSeleccionadas: string[] = [];
     const recetasYaUsadas = new Set<string>();
 
-    // Pollo: 2 veces (asegurar que no haya duplicados)
-    const recetasPolloDisponibles = [...recetasPollo];
-    for (let i = 0; i < 2 && recetasPolloDisponibles.length > 0; i++) {
-        const recetaSeleccionada = obtenerAleatorio(recetasPolloDisponibles);
-        recetasSeleccionadas.push(recetaSeleccionada);
-        recetasYaUsadas.add(recetaSeleccionada);
-        // Remover la receta seleccionada para evitar duplicados
-        const index = recetasPolloDisponibles.indexOf(recetaSeleccionada);
-        if (index > -1) {
-            recetasPolloDisponibles.splice(index, 1);
-        }
-    }
+    let contadorLeche = 0;
+    let contadorFruta = 0;
 
-    // Vacuna: 1 vez
-    // Vacuna: 1 vez
-    const recetasVacunaDisponibles = recetasVacuna.filter(r => !recetasYaUsadas.has(r));
-    if (recetasVacunaDisponibles.length > 0) {
-        const receta = obtenerAleatorio(recetasVacunaDisponibles);
-        recetasSeleccionadas.push(receta);
-        recetasYaUsadas.add(receta);
-    }
+    // Helper para determinar preferencia de una receta (sin instanciar objetos complejos)
+    const getPreferencia = (receta: string): 'leche' | 'fruta' | 'neutro' => {
+        const parts = particularidadesRecetas[receta];
+        if (!parts) return 'neutro';
+        if (parts.postreRecomendado === 'leche') return 'leche';
+        if (['fruta', 'fruta_citrica', 'fruta_estacion'].includes(parts.postreRecomendado)) return 'fruta';
+        return 'neutro';
+    };
 
-    // Pescado: 1 vez
-    // Pescado: 1 vez
-    const recetasPescadoDisponibles = recetasPescado.filter(r => !recetasYaUsadas.has(r));
-    if (recetasPescadoDisponibles.length > 0) {
-        const receta = obtenerAleatorio(recetasPescadoDisponibles);
-        recetasSeleccionadas.push(receta);
-        recetasYaUsadas.add(receta);
-    }
+    // Helper de Selección Inteligente
+    const seleccionarBalanceado = (pool: string[], cantidad: number) => {
+        const disponibles = pool.filter(r => !recetasYaUsadas.has(r));
+        if (disponibles.length === 0) return;
 
-    // Cerdo: 1 vez
-    // Cerdo: 1 vez
-    const recetasCerdoDisponibles = recetasCerdo.filter(r => !recetasYaUsadas.has(r));
-    if (recetasCerdoDisponibles.length > 0) {
-        const receta = obtenerAleatorio(recetasCerdoDisponibles);
-        recetasSeleccionadas.push(receta);
-        recetasYaUsadas.add(receta);
-    }
+        // Si no necesitamos seleccionar nada, salir
+        if (cantidad <= 0) return;
 
-    // Si faltan días, completar con opciones aleatorias SIN REPETIR
-    // Filtrar también por estación
-    while (recetasSeleccionadas.length < diasSemana.length) {
-        // Primero intentar con recetas de la estación que no estén usadas
-        const recetasDisponibles = filtrarRecetasPorEstacion(
-            nombresRecetasAlmuerzo.filter(r => !recetasYaUsadas.has(r))
-        );
-        if (recetasDisponibles.length > 0) {
-            const receta = obtenerAleatorio(recetasDisponibles);
-            recetasSeleccionadas.push(receta);
-            recetasYaUsadas.add(receta);
-        } else {
-            // Si no hay más recetas disponibles para la estación, intentar sin filtro de estación
-            const todasRecetasDisponibles = nombresRecetasAlmuerzo.filter(r => !recetasYaUsadas.has(r));
-            if (todasRecetasDisponibles.length > 0) {
-                const receta = obtenerAleatorio(todasRecetasDisponibles);
-                recetasSeleccionadas.push(receta);
-                recetasYaUsadas.add(receta);
+        for (let i = 0; i < cantidad; i++) {
+            // Recalcular disponibles en cada iteración
+            const currentPool = pool.filter(r => !recetasYaUsadas.has(r));
+            if (currentPool.length === 0) break;
+
+            // Separar en grupos
+            const grupoLeche = currentPool.filter(r => getPreferencia(r) === 'leche');
+            const grupoFruta = currentPool.filter(r => getPreferencia(r) === 'fruta');
+            const grupoNeutro = currentPool.filter(r => getPreferencia(r) === 'neutro');
+
+            let elegido = '';
+
+            // Lógica de Balanceo: Intentar igualar contadores hacia 3 vs 2
+            // Si Leche va perdiendo mucho, priorizar Leche. Si Fruta va perdiendo, priorizar Fruta.
+            // Si van parejos, priorizar Neutro o Random.
+            const total = contadorLeche + contadorFruta;
+
+            // Estrategia: "Best Effort" para mantener equilibrio
+            if (contadorLeche > contadorFruta + 1 && grupoFruta.length > 0) {
+                elegido = obtenerAleatorio(grupoFruta);
+            } else if (contadorFruta > contadorLeche + 1 && grupoLeche.length > 0) {
+                elegido = obtenerAleatorio(grupoLeche);
             } else {
-                // Si realmente no hay más opciones únicas, usar recetas ya seleccionadas pero mezcladas
-                // Esto solo debería pasar si hay muy pocas recetas disponibles
-                const recetasYaSeleccionadas = [...recetasSeleccionadas];
-                if (recetasYaSeleccionadas.length > 0) {
-                    recetasSeleccionadas.push(obtenerAleatorio(recetasYaSeleccionadas));
+                // Si no hay desbalance crítico, preferimos variedad o lo que haya
+                if (grupoNeutro.length > 0 && Math.random() > 0.5) {
+                    elegido = obtenerAleatorio(grupoNeutro);
+                } else if (grupoFruta.length > 0 && grupoLeche.length > 0) {
+                    // Si ambos tienen cards, elegir del que tenga menos votos globales
+                    elegido = contadorLeche <= contadorFruta
+                        ? obtenerAleatorio(grupoLeche)
+                        : obtenerAleatorio(grupoFruta);
                 } else {
-                    break;
+                    // Random total si no hay opciones específicas
+                    elegido = obtenerAleatorio(currentPool);
                 }
             }
+
+            // Fallback por seguridad
+            if (!elegido) elegido = obtenerAleatorio(currentPool);
+
+            // Actualizar contadores
+            const pref = getPreferencia(elegido);
+            if (pref === 'leche') contadorLeche++;
+            if (pref === 'fruta') contadorFruta++;
+
+            recetasSeleccionadas.push(elegido);
+            recetasYaUsadas.add(elegido);
         }
+    };
+
+    // Aplicar selección por tipo de carne
+    // Pollo: 2 veces
+    seleccionarBalanceado(recetasPollo, 2);
+    // Vacuna: 1 vez
+    seleccionarBalanceado(recetasVacuna, 1);
+    // Pescado: 1 vez
+    seleccionarBalanceado(recetasPescado, 1);
+    // Cerdo: 1 vez
+    seleccionarBalanceado(recetasCerdo, 1);
+
+    // Si faltan días (ej. falta de stock en algún tipo), completar con cualquiera válida de estación
+    while (recetasSeleccionadas.length < diasSemana.length) {
+        // Pool general de estación
+        const poolGeneral = nombresRecetasAlmuerzo.filter(r =>
+            !recetasYaUsadas.has(r) &&
+            recetasPollo.includes(r) || recetasVacuna.includes(r) || recetasPescado.includes(r) || recetasCerdo.includes(r) // Asegurar que sea de los pools válidos de estación
+        );
+
+        // Si el pool general está vacío (muy raro), fallback a todo
+        const poolFinal = poolGeneral.length > 0 ? poolGeneral : nombresRecetasAlmuerzo;
+
+        seleccionarBalanceado(poolFinal, 1);
     }
 
     // Asegurar que no haya duplicados en las recetas seleccionadas
@@ -174,464 +200,162 @@ export const generarMenuInteligente = () => {
         }
     }
 
-    // Mezclar las recetas para distribución aleatoria en la semana
-    const recetasMezcladas = mezclarArray(recetasUnicas.slice(0, diasSemana.length));
+    // --- LÓGICA DE ASIGNACIÓN INTELIGENTE (Smart Sort) ---
+    // En lugar de mezclar al azar, asignamos recetes a días basándonos en el patrón de postres
 
-    // Seleccionar postres: 2-3 de leche y 2-3 de fruta (total 4-5, pero tenemos 5 días)
-    // Combinar postres de fruta con frutas frescas disponibles
-    const todosPostresDisponiblesList = [...nombresPostres, ...frutasFrescas];
-    const postresLecheDisponibles = postresDeLeche.filter(p => todosPostresDisponiblesList.includes(p));
-    const postresFrutaDisponibles = [...postresDeFruta.filter(p => todosPostresDisponiblesList.includes(p)), ...frutasFrescas];
+    // 1. Analizar preferencias de postre de las 5 recetas seleccionadas
+    let votosLeche = 0;
+    let votosFruta = 0;
+    const preferenciasRecetas = recetasUnicas.slice(0, 5).map(receta => {
+        const parts = particularidadesRecetas[receta];
+        // Determinar preferencia: 'leche', 'fruta' (incluye cítrica y estación), o 'neutro'
+        let tipo = 'neutro';
+        if (parts) {
+            if (parts.postreRecomendado === 'leche') tipo = 'leche';
+            else if (['fruta', 'fruta_estacion', 'fruta_citrica'].includes(parts.postreRecomendado)) tipo = 'fruta';
+        }
 
-    // Verificar si hay recetas que requieren fruta cítrica (lentejas)
-    const recetasConLentejas = recetasMezcladas.filter(r => {
-        const particularidades = particularidadesRecetas[r];
-        return particularidades?.postreRecomendado === 'fruta_citrica';
+        if (tipo === 'leche') votosLeche++;
+        if (tipo === 'fruta') votosFruta++;
+
+        return { receta, tipo, parts };
     });
 
-    const postresSeleccionados: string[] = [];
-    const postresYaUsados = new Set<string>();
+    // 2. Definir el Patrón Estricto 3vs2
+    // Si hay más o igual votos para leche, patrón L-F-L-F-L. Si no, F-L-F-L-F.
+    const ganaLeche = votosLeche >= votosFruta;
+    const patronSemanal = ganaLeche
+        ? ['leche', 'fruta', 'leche', 'fruta', 'leche']
+        : ['fruta', 'leche', 'fruta', 'leche', 'fruta'];
 
-    // Si hay recetas con lentejas, asegurar que haya al menos una fruta cítrica disponible
-    if (recetasConLentejas.length > 0) {
-        const frutasCitricasDisponibles = frutasCitricas.filter(f => frutasFrescas.includes(f));
-        if (frutasCitricasDisponibles.length > 0) {
-            const frutaCitrica = obtenerAleatorio(frutasCitricasDisponibles);
-            postresSeleccionados.push(frutaCitrica);
-            postresYaUsados.add(frutaCitrica);
+    // 3. Asignar Recetas a Días (Smart Sort)
+    const recetasOrdenadas: string[] = new Array(5).fill('');
+    const recetasUsadasSet = new Set<string>();
+
+    // Pasada 1: Coincidencias Exactas
+    patronSemanal.forEach((tipoDia, indexDia) => {
+        if (recetasOrdenadas[indexDia]) return; // Ya asignado
+
+        // Buscar receta que prefiera este tipo y no esté usada
+        const candidato = preferenciasRecetas.find(p =>
+            !recetasUsadasSet.has(p.receta) && p.tipo === tipoDia
+        );
+
+        if (candidato) {
+            recetasOrdenadas[indexDia] = candidato.receta;
+            recetasUsadasSet.add(candidato.receta);
         }
-    }
+    });
 
-    // Seleccionar 2-3 postres de leche (asegurar variedad)
-    const cantidadPostresLeche = Math.floor(Math.random() * 2) + 2; // 2 o 3
-    const postresLecheCopia = [...postresLecheDisponibles];
-    for (let i = 0; i < cantidadPostresLeche && postresLecheCopia.length > 0; i++) {
-        const postre = obtenerAleatorio(postresLecheCopia);
-        postresSeleccionados.push(postre);
-        postresYaUsados.add(postre);
-        const index = postresLecheCopia.indexOf(postre);
-        if (index > -1) {
-            postresLecheCopia.splice(index, 1);
+    // Pasada 2: Neutros
+    patronSemanal.forEach((tipoDia, indexDia) => {
+        if (recetasOrdenadas[indexDia]) return;
+
+        const candidato = preferenciasRecetas.find(p =>
+            !recetasUsadasSet.has(p.receta) && p.tipo === 'neutro'
+        );
+
+        if (candidato) {
+            recetasOrdenadas[indexDia] = candidato.receta;
+            recetasUsadasSet.add(candidato.receta);
         }
-    }
+    });
 
-    // Completar con postres de fruta y frutas frescas hasta tener 5 (asegurar variedad)
-    const postresFrutaCopia = [...postresFrutaDisponibles].filter(p => !postresYaUsados.has(p));
-    while (postresSeleccionados.length < diasSemana.length && postresFrutaCopia.length > 0) {
-        const postre = obtenerAleatorio(postresFrutaCopia);
-        postresSeleccionados.push(postre);
-        postresYaUsados.add(postre);
-        const index = postresFrutaCopia.indexOf(postre);
-        if (index > -1) {
-            postresFrutaCopia.splice(index, 1);
+    // Pasada 3: Rellenar con lo que sobre (Mismatch forzado)
+    patronSemanal.forEach((tipoDia, indexDia) => {
+        if (recetasOrdenadas[indexDia]) return;
+
+        const candidato = preferenciasRecetas.find(p => !recetasUsadasSet.has(p.receta));
+        if (candidato) {
+            recetasOrdenadas[indexDia] = candidato.receta;
+            recetasUsadasSet.add(candidato.receta);
         }
-    }
+    });
 
-    // Si aún faltan postres, completar con los disponibles (puede incluir duplicados si es necesario)
-    const todosPostresDisponibles = [...nombresPostres, ...frutasFrescas].filter(p => !postresYaUsados.has(p));
-    while (postresSeleccionados.length < diasSemana.length) {
-        if (todosPostresDisponibles.length > 0) {
-            const postre = obtenerAleatorio(todosPostresDisponibles);
-            postresSeleccionados.push(postre);
-            postresYaUsados.add(postre);
-            const index = todosPostresDisponibles.indexOf(postre);
-            if (index > -1) {
-                todosPostresDisponibles.splice(index, 1);
-            }
-        } else {
-            // Si no hay más postres únicos, permitir duplicados de leche o fruta
-            if (postresLecheDisponibles.length > 0) {
-                postresSeleccionados.push(obtenerAleatorio(postresLecheDisponibles));
-            } else if (postresFrutaDisponibles.length > 0) {
-                postresSeleccionados.push(obtenerAleatorio(postresFrutaDisponibles));
-            } else {
-                break;
-            }
-        }
-    }
+    // 4. Seleccionar Postres Específicos para cada día
+    // Preparar pools de postres
+    const todosPostresDisponiblesList = [...nombresPostres, ...frutasFrescas];
 
-    // Función para distribuir postres evitando consecutivos del mismo tipo
-    const distribuirPostresSinConsecutivos = (postres: string[]): string[] => {
-        if (postres.length === 0) return [];
+    // Filtrar postres de leche disponibles
+    const poolLeche = mezclarArray(
+        postresDeLeche.filter(p => todosPostresDisponiblesList.includes(p))
+    );
 
-        // Clasificar postres por tipo
-        const postresLeche: string[] = [];
-        const postresFruta: string[] = [];
+    // Filtrar postres de fruta disponibles (incluyendo frutas frescas)
+    const poolFruta = mezclarArray(
+        [...postresDeFruta.filter(p => todosPostresDisponiblesList.includes(p)), ...frutasFrescas]
+    );
 
-        postres.forEach(postre => {
-            if (postresDeLeche.includes(postre)) {
-                postresLeche.push(postre);
-            } else if (postresDeFruta.includes(postre) || frutasFrescas.includes(postre)) {
-                postresFruta.push(postre);
-            } else {
-                // Si no está en ninguna categoría, asignarlo a fruta por defecto
-                postresFruta.push(postre);
-            }
-        });
+    // Asegurar frutas cítricas para casos especiales
+    const poolCitricos = mezclarArray(
+        frutasCitricas.filter(f => frutasFrescas.includes(f))
+    );
 
-        const resultado: string[] = new Array(diasSemana.length).fill('');
-        const usados = new Set<string>();
+    const postresAsignados: string[] = new Array(5).fill('');
+    const postresUsadosFinal = new Set<string>();
 
-        // Función auxiliar para verificar si un postre puede ir en una posición
-        const puedeIrEnPosicion = (postre: string, posicion: number): boolean => {
-            if (usados.has(postre)) return false;
+    recetasOrdenadas.forEach((receta, index) => {
+        const tipoDia = patronSemanal[index];
+        const parts = particularidadesRecetas[receta];
 
-            const esLeche = postresDeLeche.includes(postre);
-            const esFruta = postresDeFruta.includes(postre) || frutasFrescas.includes(postre);
+        let postreSeleccionado = '';
 
-            // Verificar que no haya consecutivos del mismo tipo
-            if (posicion > 0 && resultado[posicion - 1]) {
-                const anteriorEsLeche = postresDeLeche.includes(resultado[posicion - 1]);
-                const anteriorEsFruta = postresDeFruta.includes(resultado[posicion - 1]) || frutasFrescas.includes(resultado[posicion - 1]);
-
-                if (esLeche && anteriorEsLeche) return false;
-                if (esFruta && anteriorEsFruta) return false;
-            }
-
-            if (posicion < resultado.length - 1 && resultado[posicion + 1]) {
-                const siguienteEsLeche = postresDeLeche.includes(resultado[posicion + 1]);
-                const siguienteEsFruta = postresDeFruta.includes(resultado[posicion + 1]) || frutasFrescas.includes(resultado[posicion + 1]);
-
-                if (esLeche && siguienteEsLeche) return false;
-                if (esFruta && siguienteEsFruta) return false;
-            }
-
-            return true;
-        };
-
-        // Distribuir alternando tipos cuando sea posible
-        let indiceLeche = 0;
-        let indiceFruta = 0;
-        let intentos = 0;
-        const maxIntentos = 100;
-
-        // Intentar distribuir de manera balanceada
-        for (let i = 0; i < diasSemana.length && intentos < maxIntentos; i++) {
-            let asignado = false;
-
-            // Intentar alternar tipos
-            if (i % 2 === 0 && indiceLeche < postresLeche.length) {
-                // Posición par: intentar postre de leche
-                for (let j = indiceLeche; j < postresLeche.length; j++) {
-                    const postre = postresLeche[j];
-                    if (puedeIrEnPosicion(postre, i)) {
-                        resultado[i] = postre;
-                        usados.add(postre);
-                        indiceLeche = j + 1;
-                        asignado = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!asignado && indiceFruta < postresFruta.length) {
-                // Intentar postre de fruta
-                for (let j = indiceFruta; j < postresFruta.length; j++) {
-                    const postre = postresFruta[j];
-                    if (puedeIrEnPosicion(postre, i)) {
-                        resultado[i] = postre;
-                        usados.add(postre);
-                        indiceFruta = j + 1;
-                        asignado = true;
-                        break;
-                    }
-                }
-            }
-
-            // Si no se pudo asignar con el tipo preferido, intentar con el otro
-            if (!asignado) {
-                if (i % 2 === 0 && indiceFruta < postresFruta.length) {
-                    for (let j = indiceFruta; j < postresFruta.length; j++) {
-                        const postre = postresFruta[j];
-                        if (puedeIrEnPosicion(postre, i)) {
-                            resultado[i] = postre;
-                            usados.add(postre);
-                            indiceFruta = j + 1;
-                            asignado = true;
-                            break;
-                        }
-                    }
-                } else if (indiceLeche < postresLeche.length) {
-                    for (let j = indiceLeche; j < postresLeche.length; j++) {
-                        const postre = postresLeche[j];
-                        if (puedeIrEnPosicion(postre, i)) {
-                            resultado[i] = postre;
-                            usados.add(postre);
-                            indiceLeche = j + 1;
-                            asignado = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Si aún no se asignó, buscar cualquier postre disponible que no cree consecutivos
-            if (!asignado) {
-                const disponibles = postres.filter(p => !usados.has(p) && puedeIrEnPosicion(p, i));
-                if (disponibles.length > 0) {
-                    resultado[i] = disponibles[0];
-                    usados.add(disponibles[0]);
-                    asignado = true;
-                } else {
-                    // Si no hay disponible que no cree consecutivos, usar cualquier disponible
-                    const cualquierDisponible = postres.filter(p => !usados.has(p));
-                    if (cualquierDisponible.length > 0) {
-                        resultado[i] = cualquierDisponible[0];
-                        usados.add(cualquierDisponible[0]);
-                    }
-                }
-            }
-
-            intentos++;
+        // Regla Especial: Lentejas obligan a Cítrico (si el día es fruta)
+        if (parts?.postreRecomendado === 'fruta_citrica' && tipoDia === 'fruta') {
+            const citrico = poolCitricos.find(p => !postresUsadosFinal.has(p));
+            if (citrico) postreSeleccionado = citrico;
         }
 
-        // Completar posiciones vacías con postres restantes, verificando que no creen consecutivos
-        const postresRestantes = postres.filter(p => !usados.has(p));
-        for (let i = 0; i < resultado.length; i++) {
-            if (!resultado[i] && postresRestantes.length > 0) {
-                // Buscar un postre que no cree consecutivos
-                const postreValido = postresRestantes.find(p => puedeIrEnPosicion(p, i));
-                if (postreValido) {
-                    resultado[i] = postreValido;
-                    usados.add(postreValido);
-                    const index = postresRestantes.indexOf(postreValido);
-                    if (index > -1) {
-                        postresRestantes.splice(index, 1);
-                    }
-                } else if (postresRestantes.length > 0) {
-                    // Si no hay válido, usar cualquier disponible
-                    resultado[i] = postresRestantes.shift() || '';
-                }
+        // Selección normal si no hubo regla especial
+        if (!postreSeleccionado) {
+            const pool = tipoDia === 'leche' ? poolLeche : poolFruta;
+
+            // 1. Intentar uno no usado
+            let candidato = pool.find(p => !postresUsadosFinal.has(p));
+
+            // 2. Si se acabaron los únicos, repetir (pero intentar no repetir el INMEDIATO anterior)
+            if (!candidato) {
+                const anterior = index > 0 ? postresAsignados[index - 1] : null;
+                candidato = pool.find(p => p !== anterior) || pool[0];
             }
+
+            postreSeleccionado = candidato!;
         }
 
-        return resultado;
-    };
+        // VALIDACIÓN FINAL: Arroz con Leche
+        // Si el plato principal o acompañamiento tiene arroz, Y salió Arroz con Leche, cambiarlo
+        const nombreAcom = obtenerAcompanamientoParaReceta(receta, nombresAcompanamientos);
+        const tieneArroz = (receta.toLowerCase().includes('arroz')) ||
+            (nombreAcom.toLowerCase().includes('arroz'));
 
-    // Distribuir postres evitando consecutivos del mismo tipo
-    const postresMezclados = distribuirPostresSinConsecutivos(postresSeleccionados.slice(0, diasSemana.length));
+        if (tieneArroz && postreSeleccionado === 'Arroz con leche') {
+            // Buscar alternativa en el mismo pool de leche
+            const alternativo = poolLeche.find(p => p !== 'Arroz con leche' && p !== postresAsignados[index - 1]);
+            if (alternativo) postreSeleccionado = alternativo;
+        }
 
-    // Crear el menú semanal con acompañamientos primero, luego postres
-    const nuevoMenuTemporal = diasSemana.map((dia, index) => {
-        const recetaPrincipal = recetasMezcladas[index] || '';
+        postresAsignados[index] = postreSeleccionado;
+        postresUsadosFinal.add(postreSeleccionado);
+    });
+
+    // Construir Menú Final
+    const nuevoMenu = diasSemana.map((dia, index) => {
+        const recetaPrincipal = recetasOrdenadas[index];
         const acompanamiento = obtenerAcompanamientoParaReceta(recetaPrincipal, nombresAcompanamientos);
         const particularidades = recetaPrincipal ? particularidadesRecetas[recetaPrincipal] : null;
-        const incluirPan = !particularidades?.llevaMasa; // No incluir pan si la receta lleva masa
+        const incluirPan = !particularidades?.llevaMasa;
 
         return {
             dia,
             principal: recetaPrincipal,
             acompanamiento,
             recetaBase: '',
-            postre: '',
+            postre: postresAsignados[index],
             sinMenu: false,
             porciones: { chica: '', mediana: '', grande: '' },
             incluirPan
         };
     });
-
-    // Función auxiliar para verificar si un postre puede ir en una posición sin crear consecutivos
-    const puedeAsignarPostre = (postre: string, posicion: number, postresAsignados: string[]): boolean => {
-        const esLeche = postresDeLeche.includes(postre);
-        const esFruta = postresDeFruta.includes(postre) || frutasFrescas.includes(postre);
-
-        // Verificar día anterior
-        if (posicion > 0 && postresAsignados[posicion - 1]) {
-            const anteriorEsLeche = postresDeLeche.includes(postresAsignados[posicion - 1]);
-            const anteriorEsFruta = postresDeFruta.includes(postresAsignados[posicion - 1]) || frutasFrescas.includes(postresAsignados[posicion - 1]);
-
-            if (esLeche && anteriorEsLeche) return false;
-            if (esFruta && anteriorEsFruta) return false;
-        }
-
-        // Verificar día siguiente
-        if (posicion < postresAsignados.length - 1 && postresAsignados[posicion + 1]) {
-            const siguienteEsLeche = postresDeLeche.includes(postresAsignados[posicion + 1]);
-            const siguienteEsFruta = postresDeFruta.includes(postresAsignados[posicion + 1]) || frutasFrescas.includes(postresAsignados[posicion + 1]);
-
-            if (esLeche && siguienteEsLeche) return false;
-            if (esFruta && siguienteEsFruta) return false;
-        }
-
-        return true;
-    };
-
-    // Asignar postres según recomendaciones, pero respetando la distribución sin consecutivos
-    const postresAsignados: string[] = new Array(diasSemana.length).fill('');
-    const postresUsados = new Set<string>();
-
-    // Usar los postres distribuidos sin consecutivos como base
-    const postresBase = [...postresMezclados];
-
-    // Primera pasada: intentar asignar postres recomendados respetando distribución sin consecutivos
-    nuevoMenuTemporal.forEach((item, index) => {
-        const { principal, acompanamiento } = item;
-        const particularidades = particularidadesRecetas[principal];
-
-        if (!particularidades) {
-            // Si no hay particularidades, usar el postre de la distribución base si está disponible
-            if (postresBase[index] && !postresUsados.has(postresBase[index]) &&
-                puedeAsignarPostre(postresBase[index], index, postresAsignados)) {
-                postresAsignados[index] = postresBase[index];
-                postresUsados.add(postresBase[index]);
-            }
-            return;
-        }
-
-        // Obtener postres candidatos según recomendaciones y restricciones
-        const postresDisponibles = todosPostresDisponiblesList.filter(p => !postresUsados.has(p));
-
-        // PRIORIDAD: Si la receta requiere fruta cítrica (lentejas), asegurar que se asigne
-        if (particularidades.postreRecomendado === 'fruta_citrica') {
-            const frutasCitricasDisponibles = frutasCitricas.filter(p =>
-                postresDisponibles.includes(p) && puedeAsignarPostre(p, index, postresAsignados)
-            );
-            if (frutasCitricasDisponibles.length > 0) {
-                const postreCitrico = obtenerAleatorio(frutasCitricasDisponibles);
-                postresAsignados[index] = postreCitrico;
-                postresUsados.add(postreCitrico);
-                return;
-            }
-        }
-
-        const postreRecomendado = obtenerPostreParaReceta(principal, acompanamiento, postresDisponibles);
-
-        // Verificar si el postre recomendado puede ir en esta posición sin crear consecutivos
-        if (postreRecomendado && puedeAsignarPostre(postreRecomendado, index, postresAsignados)) {
-            postresAsignados[index] = postreRecomendado;
-            postresUsados.add(postreRecomendado);
-        } else {
-            // Si el recomendado no puede ir, buscar una alternativa del mismo tipo que no cree consecutivos
-            let postreAlternativo = null;
-
-            if (postreRecomendado) {
-                const esLecheRecomendado = postresDeLeche.includes(postreRecomendado);
-                const esFrutaRecomendado = postresDeFruta.includes(postreRecomendado) || frutasFrescas.includes(postreRecomendado);
-
-                // Buscar alternativa del mismo tipo
-                if (esLecheRecomendado) {
-                    postreAlternativo = postresDeLeche.find(p =>
-                        postresDisponibles.includes(p) &&
-                        puedeAsignarPostre(p, index, postresAsignados)
-                    );
-                } else if (esFrutaRecomendado) {
-                    postreAlternativo = [...postresDeFruta, ...frutasFrescas].find(p =>
-                        postresDisponibles.includes(p) &&
-                        puedeAsignarPostre(p, index, postresAsignados)
-                    );
-                }
-            }
-
-            if (postreAlternativo) {
-                postresAsignados[index] = postreAlternativo;
-                postresUsados.add(postreAlternativo);
-            } else if (postresBase[index] && !postresUsados.has(postresBase[index]) &&
-                puedeAsignarPostre(postresBase[index], index, postresAsignados)) {
-                // Si no hay alternativa del mismo tipo, usar el de la distribución base
-                postresAsignados[index] = postresBase[index];
-                postresUsados.add(postresBase[index]);
-            }
-        }
-    });
-
-    // Segunda pasada: completar posiciones vacías respetando distribución sin consecutivos
-    const postresRestantes = postresBase.filter(p => !postresUsados.has(p));
-    const todosPostresRestantes = todosPostresDisponiblesList.filter(p => !postresUsados.has(p));
-
-    for (let i = 0; i < diasSemana.length; i++) {
-        if (!postresAsignados[i]) {
-            const { principal, acompanamiento } = nuevoMenuTemporal[i];
-            const particularidades = principal ? particularidadesRecetas[principal] : null;
-
-            let postreFinal = '';
-
-            // Primero intentar con postres de la distribución base
-            // Verificar si hay arroz en el acompañamiento o plato principal
-            const acompanamientosConArroz = ['Arroz', 'Arroz con vegetales salteados', 'Arroz amarillo', 'Arroz plato principal'];
-            const tieneArroz = (acompanamiento && acompanamientosConArroz.includes(acompanamiento)) ||
-                (principal && principal.toLowerCase().includes('arroz'));
-
-            if (postresRestantes.length > 0) {
-                for (const postre of postresRestantes) {
-                    // Excluir arroz con leche si hay arroz
-                    if (tieneArroz && postre === 'Arroz con leche') continue;
-                    if (puedeAsignarPostre(postre, i, postresAsignados)) {
-                        postreFinal = postre;
-                        break;
-                    }
-                }
-            }
-
-            // Si no se encontró en la base, intentar con recomendaciones
-            if (!postreFinal && particularidades) {
-                // PRIORIDAD: Si la receta requiere fruta cítrica (lentejas), asegurar que se asigne
-                if (particularidades.postreRecomendado === 'fruta_citrica') {
-                    const frutasCitricasDisponibles = frutasCitricas.filter(p =>
-                        todosPostresRestantes.includes(p) && puedeAsignarPostre(p, i, postresAsignados)
-                    );
-                    if (frutasCitricasDisponibles.length > 0) {
-                        postreFinal = obtenerAleatorio(frutasCitricasDisponibles);
-                    }
-                }
-
-                // Si aún no hay postre, intentar con otras recomendaciones
-                if (!postreFinal) {
-                    const postresDisponibles = todosPostresRestantes.filter(p =>
-                        puedeAsignarPostre(p, i, postresAsignados)
-                    );
-                    if (postresDisponibles.length > 0) {
-                        postreFinal = obtenerPostreParaReceta(principal, acompanamiento, postresDisponibles);
-                    }
-                }
-            }
-
-            // Si aún no hay postre, usar cualquier disponible que no cree consecutivos
-            if (!postreFinal) {
-                // Verificar si hay arroz en el acompañamiento o plato principal
-                const acompanamientosConArroz = ['Arroz', 'Arroz con vegetales salteados', 'Arroz amarillo', 'Arroz plato principal'];
-                const tieneArroz = (acompanamiento && acompanamientosConArroz.includes(acompanamiento)) ||
-                    (principal && principal.toLowerCase().includes('arroz'));
-
-                const postresCandidatos = todosPostresRestantes.filter(p => {
-                    if (!puedeAsignarPostre(p, i, postresAsignados)) return false;
-                    // Excluir arroz con leche si hay arroz
-                    if (tieneArroz && p === 'Arroz con leche') return false;
-                    return true;
-                });
-
-                if (postresCandidatos.length > 0) {
-                    postreFinal = obtenerAleatorio(postresCandidatos);
-                } else if (todosPostresRestantes.length > 0) {
-                    // Si no hay opciones que eviten consecutivos, usar cualquier disponible (excepto arroz con leche si hay arroz)
-                    const tieneArroz = (acompanamiento && acompanamientosConArroz.includes(acompanamiento)) ||
-                        (principal && principal.toLowerCase().includes('arroz'));
-                    const postresFinales = tieneArroz
-                        ? todosPostresRestantes.filter(p => p !== 'Arroz con leche')
-                        : todosPostresRestantes;
-                    postreFinal = postresFinales.length > 0 ? postresFinales[0] : todosPostresRestantes[0];
-                }
-            }
-
-            if (postreFinal) {
-                postresAsignados[i] = postreFinal;
-                postresUsados.add(postreFinal);
-                const indexRestante = postresRestantes.indexOf(postreFinal);
-                if (indexRestante > -1) {
-                    postresRestantes.splice(indexRestante, 1);
-                }
-                const indexTodosRestantes = todosPostresRestantes.indexOf(postreFinal);
-                if (indexTodosRestantes > -1) {
-                    todosPostresRestantes.splice(indexTodosRestantes, 1);
-                }
-            }
-        }
-    }
-
-    // Crear el menú final con postres asignados
-    const nuevoMenu = nuevoMenuTemporal.map((item, index) => ({
-        ...item,
-        postre: postresAsignados[index] || ''
-    }));
 
     return nuevoMenu;
 };

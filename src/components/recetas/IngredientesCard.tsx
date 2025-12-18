@@ -4,6 +4,7 @@ import { FaFilePdf } from 'react-icons/fa';
 import { exportRecetaToPDF } from '@/utils/exportToPDF';
 import { useAppSelector } from '@/store';
 import { convertirFluidaAPolvo } from '@/utils/conversion-leche';
+import { UnidadMasa } from '@/utils/enums/unidad-masa';
 import { useState } from 'react';
 
 // Wait, I don't see a UI lib import in the file. I'll use a standard HTML checkbox styled as a switch or just a button if I can't find a switch component.
@@ -13,9 +14,22 @@ import { useState } from 'react';
 // Actually, I'll just use a styled button or input.
 
 
+// Helper para formatear cantidades con precisión adecuada
+const formatQuantity = (cantidad: number) => {
+  if (cantidad === 0) return '0';
+  // Si es muy pequeño pero no 0, mostrar hasta 4 decimales
+  // Si es entero o grande, comportamiento normal
+  return cantidad.toLocaleString('es-UY', {
+    maximumFractionDigits: 4,
+    minimumFractionDigits: 0
+  });
+};
+
 const IngredientesCard = () => {
   const recetaPorciones = useAppSelector((state) => state.receta.recetaPorciones);
   const porcionesTipo = useAppSelector((state) => state.receta.porcionesTipo);
+  const unidadMasa = useAppSelector((state) => state.receta.unidadMasa);
+  const unidadVolumen = useAppSelector((state) => state.receta.unidadVolumen);
   const [usarPolvo, setUsarPolvo] = useState(false);
 
   const totalPersonas = porcionesTipo.chica + porcionesTipo.mediana + porcionesTipo.grande;
@@ -64,16 +78,37 @@ const IngredientesCard = () => {
 
                   if (esLeche && usarPolvo) {
                     const cantidadNumerica = typeof quantity === 'number' ? quantity : parseFloat(quantity as string) || 0;
-                    const { gramosPolvo, mlAgua } = convertirFluidaAPolvo(cantidadNumerica);
+
+                    // Detectar si la unidad origen es litros
+                    const esLitros = ['l', 'litro', 'litros'].includes(unit.toLowerCase());
+                    // Normalizar input a ml para el cálculo interno (fórmula basada en 1000ml = 100g polvo + 900ml agua)
+                    const cantidadEnMlInput = esLitros ? cantidadNumerica * 1000 : cantidadNumerica;
+
+                    const { gramosPolvo, mlAgua } = convertirFluidaAPolvo(cantidadEnMlInput);
+
+                    // Determinar output de Agua: si la unidad seleccionada era Litros, mostrar Agua en Litros.
+                    // Si era ml/cc, mostrar en ml.
+                    const aguaMostrar = esLitros ? mlAgua / 1000 : mlAgua;
+                    const unidadAgua = esLitros ? 'l' : 'ml';
+
+                    // Convertir Leche en Polvo según Unidad de Masa seleccionada
+                    let polvoMostrar = gramosPolvo;
+                    let unidadPolvo = 'g';
+
+                    if (unidadMasa === UnidadMasa.KILOGRAMOS) {
+                      polvoMostrar = gramosPolvo / 1000;
+                      unidadPolvo = 'kg';
+                    }
+
                     return (
                       <>
                         <tr className="bg-blue-50/50 hover:bg-blue-50" key={`${name}-polvo`}>
                           <td className="py-2 px-4 border-b border-grey-light text-blue-800">Leche en Polvo</td>
-                          <td className="py-2 px-4 border-b border-grey-light text-left text-blue-800 font-medium">{gramosPolvo.toLocaleString()} g</td>
+                          <td className="py-2 px-4 border-b border-grey-light text-left text-blue-800 font-medium">{formatQuantity(polvoMostrar)} {unidadPolvo}</td>
                         </tr>
                         <tr className="bg-blue-50/50 hover:bg-blue-50" key={`${name}-agua`}>
                           <td className="py-2 px-4 border-b border-grey-light text-blue-800">Agua</td>
-                          <td className="py-2 px-4 border-b border-grey-light text-left text-blue-800 font-medium">{mlAgua.toLocaleString()} ml</td>
+                          <td className="py-2 px-4 border-b border-grey-light text-left text-blue-800 font-medium">{formatQuantity(aguaMostrar)} {unidadAgua}</td>
                         </tr>
                       </>
                     );
@@ -82,7 +117,7 @@ const IngredientesCard = () => {
                   return (
                     <tr className="hover:bg-grey-lighter" key={name}>
                       <td className="py-2 px-4 border-b border-grey-light">{name}</td>
-                      <td className="py-2 px-4 border-b border-grey-light text-left">{quantity.toLocaleString()} {unit}</td>
+                      <td className="py-2 px-4 border-b border-grey-light text-left">{formatQuantity(typeof quantity === 'number' ? quantity : parseFloat(quantity))} {unit}</td>
                     </tr>
                   );
                 }
@@ -108,7 +143,7 @@ const IngredientesCard = () => {
                     ({ name, quantity, unit }) => (
                       <tr className="hover:bg-grey-lighter" key={name}>
                         <td className="py-2 px-4 border-b border-grey-light">{name}</td>
-                        <td className="py-2 px-4 border-b border-grey-light text-left">{quantity.toLocaleString()} {unit}</td>
+                        <td className="py-2 px-4 border-b border-grey-light text-left">{formatQuantity(typeof quantity === 'number' ? quantity : parseFloat(quantity))} {unit}</td>
                       </tr>
                     )
                   )
@@ -131,7 +166,9 @@ const IngredientesCard = () => {
                 },
                 recetaPorciones?.ingredients || [],
                 recetaPorciones?.variants || [],
-                usarPolvo
+                usarPolvo,
+                unidadMasa,
+                unidadVolumen
               )
             }
             className="flex items-center gap-2 bg-logoGreen hover:bg-logoGreenHover text-white font-bold py-2 px-4 rounded"

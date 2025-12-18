@@ -83,10 +83,11 @@ const PorcionesCard = ({ isAlmuerzo = false }: Props) => {
       }
     } else if (['ml', 'l', 'g', 'kg'].includes(unit)) {
       if (unit === 'ml' && unidadVolumen === UnidadVolumen.LITROS) {
-        q = parseFloat(((Number(quantity) * factor) / 1000).toFixed(2));
+        // Usar 4 decimales para evitar que cantidades pequeñas (ej 5ml = 0.005l) sean 0
+        q = parseFloat(((Number(quantity) * factor) / 1000).toFixed(4));
         u = 'l';
       } else if (unit === 'g' && unidadMasa === UnidadMasa.KILOGRAMOS) {
-        q = parseFloat(((Number(quantity) * factor) / 1000).toFixed(2));
+        q = parseFloat(((Number(quantity) * factor) / 1000).toFixed(4));
         u = 'kg';
       } else {
         q = parseFloat((Number(quantity) * factor).toFixed(2));

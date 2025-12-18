@@ -12,7 +12,8 @@ import {
   procesarDatosPostre,
   normalizarNombreIngrediente
 } from '@/utils/pdf-helpers';
-import { convertirFluidaAPolvo } from '@/utils/conversion-leche';
+import { UnidadMasa } from '@/utils/enums/unidad-masa';
+import { UnidadVolumen } from '@/utils/enums/unidad-volumen';
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -20,7 +21,12 @@ declare module 'jspdf' {
   }
 }
 
-export function exportMenuToPDF(menu: DiaMenu[], usarLechePolvo: boolean = false) {
+export function exportMenuToPDF(
+  menu: DiaMenu[],
+  usarLechePolvo: boolean = false,
+  unidadMasa: UnidadMasa = UnidadMasa.GRAMOS,
+  unidadVolumen: UnidadVolumen = UnidadVolumen.CENTIMETROS_CUBICOS
+) {
   const doc = new jsPDF();
   const { colors, fonts, margins, tables } = PDF_CONFIG;
 
@@ -55,83 +61,9 @@ export function exportMenuToPDF(menu: DiaMenu[], usarLechePolvo: boolean = false
 
   const renderIngredientes = (titulo: string, totalPersonas: number, xOffset: number, maxWidth: number, startY: number) => {
     // Calcula ingredientes y actualiza el acumulador global
-    const ingredientes = calcularIngredientesReceta(titulo, totalPersonas, acumuladorIngredientes, usarLechePolvo);
+    // Ahora devuelve la lista ya convertida/expandida gracias al flatMap interno
+    const ingredientes = calcularIngredientesReceta(titulo, totalPersonas, acumuladorIngredientes, usarLechePolvo, unidadMasa, unidadVolumen);
 
-    // Interceptar y convertir leche si es necesario
-    if (usarLechePolvo) {
-      // Iteramos sobre las claves del acumulador para encontrar leche recien agregada o existente
-      // NOTA: calcularIngredientesReceta ya sumó al acumulador. Necesitamos ajustar el acumulador.
-      // Sin embargo, calcularIngredientesReceta devuelve la lista de ingredientes de ESTA receta.
-      // Pero el acumulador es GLOBAL.
-      // La estrategia más segura es:
-      // 1. Dejar que calcularIngredientesReceta haga su trabajo.
-      // 2. Al final, antes de generar la tabla de totales, hacer la conversión.
-      // PERO, el usuario pidió: "Ignora la leche fluida (no la sumes a la lista final)."
-      // Si lo hacemos al final, es más fácil.
-      // Si lo hacemos aquí, afectamos a la tabla por día?
-      // El requerimiento dice: "Resultado Esperado: El usuario controla si quiere ver y comprar leche líquida o en polvo".
-      // Y "UI Reactiva... INSERTA visualmente dos filas".
-      // Para el PDF, "Recorre los ingredientes... Si usarLechePolvo es true... Ignora la leche fluida... Calcula... Suma".
-
-      // Si modificamos el acumulador aquí, afectamos los totales.
-      // Pero `ingredientes` (el array devuelto) se usa para la tabla del día.
-      // Deberíamos modificar AMBOS si queremos que el PDF refleje el cambio en la tabla del día TAMBIÉN?
-      // El usuario dijo: "Lógica del PDF... Intercepción de Datos... Recorre los ingredientes... Si usarLechePolvo es true... Ignora... Calcula... Suma a los acumuladores".
-      // Esto suena a que afecta a los TOTALES.
-      // ¿Afecta a las tablas individuales de cada día?
-      // "El usuario controla si quiere ver y comprar".
-      // Asumiré que quiere ver el cambio en TODAS partes (tablas diarias y totales).
-      // Asumiré que quiere ver el cambio en TODAS partes (tablas diarias y totales).
-
-      // Modificar la lista de ingredientes para el renderizado de la tabla diaria
-      const ingredientesConvertidos = ingredientes.flatMap(ing => {
-        const [nombre, cantidad, unidad] = ing;
-        const nombreNorm = normalizarNombreIngrediente(nombre as string).toLowerCase();
-
-        // Parsear cantidad si es string (ya que calcularIngredientesReceta devuelve strings formateados)
-        const cantidadNum = typeof cantidad === 'number' ? cantidad : parseFloat(cantidad as string);
-
-        if ((nombreNorm === 'leche' || nombreNorm === 'leche fluida') && !isNaN(cantidadNum)) {
-          const { gramosPolvo, mlAgua } = convertirFluidaAPolvo(cantidadNum);
-          return [
-            ['Leche en Polvo', gramosPolvo, 'g'],
-            ['Agua (para leche en polvo)', mlAgua, 'ml']
-          ];
-        }
-        return [ing];
-      });
-
-      // Usamos la lista convertida para la tabla
-      // NOTA: Esto NO afecta al acumulador global todavía, eso se hace al final en "PROCESAMIENTO FINAL DE TOTALES"
-      // O podemos hacerlo aquí si queremos que el acumulador se vaya llenando con lo convertido.
-      // Si lo hacemos aquí, debemos tener cuidado de no duplicar o dejar basura.
-      // El código actual hace la conversión de totales AL FINAL.
-      // Así que aquí solo necesitamos alterar la VISUALIZACIÓN de la tabla diaria.
-
-      const ingredientesOrdenados = ingredientesConvertidos.sort((a, b) => {
-        const ordenA = obtenerOrdenIngrediente(a[0] as string);
-        const ordenB = obtenerOrdenIngrediente(b[0] as string);
-        return ordenA - ordenB;
-      });
-
-      doc.setFontSize(fonts.sizes.normal);
-      doc.text(`${titulo}`, xOffset, startY);
-      const tableStartY = startY + 6;
-
-      autoTable(doc, {
-        startY: tableStartY,
-        head: tables.ingredientsHeader,
-        body: ingredientesOrdenados,
-        styles: { fontSize: fonts.sizes.tableBody, cellPadding: 1 },
-        headStyles: { fillColor: colors.primary, textColor: colors.text.white, fontSize: fonts.sizes.tableHeader },
-        margin: { left: xOffset },
-        tableWidth: maxWidth
-      });
-
-      return (doc as any).lastAutoTable?.finalY || startY + 20;
-    }
-
-    // Si no se usa leche en polvo, comportamiento normal
     const ingredientesOrdenados = ingredientes.sort((a, b) => {
       const ordenA = obtenerOrdenIngrediente(a[0] as string);
       const ordenB = obtenerOrdenIngrediente(b[0] as string);
@@ -205,7 +137,7 @@ export function exportMenuToPDF(menu: DiaMenu[], usarLechePolvo: boolean = false
       }
 
       // Procesar lógica de postre (actualiza acumulador si es fruta)
-      const resultadoPostre = procesarDatosPostre(postre, totalPersonas, acumuladorIngredientes);
+      const resultadoPostre = procesarDatosPostre(postre, totalPersonas, acumuladorIngredientes, unidadMasa, unidadVolumen);
 
       if (resultadoPostre && resultadoPostre.tipo !== 'receta') {
         doc.setFontSize(fonts.sizes.normal);
@@ -245,7 +177,15 @@ export function exportMenuToPDF(menu: DiaMenu[], usarLechePolvo: boolean = false
         doc.text('Pan', margins.left, currentY);
         currentY += 6;
         doc.setFontSize(fonts.sizes.small);
-        doc.text(`Cantidad necesaria: ${panDelDia}g`, margins.left, currentY);
+
+        let panMostrar = panDelDia;
+        let unidadPan = 'g';
+        if (unidadMasa === UnidadMasa.KILOGRAMOS) {
+          panMostrar = panDelDia / 1000;
+          unidadPan = 'kg';
+        }
+
+        doc.text(`Cantidad necesaria: ${panMostrar.toLocaleString('es-ES', { maximumFractionDigits: 3 })} ${unidadPan}`, margins.left, currentY);
         currentY += 10;
       }
     } else {
@@ -275,9 +215,9 @@ export function exportMenuToPDF(menu: DiaMenu[], usarLechePolvo: boolean = false
   doc.setFontSize(fonts.sizes.title);
   doc.text('INGREDIENTES TOTALES PARA TODA LA SEMANA', margins.left, margins.top);
 
-  // --- PROCESAMIENTO FINAL DE TOTALES (CONVERSIÓN DE LECHE) ---
   // --- PROCESAMIENTO FINAL DE TOTALES ---
-  // La conversión de leche ya se realizó durante la acumulación en calcularIngredientesReceta
+  // El acumulador ya contiene las cantidades en las unidades correctas (kg/L si corresponde) gracias a los helpers.
+  // Solo necesitamos formatear.
 
   const totalIngredientesArray = Object.entries(acumuladorIngredientes)
     .map(([clave, { cantidad, unidad }]) => {
@@ -290,7 +230,7 @@ export function exportMenuToPDF(menu: DiaMenu[], usarLechePolvo: boolean = false
       if (['unidades', 'unidad', 'racimos', 'unidad/es', 'racimos pequeños'].some(u => unidad.includes(u))) {
         cantidadFormateada = Math.ceil(cantidad).toString();
       } else {
-        cantidadFormateada = cantidad.toFixed(2);
+        cantidadFormateada = cantidad.toLocaleString('es-ES', { maximumFractionDigits: 4, minimumFractionDigits: 0 });
       }
 
       return [nombreParaMostrar, cantidadFormateada, unidad];
@@ -312,11 +252,18 @@ export function exportMenuToPDF(menu: DiaMenu[], usarLechePolvo: boolean = false
   // Total Pan
   const totalPan = calcularPanTotal(menu);
   if (totalPan > 0) {
+    let panTotalMostrar = totalPan;
+    let unidadPanTotal = 'g';
+    if (unidadMasa === UnidadMasa.KILOGRAMOS) {
+      panTotalMostrar = totalPan / 1000;
+      unidadPanTotal = 'kg';
+    }
+
     const lastY = (doc as any).lastAutoTable?.finalY || 30;
     autoTable(doc, {
       startY: lastY + 10,
       head: tables.totalIngredientsHeader,
-      body: [['Pan', totalPan.toLocaleString('es-ES', { maximumFractionDigits: 0 }), 'g']],
+      body: [['Pan', panTotalMostrar.toLocaleString('es-ES', { maximumFractionDigits: 3 }), unidadPanTotal]],
       styles: { fontSize: fonts.sizes.tableBodySummary, cellPadding: 2 },
       headStyles: { fillColor: colors.primary, textColor: colors.text.white }
     });

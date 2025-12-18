@@ -6,6 +6,9 @@ import { exportMenuToPDF } from '@/utils/exportMenuPDF';
 import { FaFilePdf, FaMagic } from 'react-icons/fa';
 import NavigationButtons from '@/components/shared/NavigationButtons';
 import DiaMenuRow from '@/components/menu/DiaMenuRow';
+import { useAppSelector } from '@/store';
+import { UnidadMasa } from '@/utils/enums/unidad-masa';
+import { UnidadVolumen } from '@/utils/enums/unidad-volumen';
 import {
   diasSemana,
   particularidadesRecetas,
@@ -14,6 +17,9 @@ import {
 import { generarMenuInteligente } from '@/utils/menu-generator';
 
 const MenuSemanal = () => {
+  const unidadMasa = useAppSelector((state) => state.receta.unidadMasa);
+  const unidadVolumen = useAppSelector((state) => state.receta.unidadVolumen);
+
   const [menu, setMenu] = useState(
     diasSemana.map((dia) => ({
       dia,
@@ -292,7 +298,21 @@ const MenuSemanal = () => {
                 incluirPan
               };
             });
-            exportMenuToPDF(menuConNumeros, usarLechePolvoGlobal);
+            // Verificar si hay más de 50 comensales en algún día
+            let exportMasa = unidadMasa;
+            let exportVolumen = unidadVolumen;
+
+            const maxComensales = Math.max(...menuConNumeros.map(item => {
+              if (item.sinMenu) return 0;
+              return (item.porciones.chica || 0) + (item.porciones.mediana || 0) + (item.porciones.grande || 0);
+            }));
+
+            if (maxComensales > 50) {
+              exportMasa = UnidadMasa.KILOGRAMOS;
+              exportVolumen = UnidadVolumen.LITROS;
+            }
+
+            exportMenuToPDF(menuConNumeros, usarLechePolvoGlobal, exportMasa, exportVolumen);
           }}
           className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded"
         >
