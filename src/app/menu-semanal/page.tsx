@@ -38,6 +38,7 @@ const MenuSemanal = () => {
   const [mismaCantidadTodos, setMismaCantidadTodos] = useState(true); // Marcado por defecto
   const [porcionesGlobales, setPorcionesGlobales] = useState({ chica: '', mediana: '', grande: '' });
   const [usarLechePolvoGlobal, setUsarLechePolvoGlobal] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const manejarCambio = (index: number, campo: 'principal' | 'acompanamiento' | 'recetaBase' | 'postre', valor: string) => {
     const nuevoMenu = [...menu];
@@ -174,6 +175,9 @@ const MenuSemanal = () => {
       <div className="mb-4 flex flex-wrap gap-4 items-center">
         <button
           onClick={() => {
+            setIsGenerating(true);
+            setTimeout(() => setIsGenerating(false), 600);
+
             const nuevoMenu = generarMenuInteligente();
             // Si el modo "misma cantidad" está activo, mantener las porciones globales
             if (mismaCantidadTodos) {
@@ -189,10 +193,13 @@ const MenuSemanal = () => {
               setMostrarPostre(true);
             }
           }}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-white bg-gradient-to-r from-primary to-primary-dark hover:from-primary-hover hover:to-primary-dark transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          className="relative overflow-hidden flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-white bg-gradient-to-r from-primary to-primary-dark hover:from-primary-hover hover:to-primary-dark transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
           title="Genera un menú semanal automáticamente respetando las frecuencias de carnes y postres recomendadas"
         >
-          <FaMagic className="text-lg" />
+          {isGenerating && (
+            <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-15deg] animate-shimmer" />
+          )}
+          <FaMagic className={`text-lg transition-transform duration-500 ${isGenerating ? 'rotate-[360deg]' : ''}`} />
           Generar Menú Inteligente
         </button>
 

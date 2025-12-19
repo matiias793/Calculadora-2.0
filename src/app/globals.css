@@ -199,3 +199,17 @@ select option:hover {
 .animate-fade-in-delay {
   animation: fade-in 0.6s ease-out 0.4s both;
 }
+
+/* Animación de destello/shimmer */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-150%) skewX(-15deg);
+  }
+  100% {
+    transform: translateX(150%) skewX(-15deg);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}

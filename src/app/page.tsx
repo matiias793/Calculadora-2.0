@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import OptionCard from "@/components/main/OptionCard";
 import WelcomeScreen from "@/components/welcome/WelcomeScreen";
+import Loading from "./loading";
 
 // Opciones de servicio de alimentación (contenido principal de la app)
 const options = [
@@ -148,7 +149,7 @@ export default function Home() {
 
   // No renderizar hasta determinar si mostrar bienvenida
   if (showWelcome === null) {
-    return null;
+    return <Loading />;
   }
 
   if (showWelcome) {
