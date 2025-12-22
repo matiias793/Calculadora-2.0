@@ -4,7 +4,7 @@ import React from 'react';
 import NavigationButtons from '@/components/shared/NavigationButtons';
 import { PautasCarousel } from '@/components/pautas/PautasCarousel';
 import { BookOpen, ExternalLink } from 'lucide-react';
-import Image from 'next/image';
+
 
 export default function PautasPage() {
     return (
@@ -20,14 +20,7 @@ export default function PautasPage() {
             {/* Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="text-center mb-8">
-                    <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden shadow-sm border-4 border-white">
-                        <Image
-                            src="/images/pg.png"
-                            alt="Logo Pautas"
-                            fill
-                            className="object-cover"
-                        />
-                    </div>
+
                     <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-2">
                         Pautas generales para los servicios de alimentación
                     </h1>

@@ -71,7 +71,7 @@ const options = [
   {
     image: (
       <Image
-        src="/images/pg.png"
+        src="/images/PG.PNG"
         fill
         style={{ objectFit: "contain" }}
         alt="Pautas generales"
