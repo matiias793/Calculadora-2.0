@@ -4,7 +4,7 @@ export const menuVerano = [
         fecha: "2026-01-08",
         semana: 1,
         copaLeche: "Leche con cocoa, Pan integral con dulce de leche, Fruta.",
-        almuerzo: "Pasta con verdusalsa, Ensalada de vegetales, Fruta , Pan , Agua."
+        almuerzo: "Pasta con verdusalsa, Fruta , Pan , Agua."
     },
     {
         fecha: "2026-01-09",

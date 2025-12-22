@@ -67,6 +67,18 @@ const options = [
     ),
     title: 'Escuelas de verano 2026',
     url: '/escuelas-verano'
+  },
+  {
+    image: (
+      <Image
+        src="/images/pg.png"
+        fill
+        style={{ objectFit: "contain" }}
+        alt="Pautas generales"
+      />
+    ),
+    title: 'Pautas generales',
+    url: '/pautas'
   }
 ];
 
